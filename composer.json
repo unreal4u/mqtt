@@ -1,0 +1,37 @@
+{
+  "name": "unreal4u/mqtt",
+  "description": "Complete MQTT v3.1.1 implementation for PHP 7.x",
+  "keywords": [
+    "mqtt",
+    "php",
+    "api"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Camilo Sperberg",
+      "email": "me+mqtt@unreal4u.com",
+      "homepage": "https://github.com/unreal4u/mqtt/graphs/contributors"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "unreal4u\\MQTT\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "tests\\unreal4u\\MQTT\\": "tests/ActualTests"
+    }
+  },
+  "require": {
+    "php": ">=7.0.0",
+    "ext-mbstring": "*",
+    "roave/security-advisories": "dev-master",
+    "psr/log": "~1.0"
+  },
+  "require-dev": {
+    "monolog/monolog": "~1.17",
+    "phpunit/phpunit": "@stable"
+  }
+}

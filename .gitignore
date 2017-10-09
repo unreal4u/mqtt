@@ -1,0 +1,4 @@
+docs/phpdoc-cache-*
+.vagrant
+.idea
+quicky.php
