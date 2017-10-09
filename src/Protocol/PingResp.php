@@ -6,13 +6,13 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\CommonFunctionality;
-use unreal4u\MQTT\Internals\ReadableBase;
+use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 
 final class PingResp implements ReadableContentInterface
 {
     use CommonFunctionality;
-    use ReadableBase;
+    use ReadableContent;
 
     const CONTROL_PACKET_VALUE = 13;
 

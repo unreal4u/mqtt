@@ -6,7 +6,7 @@ namespace unreal4u\MQTT\Application;
 
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\CommonFunctionality;
-use unreal4u\MQTT\Internals\ReadableBase;
+use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 
 /**
@@ -18,7 +18,7 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 final class EmptyReadableResponse implements ReadableContentInterface
 {
     use CommonFunctionality;
-    use ReadableBase;
+    use ReadableContent;
 
     /**
      * Will perform sanity checks and fill in the Readable object with data

@@ -8,13 +8,13 @@ use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\CommonFunctionality;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Internals\WritableBase;
+use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 final class Subscribe implements WritableContentInterface
 {
     use CommonFunctionality;
-    use WritableBase;
+    use WritableContent;
 
     const CONTROL_PACKET_VALUE = 8;
 
@@ -63,7 +63,6 @@ final class Subscribe implements WritableContentInterface
         $this->updateCommunication($client);
         $publishPacketControlField = $client->readSocketData(1);
         if ((ord($publishPacketControlField) & 0xf0) > 0) {
-            $client->updateLastCommunication();
             $restOfBytes = $client->readSocketData(1);
             $payload = $client->readSocketData(ord($restOfBytes));
 

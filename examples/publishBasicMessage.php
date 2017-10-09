@@ -17,18 +17,20 @@ $connect->setConnectionParameters(new Parameters('localhost', 'publishSomething'
 $client = new Client();
 $client->sendData($connect);
 
+define('MAXIMUM', 10);
 if ($client->isConnected()) {
     $payload = new SimplePayload();
-    $payload->setPayload('Hello world!!');
-
     $message = new Message();
     $message->setTopicName('firstTest');
-    $message->setPayload($payload);
-    #$message->setQoSLevel(1);
-
     $publish = new Publish();
-    $publish->setMessage($message);
 
-    $response = $client->sendData($publish);
-    #var_dump($response);
+    for ($i = 1; $i <= MAXIMUM; $i++) {
+        $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
+        $message->setPayload($payload);
+        #$message->setQoSLevel(1);
+        $publish->setMessage($message);
+        $client->sendData($publish);
+        echo '.';
+    }
 }
+echo PHP_EOL;

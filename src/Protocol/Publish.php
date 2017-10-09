@@ -9,17 +9,17 @@ use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\CommonFunctionality;
-use unreal4u\MQTT\Internals\ReadableBase;
+use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Internals\WritableBase;
+use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
 final class Publish implements ReadableContentInterface, WritableContentInterface
 {
     use CommonFunctionality;
-    use ReadableBase;
-    use WritableBase;
+    use ReadableContent;
+    use WritableContent;
 
     const CONTROL_PACKET_VALUE = 3;
 
@@ -115,15 +115,13 @@ final class Publish implements ReadableContentInterface, WritableContentInterfac
     public function fillObject(): ReadableContentInterface
     {
         $topicSize = ord($this->rawMQTTHeaders{3});
-        $topicName = substr($this->rawMQTTHeaders, 4, $topicSize);
-        $message = substr($this->rawMQTTHeaders, 4 + $topicSize);
 
         $simplePayload = new SimplePayload();
-        $simplePayload->setPayload($message);
+        $simplePayload->setPayload(substr($this->rawMQTTHeaders, 4 + $topicSize));
 
         $this->message = new Message();
         $this->message->setPayload($simplePayload);
-        $this->message->setTopicName($topicName);
+        $this->message->setTopicName(substr($this->rawMQTTHeaders, 4, $topicSize));
 
         return $this;
     }
@@ -133,10 +131,30 @@ final class Publish implements ReadableContentInterface, WritableContentInterfac
      *
      * @param Client $client
      * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\InvalidMethod
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     public function performSpecialActions(Client $client): bool
     {
-        // TODO Send the actual response
+        $client->setBlocking(true);
+        $qosLevel = $this->message->getQoSLevel();
+        switch ($qosLevel) {
+            case 1:
+                $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
+                $client->sendData(new PubAck($this->logger));
+                break;
+            case 2:
+                $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
+                $client->sendData(new PubRec($this->logger));
+                break;
+            default:
+                $this->logger->debug('No response needed', ['qosLevel', $qosLevel]);
+                break;
+        }
+        $client->setBlocking(false);
+
         return true;
     }
 }

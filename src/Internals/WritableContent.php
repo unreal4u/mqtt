@@ -7,7 +7,7 @@ namespace unreal4u\MQTT\Internals;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
 
-trait WritableBase
+trait WritableContent
 {
     /**
      * Any special flags that are set on runtime

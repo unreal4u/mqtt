@@ -6,7 +6,7 @@ namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
 
-trait ReadableBase
+trait ReadableContent
 {
     /**
      * The raw MQTT headers that initialized this object

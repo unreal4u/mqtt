@@ -12,7 +12,7 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Disconnect;
 
-class Client
+final class Client
 {
     /**
      * Where all the magic happens
@@ -24,27 +24,27 @@ class Client
      * Logs all activity
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * Fast way to know whether we are connected or not
      * @var bool
      */
-    protected $isConnected = false;
+    private $isConnected = false;
 
     /**
      * Annotates the last time there was known to be communication with the MQTT server
      * @var \DateTimeImmutable
      */
-    protected $lastCommunication;
+    private $lastCommunication;
 
     /**
      * Internal holder of connection parameters
      * @var Connect\Parameters
      */
-    protected $connectionParameters;
+    private $connectionParameters;
 
-    final public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null)
     {
         if ($logger === null) {
             $logger = new DummyLogger();
@@ -62,13 +62,12 @@ class Client
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    final public function __destruct()
+    public function __destruct()
     {
         if ($this->socket !== null) {
             $this->logger->info('Currently connected to broker, disconnecting from it');
 
-            $this->sendData(new Disconnect());
-            $this->setConnected();
+            $this->sendData(new Disconnect($this->logger));
         }
     }
 
@@ -78,7 +77,7 @@ class Client
      * @param int $bytes
      * @return string
      */
-    final public function readSocketData(int $bytes): string
+    public function readSocketData(int $bytes): string
     {
         $this->logger->debug('Reading bytes from socket', ['numberOfBytes' => $bytes]);
         return fread($this->socket, $bytes);
@@ -88,7 +87,7 @@ class Client
      * The first 4 bytes will _always_ contain basic information with which we'll know what to do afterwards
      * @return string
      */
-    final public function readSocketHeader(): string
+    public function readSocketHeader(): string
     {
         $this->logger->debug('Reading header from response');
         return $this->readSocketData(4);
@@ -102,7 +101,7 @@ class Client
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      */
-    final public function sendSocketData(WritableContentInterface $object): string
+    public function sendSocketData(WritableContentInterface $object): string
     {
         if ($this->socket === null) {
             $this->logger->alert('Not connected before sending data');
@@ -110,7 +109,6 @@ class Client
         }
 
         $writableString = $object->createSendableMessage();
-        #var_dump(get_class($object), \str2bin($writableString));
         $sizeOfString = strlen($writableString);
         $writtenBytes = fwrite($this->socket, $writableString, $sizeOfString);
         if ($writtenBytes !== $sizeOfString) {
@@ -121,7 +119,7 @@ class Client
 
             throw new ServerClosedConnection('The server may have disconnected the current client');
         }
-        $this->logger->info('Sending data to socket', [
+        $this->logger->debug('Sending data to socket', [
             'writtenBytes' => $writtenBytes,
             'sizeOfString' => $sizeOfString,
         ]);
@@ -140,7 +138,7 @@ class Client
      * @return bool
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
-    protected function generateSocketConnection(Connect $connection): bool
+    private function generateSocketConnection(Connect $connection): bool
     {
         $this->logger->debug('Creating socket connection');
         $this->connectionParameters = $connection->getConnectionParameters();
@@ -152,14 +150,14 @@ class Client
             STREAM_CLIENT_CONNECT
         );
 
-        stream_set_timeout($this->socket, 10);
+        stream_set_timeout($this->socket, (int)floor($this->connectionParameters->getKeepAlivePeriod() * 1.5));
         $this->setBlocking(true);
 
-        $this->logger->debug('Created socket connection successfully, continuing');
+        $this->logger->debug('Created socket connection successfully, continuing', stream_get_meta_data($this->socket));
         return true;
     }
 
-    final public function setBlocking(bool $newStatus = false): Client
+    public function setBlocking(bool $newStatus = false): Client
     {
         $this->logger->debug('Setting new blocking status', ['newStatus' => $newStatus]);
         stream_set_blocking($this->socket, $newStatus);
@@ -176,7 +174,7 @@ class Client
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\InvalidMethod
      */
-    final public function sendData(WritableContentInterface $object): ReadableContentInterface
+    public function sendData(WritableContentInterface $object): ReadableContentInterface
     {
         $currentObject = get_class($object);
         $this->logger->debug('Validating object', ['object' => $currentObject]);
@@ -209,7 +207,7 @@ class Client
      *
      * @return bool
      */
-    final public function needsCommunication(): bool
+    public function needsCommunication(): bool
     {
         $secondsDifference = (new \DateTime('now'))->getTimestamp() - $this->lastCommunication->getTimestamp();
         $this->logger->debug('Checking time difference', ['secondsDifference' => $secondsDifference]);
@@ -221,20 +219,20 @@ class Client
     }
 
     /**
-     * Updates the internal counter to know when was the last known communication possible with the MQTT broker
+     * Updates the internal counter to know when was the last known communication with the MQTT broker
      *
      * This will create a timestamp with support for microseconds
      * @see https://gist.github.com/graste/47a4a6433dfe0acf64b7
      *
      * @return Client
      */
-    final public function updateLastCommunication(): Client
+    public function updateLastCommunication(): Client
     {
         $lastCommunication = null;
         if ($this->lastCommunication !== null) {
             $lastCommunication = $this->lastCommunication->format('Y-m-d H:i:s.u');
         }
-        // now does not support microseconds, so create it with a format that does
+        // "now" does not support microseconds, so create the timestamp with a format that does
         $this->lastCommunication = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
         $this->logger->debug('Updating internal last communication timestamp', [
             'previousValue' => $lastCommunication,
@@ -249,7 +247,7 @@ class Client
      * @param bool $isConnected
      * @return Client
      */
-    final public function setConnected(bool $isConnected = false): Client
+    public function setConnected(bool $isConnected = false): Client
     {
         $this->logger->debug('Setting internal connected property', ['connected' => $isConnected]);
         $this->isConnected = $isConnected;
@@ -265,7 +263,7 @@ class Client
      *
      * @return bool
      */
-    final public function isConnected(): bool
+    public function isConnected(): bool
     {
         return $this->isConnected;
     }

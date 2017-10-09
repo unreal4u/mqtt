@@ -6,13 +6,13 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\CommonFunctionality;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Internals\WritableBase;
+use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 final class PingReq implements WritableContentInterface
 {
     use CommonFunctionality;
-    use WritableBase;
+    use WritableContent;
 
     const CONTROL_PACKET_VALUE = 12;
 

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\DisconnectCleanup;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Internals\WritableBase;
+use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 final class Disconnect implements WritableContentInterface
 {
     use CommonFunctionality;
-    use WritableBase;
+    use WritableContent;
 
     const CONTROL_PACKET_VALUE = 14;
 
@@ -29,7 +29,7 @@ final class Disconnect implements WritableContentInterface
 
     public function expectAnswer(string $data): ReadableContentInterface
     {
-        return new EmptyReadableResponse($this->logger);
+        return new DisconnectCleanup($this->logger);
     }
 
     /**

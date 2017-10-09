@@ -6,13 +6,16 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\CommonFunctionality;
-use unreal4u\MQTT\Internals\ReadableBase;
+use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
+use unreal4u\MQTT\Internals\WritableContent;
+use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class PubAck implements ReadableContentInterface
+final class PubAck implements ReadableContentInterface, WritableContentInterface
 {
     use CommonFunctionality;
-    use ReadableBase;
+    use ReadableContent;
+    use WritableContent;
 
     const CONTROL_PACKET_VALUE = 4;
 
@@ -25,5 +28,43 @@ final class PubAck implements ReadableContentInterface
     {
         $client->updateLastCommunication();
         return true;
+    }
+
+    /**
+     * Creates the variable header that each method has
+     * @return string
+     */
+    public function createVariableHeader(): string
+    {
+        // TODO: Implement createVariableHeader() method.
+    }
+
+    /**
+     * Creates the actual payload to be sent
+     * @return string
+     */
+    public function createPayload(): string
+    {
+        // TODO: Implement createPayload() method.
+    }
+
+    /**
+     * What specific kind of post we should expect back from this request
+     *
+     * @param string $data
+     * @return ReadableContentInterface
+     */
+    public function expectAnswer(string $data): ReadableContentInterface
+    {
+        return $this;
+    }
+
+    /**
+     * Some responses won't expect an answer back, others do in some situations
+     * @return bool
+     */
+    public function shouldExpectAnswer(): bool
+    {
+        return false;
     }
 }
