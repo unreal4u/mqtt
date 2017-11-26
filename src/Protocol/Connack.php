@@ -65,7 +65,7 @@ final class Connack implements ReadableContentInterface
                 break;
             default:
                 throw new GenericError(sprintf(
-                    'Reserved for future use or error not implemented yet (Errorcode: %d)',
+                    'Reserved for future use or error not implemented yet (Error code: %d)',
                     $this->connectReturnCode
                 ));
                 break;

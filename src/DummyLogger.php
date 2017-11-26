@@ -10,7 +10,7 @@ use Psr\Log\LogLevel;
  *
  * As the name implies, this class won't do anything except declare the methods so we can still call them in this API.
  */
-class DummyLogger implements LoggerInterface
+final class DummyLogger implements LoggerInterface
 {
     public function emergency($message, array $context = array()): bool
     {

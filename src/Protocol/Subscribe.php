@@ -70,6 +70,8 @@ final class Subscribe implements WritableContentInterface
             $publish->populate($publishPacketControlField . $restOfBytes . $payload);
             return $publish;
         }
+
+        $this->logger->debug('No valid publish packet control field found, returning empty response');
         return new EmptyReadableResponse($this->logger);
     }
 
