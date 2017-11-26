@@ -41,7 +41,7 @@ final class Connack implements ReadableContentInterface
 
     public function fillObject(): ReadableContentInterface
     {
-        $this->connectReturnCode = ord($this->rawMQTTHeaders[3]);
+        $this->connectReturnCode = \ord($this->rawMQTTHeaders[3]);
         switch ($this->connectReturnCode) {
             case 0:
                 // Everything correct, do nothing

@@ -53,7 +53,7 @@ class WritableBaseTest extends TestCase
         $this->assertSame($length, mb_strlen($output));
         $humanOutput = '';
         for ($i = 0; $i < $length; $i++) {
-            $humanOutput .= sprintf('%02x', ord($output[$i]));
+            $humanOutput .= sprintf('%02x', \ord($output[$i]));
         }
 
         $this->assertSame($expected, $humanOutput);
@@ -68,6 +68,6 @@ class WritableBaseTest extends TestCase
     public function test_validProtocolLevel()
     {
         $output = $this->writableBase->getProtocolLevel();
-        $this->assertSame(4, ord($output));
+        $this->assertSame(4, \ord($output));
     }
 }

@@ -19,6 +19,6 @@ class ReadableBaseTest extends TestCase
     {
         // Check for invalid responses
         $this->expectException(InvalidResponseType::class);
-        $this->readableBase = new ReadableBaseMock(chr(208) . chr(0));
+        $this->readableBase = new ReadableBaseMock(\chr(208) . \chr(0));
     }
 }

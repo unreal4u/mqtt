@@ -12,7 +12,7 @@ class PingRespTest extends TestCase
 {
     public function testCheckControlPacketValue()
     {
-        $success = chr(208) . chr(0);
+        $success = \chr(208) . \chr(0);
         $pingResp = new PingResp($success);
         $pingResp->checkControlPacketValue();
 

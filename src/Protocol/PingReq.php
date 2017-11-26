@@ -28,7 +28,7 @@ final class PingReq implements WritableContentInterface
 
     public function expectAnswer(string $data): ReadableContentInterface
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => get_class($this)]);
+        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
         $pingResp = new PingResp($this->logger);
         $pingResp->populate($data);
         return $pingResp;

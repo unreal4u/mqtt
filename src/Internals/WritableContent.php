@@ -39,7 +39,7 @@ trait WritableContent
     {
         // Binary OR is safe to do because the first 4 bits are always 0 after shifting
         return
-            chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags) .
+            \chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags) .
             $this->getRemainingLength($variableHeaderLength);
     }
 
@@ -65,7 +65,7 @@ trait WritableContent
             if ($x > 0) {
                 $encodedByte |= 128;
             }
-            $outputString .= chr($encodedByte);
+            $outputString .= \chr($encodedByte);
         } while ($x > 0);
 
         return $outputString;
@@ -92,11 +92,11 @@ trait WritableContent
     final public function getProtocolLevel(): string
     {
         if ($this->protocolLevel === '3.1.1') {
-            return chr(4);
+            return \chr(4);
         }
 
         // Return a default of 0, which will be invalid anyway (but data will be sent to the broker this way)
-        return chr(0);
+        return \chr(0);
     }
 
     /**

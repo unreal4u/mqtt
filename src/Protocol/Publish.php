@@ -114,7 +114,7 @@ final class Publish implements ReadableContentInterface, WritableContentInterfac
      */
     public function fillObject(): ReadableContentInterface
     {
-        $topicSize = ord($this->rawMQTTHeaders{3});
+        $topicSize = \ord($this->rawMQTTHeaders{3});
 
         $simplePayload = new SimplePayload();
         $simplePayload->setPayload(substr($this->rawMQTTHeaders, 4 + $topicSize));

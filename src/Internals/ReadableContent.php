@@ -30,11 +30,11 @@ trait ReadableContent
     final public function checkControlPacketValue(): ReadableContentInterface
     {
         // Check whether the first byte corresponds to the expected control packet value
-        if ($this->rawMQTTHeaders !== '' && static::CONTROL_PACKET_VALUE !== (ord($this->rawMQTTHeaders[0]) >> 4)) {
+        if ($this->rawMQTTHeaders !== '' && static::CONTROL_PACKET_VALUE !== (\ord($this->rawMQTTHeaders[0]) >> 4)) {
             throw new InvalidResponseType(sprintf(
                 'Value of received value does not correspond to response (Expected: %d, Actual: %d)',
                 static::CONTROL_PACKET_VALUE,
-                ord($this->rawMQTTHeaders[0]) >> 4
+                \ord($this->rawMQTTHeaders[0]) >> 4
             ));
         }
 

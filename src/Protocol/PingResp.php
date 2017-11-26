@@ -23,7 +23,7 @@ final class PingResp implements ReadableContentInterface
 
     public function performSpecialActions(Client $client): bool
     {
-        $this->logger->debug('Updating internal last communication', ['object' => get_class($this)]);
+        $this->logger->debug('Updating internal last communication', ['object' => \get_class($this)]);
         $client->updateLastCommunication();
         return true;
     }

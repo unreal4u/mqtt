@@ -32,6 +32,6 @@ final class Utilities
     public static function convertNumberToBinaryString(int $number): string
     {
         $convertedNumber = self::convertEndianness($number);
-        return chr($convertedNumber & 255) . chr($convertedNumber >> 8);
+        return \chr($convertedNumber & 255) . \chr($convertedNumber >> 8);
     }
 }

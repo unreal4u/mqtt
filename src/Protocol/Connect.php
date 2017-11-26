@@ -55,7 +55,7 @@ final class Connect implements WritableContentInterface
     {
         $bitString = $this->createUTF8String('MQTT'); // Connect MUST begin with MQTT
         $bitString .= $this->getProtocolLevel(); // Protocol level
-        $bitString .= chr($this->connectionParameters->getFlags());
+        $bitString .= \chr($this->connectionParameters->getFlags());
         $bitString .= Utilities::convertNumberToBinaryString($this->connectionParameters->keepAlivePeriod);
         return $bitString;
     }
@@ -102,7 +102,7 @@ final class Connect implements WritableContentInterface
      */
     public function expectAnswer(string $data): ReadableContentInterface
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => get_class($this)]);
+        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
         $connAck = new Connack($this->logger);
         $connAck->populate($data);
         return $connAck;

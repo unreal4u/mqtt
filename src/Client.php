@@ -109,7 +109,7 @@ final class Client
         }
 
         $writableString = $object->createSendableMessage();
-        $sizeOfString = strlen($writableString);
+        $sizeOfString = \strlen($writableString);
         $writtenBytes = fwrite($this->socket, $writableString, $sizeOfString);
         if ($writtenBytes !== $sizeOfString) {
             $this->logger->error('Written bytes do NOT correspond with size of string!', [
@@ -157,7 +157,13 @@ final class Client
         return true;
     }
 
-    public function setBlocking(bool $newStatus = false): Client
+    /**
+     * Defines whether the following requests should act sync- or asynchronously
+     *
+     * @param bool $newStatus
+     * @return Client
+     */
+    public function setBlocking(bool $newStatus): Client
     {
         $this->logger->debug('Setting new blocking status', ['newStatus' => $newStatus]);
         stream_set_blocking($this->socket, $newStatus);
@@ -176,7 +182,7 @@ final class Client
      */
     public function sendData(WritableContentInterface $object): ReadableContentInterface
     {
-        $currentObject = get_class($object);
+        $currentObject = \get_class($object);
         $this->logger->debug('Validating object', ['object' => $currentObject]);
 
         if ($object instanceof Connect) {
@@ -192,7 +198,7 @@ final class Client
          */
         $this->logger->debug('Executing special actions for this object', [
             'originObject' => $currentObject,
-            'responseObject' => get_class($readableContent),
+            'responseObject' => \get_class($readableContent),
         ]);
         $readableContent->performSpecialActions($this);
 
@@ -247,7 +253,7 @@ final class Client
      * @param bool $isConnected
      * @return Client
      */
-    public function setConnected(bool $isConnected = false): Client
+    public function setConnected(bool $isConnected): Client
     {
         $this->logger->debug('Setting internal connected property', ['connected' => $isConnected]);
         $this->isConnected = $isConnected;
