@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
+use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Internals\CommonFunctionality;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
@@ -85,6 +86,9 @@ final class Connect implements WritableContentInterface
 
         // And finally the password as last parameter
         if ($this->connectionParameters->getPassword() !== '') {
+            if ($this->connectionParameters->getUsername() === '') {
+                throw new MustProvideUsername('A password can not be set without a username! Please set username');
+            }
             $output .= $this->createUTF8String($this->connectionParameters->getPassword());
         }
 

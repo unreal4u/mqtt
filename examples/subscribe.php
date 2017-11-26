@@ -20,6 +20,9 @@ $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 $connectionParameters = new Parameters('localhost', 'subscribeToSomething');
 $connectionParameters->setKeepAlivePeriod($keepAlivePeriod);
+$connectionParameters->setUsername('testuser');
+$connectionParameters->setPassword('userpass');
+
 $connect = new Connect($logger);
 $connect->setConnectionParameters($connectionParameters);
 

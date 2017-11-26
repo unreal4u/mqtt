@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace tests\unreal4u\MQTT\Mocks;
 
+use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\WritableContentInterface;
+use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Protocol\Connack;
-use unreal4u\MQTT\Protocol\ReadableContentInterface;
-use unreal4u\MQTT\Protocol\WritableBase;
 
-class WritableBaseMock extends WritableBase
+class WritableBaseMock implements WritableContentInterface
 {
+    use CommonFunctionality;
 
     /**
      * Creates the variable header that each method has
@@ -47,5 +49,25 @@ class WritableBaseMock extends WritableBase
     public function shouldExpectAnswer(): bool
     {
         return false;
+    }
+
+    /**
+     * Creates the fixed header each method has
+     *
+     * @param int $variableHeaderLength
+     * @return string
+     */
+    public function createFixedHeader(int $variableHeaderLength): string
+    {
+        // TODO: Implement createFixedHeader() method.
+    }
+
+    /**
+     * Creates the message to be sent
+     * @return string
+     */
+    public function createSendableMessage(): string
+    {
+        // TODO: Implement createSendableMessage() method.
     }
 }
