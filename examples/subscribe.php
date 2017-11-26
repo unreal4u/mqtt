@@ -18,7 +18,7 @@ $disconnectAutomatically = true;
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters('localhost', 'subscribeToSomething');
+$connectionParameters = new Parameters('subscribeToSomething');
 $connectionParameters->setKeepAlivePeriod($keepAlivePeriod);
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');

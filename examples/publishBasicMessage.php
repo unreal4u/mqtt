@@ -11,7 +11,7 @@ use unreal4u\MQTT\Protocol\Publish;
 
 include __DIR__ . '/00.basics.php';
 
-$connectionParameters = new Parameters('localhost', 'publishSomething');
+$connectionParameters = new Parameters('publishSomething');
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 

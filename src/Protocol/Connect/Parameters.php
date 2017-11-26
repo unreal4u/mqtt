@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol\Connect;
 
+use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+
 final class Parameters
 {
     /**
@@ -73,6 +76,12 @@ final class Parameters
     private $willTopic = '';
 
     /**
+     * QoS Level of the will
+     * @var int
+     */
+    private $willQoS = 0;
+
+    /**
      * Whether the will message should be retained by the server
      * @var bool
      */
@@ -103,16 +112,11 @@ final class Parameters
     /**
      * Builds up the connection parameters
      *
-     * @param string $host
-     * @param string $clientId
-     * @throws \InvalidArgumentException
+     * @param string $clientId Will default to a clientId set by the broker
+     * @param string $host Will default to localhost
      */
-    public function __construct(string $host, string $clientId = '')
+    public function __construct(string $clientId = '', string $host = 'localhost')
     {
-        if ($host === '') {
-            throw new \InvalidArgumentException('Host must be set on construction');
-        }
-
         if ($clientId !== '') {
             $this->clientId = $clientId;
         }
@@ -160,6 +164,9 @@ final class Parameters
     }
 
     /**
+     * Sets the 7th bit of the connect flag
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param string $username
      * @return Parameters
      */
@@ -174,6 +181,9 @@ final class Parameters
     }
 
     /**
+     * Sets the 6th bit of the connect flag
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param string $password
      * @return Parameters
      */
@@ -188,10 +198,33 @@ final class Parameters
     }
 
     /**
+     * @param string $willTopic
+     * @return Parameters
+     */
+    private function setWillTopic(string $willTopic): Parameters
+    {
+        $this->willTopic = $willTopic;
+        return $this;
+    }
+
+    /**
+     * @param string $willMessage
+     * @return Parameters
+     */
+    private function setWillMessage(string $willMessage): Parameters
+    {
+        $this->willMessage = $willMessage;
+        return $this;
+    }
+
+    /**
+     * Sets the 5th bit of the connect flag
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param bool $willRetain
      * @return Parameters
      */
-    public function setWillRetain(bool $willRetain): Parameters
+    private function setWillRetain(bool $willRetain): Parameters
     {
         $this->bitFlag &= ~32;
         if ($willRetain === true) {
@@ -202,34 +235,70 @@ final class Parameters
     }
 
     /**
-     * @param string $willTopic
+     * Determines and sets the 3rd and 4th bits of the connect flag
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
+     * @param int $QoSLevel
      * @return Parameters
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    public function setWillTopic(string $willTopic): Parameters
+    private function setWillQoS(int $QoSLevel): Parameters
     {
-        $this->bitFlag &= ~4;
-        if ($willTopic !== '') {
-            $this->bitFlag |= 4;
+        // Reset first the will QoS bits and proceed to set them
+        $this->bitFlag &= ~8; // Third bit: 8
+        $this->bitFlag &= ~16; // Fourth bit: 16
+
+        $this->willQoS = $QoSLevel;
+        switch ($this->willQoS) {
+            case 0:
+                // Do nothing as the relevant bits will already have been reset
+                break;
+            case 1:
+                $this->bitFlag |= 8;
+                break;
+            case 2:
+                $this->bitFlag |= 16;
+                break;
+            default:
+                throw new InvalidQoSLevel('Invalid QoS level detected at setting will. This is a bug!');
+                break;
         }
-        $this->willTopic = $willTopic;
+
         return $this;
     }
 
     /**
-     * @param string $willMessage
+     * Sets the given will. Will also set the 2nd bit of the connect flags if a message is provided
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
+     * @param Message $message
      * @return Parameters
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
+     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      */
-    public function setWillMessage(string $willMessage): Parameters
+    public function setWill(Message $message): Parameters
     {
-        $this->bitFlag &= ~4;
-        if ($willMessage !== '') {
-            $this->bitFlag |= 4;
+        // Proceed only if we have a valid message
+        if ($message->validateMessage()) {
+            $this->bitFlag &= ~4;
+            if ($message->getTopicName() !== '') {
+                $this->bitFlag |= 4;
+            }
+
+            $this
+                ->setWillMessage($message->getPayload())
+                ->setWillRetain($message->mustRetain())
+                ->setWillTopic($message->getTopicName())
+                ->setWillQoS($message->getQoSLevel());
         }
-        $this->willMessage = $willMessage;
+
         return $this;
     }
 
     /**
+     * Sets the 1st bit of the connect flags
+     *
      * @param bool $cleanSession
      * @return Parameters
      */

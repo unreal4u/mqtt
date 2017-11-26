@@ -15,9 +15,9 @@ ini_set('display_errors', '1');
 function str2bin($str)
 {
     $out=null;
-    $strLength = strlen($str);
+    $strLength = \strlen($str);
     for($a=0; $a < $strLength; $a++) {
-        $dec = ord(substr($str,$a,1)); //determine symbol ASCII-code
+        $dec = \ord(substr($str,$a,1)); //determine symbol ASCII-code
         $bin = sprintf('%08d', base_convert($dec, 10, 2)); //convert to binary representation and add leading zeros
         $out .= $bin;
     }

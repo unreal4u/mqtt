@@ -30,7 +30,7 @@ class ConnectTest extends TestCase
 
     public function test_createVariableHeaderDefaultValues()
     {
-        $this->connect->setConnectionParameters(new Parameters('localhost', 'UnitTestClientId'));
+        $this->connect->setConnectionParameters(new Parameters('UnitTestClientId'));
         $connectVariableHeader = $this->connect->createVariableHeader();
         $this->assertSame(10, mb_strlen($connectVariableHeader));
         $this->assertSame('AARNUVRUBAAAPA==', base64_encode($connectVariableHeader));
@@ -38,7 +38,7 @@ class ConnectTest extends TestCase
 
     public function test_userAndPassword()
     {
-        $parameters = new Parameters('localhost', 'UnitTestClientId');
+        $parameters = new Parameters('UnitTestClientId');
         $parameters->setUsername('unreal4u');
         $parameters->setPassword('justT3st1ng');
 
@@ -51,7 +51,7 @@ class ConnectTest extends TestCase
 
     public function test_passwordWithoutUsername()
     {
-        $parameters = new Parameters('localhost', 'UnitTestClientId');
+        $parameters = new Parameters('UnitTestClientId');
         $parameters->setPassword('justT3st1ng');
 
         $this->connect->setConnectionParameters($parameters);

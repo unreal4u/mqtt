@@ -10,7 +10,7 @@ include __DIR__ . '/00.basics.php';
 
 $client = new Client();
 
-$parameters = new Parameters('localhost', 'uniqueClientId123');
+$parameters = new Parameters('uniqueClientId123');
 $connect = new Connect();
 $connect->setConnectionParameters($parameters);
 // Example of invalid protocol which will throw an exception:
