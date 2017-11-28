@@ -7,6 +7,9 @@ namespace unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
+/**
+ * Special connection parameters will be defined in this class
+ */
 final class Parameters
 {
     /**

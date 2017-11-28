@@ -6,14 +6,70 @@ namespace tests\unreal4u\MQTT\Application;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\SimplePayload;
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
 
 class MessageTest extends TestCase
 {
+    /**
+     * @var Message
+     */
+    private $message;
+
+    protected function setUp()
+    {
+        $this->message = new Message();
+        parent::setUp();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        $this->message = null;
+    }
+
     public function test_noTopicName()
     {
-        $message = new Message();
         $this->expectException(MissingTopicName::class);
-        $message->validateMessage();
+        $this->message->validateMessage();
+    }
+
+    public function test_messageTooBig()
+    {
+        $payload = new SimplePayload();
+        $payload->setPayload(str_repeat('-', 65536));
+
+        $this->message->setPayload($payload);
+        $this->message->setTopicName('Set up a topic');
+
+        $this->expectException(MessageTooBig::class);
+        $this->message->validateMessage();
+    }
+
+    public function test_invalidQoSLevel()
+    {
+        $this->expectException(InvalidQoSLevel::class);
+        $this->message->setQoSLevel(-1);
+    }
+
+    public function provider_validQoSLevels(): array
+    {
+        $mapValues[] = [0];
+        $mapValues[] = [1];
+        $mapValues[] = [2];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_validQoSLevels
+     * @param int $level
+     */
+    public function test_validQoSLevels(int $level)
+    {
+        $this->message->setQoSLevel($level);
+        $this->assertSame($level, $this->message->getQoSLevel());
     }
 }

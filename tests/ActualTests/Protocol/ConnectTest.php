@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
+use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -57,5 +59,23 @@ class ConnectTest extends TestCase
         $this->connect->setConnectionParameters($parameters);
         $this->expectException(MustProvideUsername::class);
         $this->connect->createPayload();
+    }
+
+    public function test_completeWill()
+    {
+        $payload = new SimplePayload();
+        $payload->setPayload('Testing');
+
+        $message = new Message();
+        $message->setPayload($payload);
+        $message->setTopicName('topic');
+
+        $parameters = new Parameters('UnitTestClientId');
+        $parameters->setWill($message);
+        $this->connect->setConnectionParameters($parameters);
+        $connectPayload = $this->connect->createPayload();
+
+        $this->assertSame(34, mb_strlen($connectPayload));
+        $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw==', base64_encode($connectPayload));
     }
 }

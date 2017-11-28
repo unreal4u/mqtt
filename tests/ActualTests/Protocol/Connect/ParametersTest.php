@@ -28,9 +28,6 @@ class ParametersTest extends TestCase
     {
         $mapValues[] = ['Username', 'asdf', 128];
         $mapValues[] = ['Password', 'asdf', 64];
-        #$mapValues[] = ['WillRetain', true, 32];
-        #$mapValues[] = ['WillTopic', 'Random/Topic', 4];
-        #$mapValues[] = ['WillMessage', 'A random message', 4];
         $mapValues[] = ['CleanSession', true, 2];
 
         return $mapValues;
@@ -64,14 +61,6 @@ class ParametersTest extends TestCase
         $this->assertSame(130, $parameters->getFlags());
         $parameters->setPassword('justT3st1ng');
         $this->assertSame(194, $parameters->getFlags());
-        #$parameters->setWillRetain(true);
-        #$this->assertSame(226, $parameters->getFlags());
-
-        // Set will message and topic set the same bit
-        #$parameters->setWillMessage('You will see this if I disconnect');
-        #$this->assertSame(230, $parameters->getFlags());
-        #$parameters->setWillTopic('client/errors');
-        #$this->assertSame(230, $parameters->getFlags());
 
         $this->assertSame('unreal4u', $parameters->getUsername());
         $this->assertSame('justT3st1ng', $parameters->getPassword());
@@ -82,8 +71,6 @@ class ParametersTest extends TestCase
     {
         $mapValues[] = ['Username', 'unreal4u', '', 128];
         $mapValues[] = ['Password', 'justT3st1ng', '', 64];
-        #$mapValues[] = ['WillRetain', true, false, 32];
-        #$mapValues[] = ['WillTopic', 'client/errors', '', 4];
         $mapValues[] = ['CleanSession', true, false, 2];
 
         return $mapValues;
@@ -110,6 +97,9 @@ class ParametersTest extends TestCase
         $this->assertSame(0, $parameters->getFlags());
     }
 
+    /**
+     * Tests whether setting up a will message goes correctly or not
+     */
     public function test_validBasicWillMessage()
     {
         $payload = new SimplePayload();
@@ -166,5 +156,20 @@ class ParametersTest extends TestCase
         $parameters->setWill($willMessage);
 
         $this->assertSame($parameterFlagResult, $parameters->getFlags());
+    }
+
+    public function test_invalidTimeoutSetting()
+    {
+        $parameters = new Parameters();
+        $this->expectException(\InvalidArgumentException::class);
+        $parameters->setKeepAlivePeriod(-10);
+    }
+
+    public function test_validTimeoutSetting()
+    {
+        $parameters = new Parameters();
+        $parameters->setKeepAlivePeriod(65530);
+
+        $this->assertSame(65530, $parameters->getKeepAlivePeriod());
     }
 }
