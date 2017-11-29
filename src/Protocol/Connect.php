@@ -6,16 +6,15 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Utilities;
 
-final class Connect implements WritableContentInterface
+final class Connect extends ProtocolBase implements WritableContentInterface
 {
-    use CommonFunctionality;
     use WritableContent;
 
     const CONTROL_PACKET_VALUE = 1;

@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace tests\unreal4u\MQTT\Mocks;
 
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Protocol\Connack;
 
-class WritableBaseMock implements WritableContentInterface
+class WritableBaseMock extends ProtocolBase implements WritableContentInterface
 {
-    use CommonFunctionality;
-
     /**
      * Creates the variable header that each method has
      * @return string

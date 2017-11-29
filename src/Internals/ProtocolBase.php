@@ -7,7 +7,7 @@ namespace unreal4u\MQTT\Internals;
 use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\DummyLogger;
 
-trait CommonFunctionality
+abstract class ProtocolBase
 {
     /**
      * The actual logger object
@@ -15,6 +15,10 @@ trait CommonFunctionality
      */
     protected $logger;
 
+    /**
+     * Base constructor for all protocol stuff
+     * @param LoggerInterface|null $logger
+     */
     final public function __construct(LoggerInterface $logger = null)
     {
         if ($logger === null) {

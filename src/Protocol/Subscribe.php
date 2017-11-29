@@ -6,14 +6,13 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Client;
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class Subscribe implements WritableContentInterface
+final class Subscribe extends ProtocolBase implements WritableContentInterface
 {
-    use CommonFunctionality;
     use WritableContent;
 
     const CONTROL_PACKET_VALUE = 8;

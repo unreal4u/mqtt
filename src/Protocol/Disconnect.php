@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\DisconnectCleanup;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class Disconnect implements WritableContentInterface
+final class Disconnect extends ProtocolBase implements WritableContentInterface
 {
-    use CommonFunctionality;
     use WritableContent;
 
     const CONTROL_PACKET_VALUE = 14;

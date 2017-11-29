@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Client;
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class PubAck implements ReadableContentInterface, WritableContentInterface
+final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use CommonFunctionality;
     use ReadableContent;
     use WritableContent;
 

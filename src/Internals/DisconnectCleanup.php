@@ -9,9 +9,8 @@ use unreal4u\MQTT\Client;
 /**
  * Performs some cleanup on the socket after disconnecting, this class is NOT a part of the MQTT protocol
  */
-final class DisconnectCleanup implements ReadableContentInterface
+final class DisconnectCleanup extends ProtocolBase implements ReadableContentInterface
 {
-    use CommonFunctionality;
     use ReadableContent;
 
     /**

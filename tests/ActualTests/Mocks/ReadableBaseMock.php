@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Mocks;
 
 use unreal4u\MQTT\Client;
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 
-class ReadableBaseMock implements ReadableContentInterface
+class ReadableBaseMock extends ProtocolBase implements ReadableContentInterface
 {
-    use CommonFunctionality;
-
     /**
      * Will perform sanity checks and fill in the Readable object with data
      * @return ReadableContentInterface

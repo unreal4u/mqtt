@@ -11,13 +11,12 @@ use unreal4u\MQTT\Exceptions\Connect\IdentifierRejected;
 use unreal4u\MQTT\Exceptions\Connect\NotAuthorized;
 use unreal4u\MQTT\Exceptions\Connect\ServerUnavailable;
 use unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion;
-use unreal4u\MQTT\Internals\CommonFunctionality;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 
-final class Connack implements ReadableContentInterface
+final class Connack extends ProtocolBase implements ReadableContentInterface
 {
-    use CommonFunctionality;
     use ReadableContent;
 
     const CONTROL_PACKET_VALUE = 2;
