@@ -19,8 +19,8 @@ systemctl start firewalld
 # Set the correct time
 ntpdate -u pool.ntp.org
 
-PHP_VERSION="71"
-# PHP 7.1.x install:
+PHP_VERSION="72"
+# PHP 7.2.x install:
 yum install -q -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum install -q -y \
   php${PHP_VERSION}-php \
