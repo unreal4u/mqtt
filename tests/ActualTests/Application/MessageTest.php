@@ -38,10 +38,7 @@ class MessageTest extends TestCase
 
     public function test_messageTooBig()
     {
-        $payload = new SimplePayload();
-        $payload->setPayload(str_repeat('-', 65536));
-
-        $this->message->setPayload($payload);
+        $this->message->setPayload(new SimplePayload(str_repeat('-', 65536)));
         $this->message->setTopicName('Set up a topic');
 
         $this->expectException(MessageTooBig::class);

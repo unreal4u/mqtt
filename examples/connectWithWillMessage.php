@@ -10,11 +10,8 @@ use unreal4u\MQTT\Application\Message;
 
 include __DIR__ . '/00.basics.php';
 
-$payload = new SimplePayload();
-$payload->setPayload('If I die unexpectedly, please print this message');
-
 $willMessage = new Message();
-$willMessage->setPayload($payload);
+$willMessage->setPayload(new SimplePayload('If I die unexpectedly, please print this message'));
 $willMessage->setTopicName('client/errors');
 
 $parameters = new Parameters('uniqueClientId123');

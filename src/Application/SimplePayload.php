@@ -15,6 +15,13 @@ final class SimplePayload implements PayloadInterface
      */
     private $payload = '';
 
+    public function __construct(string $messageContents = null)
+    {
+        if ($messageContents !== null) {
+            $this->setPayload($messageContents);
+        }
+    }
+
     public function setPayload(string $contents): PayloadInterface
     {
         $this->payload = $contents;

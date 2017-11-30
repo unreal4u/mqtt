@@ -102,10 +102,8 @@ class ParametersTest extends TestCase
      */
     public function test_validBasicWillMessage()
     {
-        $payload = new SimplePayload();
-        $payload->setPayload('You will see this if I disconnect without notice');
         $willMessage = new Message();
-        $willMessage->setPayload($payload);
+        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
         $willMessage->setTopicName('client/errors');
 
         $parameters = new Parameters();
@@ -116,10 +114,8 @@ class ParametersTest extends TestCase
 
     public function test_validRetainedWillMessage()
     {
-        $payload = new SimplePayload();
-        $payload->setPayload('You will see this if I disconnect without notice');
         $willMessage = new Message();
-        $willMessage->setPayload($payload);
+        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
         $willMessage->setTopicName('client/errors');
         $willMessage->setRetainFlag(true);
 
@@ -145,10 +141,8 @@ class ParametersTest extends TestCase
      */
     public function test_validQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult)
     {
-        $payload = new SimplePayload();
-        $payload->setPayload('You will see this if I disconnect without notice');
         $willMessage = new Message();
-        $willMessage->setPayload($payload);
+        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
         $willMessage->setTopicName('client/errors');
         $willMessage->setQoSLevel($QoSLevel);
 

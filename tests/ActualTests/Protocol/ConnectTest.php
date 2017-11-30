@@ -63,11 +63,8 @@ class ConnectTest extends TestCase
 
     public function test_completeWill()
     {
-        $payload = new SimplePayload();
-        $payload->setPayload('Testing');
-
         $message = new Message();
-        $message->setPayload($payload);
+        $message->setPayload(new SimplePayload('Testing'));
         $message->setTopicName('topic');
 
         $parameters = new Parameters('UnitTestClientId');

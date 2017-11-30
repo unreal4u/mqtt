@@ -12,6 +12,12 @@ namespace unreal4u\MQTT\Application;
 interface PayloadInterface
 {
     /**
+     * When called with contents, it should set the payload to that content
+     * @param string $messageContents
+     */
+    public function __construct(string $messageContents = null);
+
+    /**
      * Called by the user with the contents we want the message to be filled with
      *
      * @param string $contents

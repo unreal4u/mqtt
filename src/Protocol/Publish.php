@@ -115,11 +115,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     {
         $topicSize = \ord($this->rawMQTTHeaders{3});
 
-        $simplePayload = new SimplePayload();
-        $simplePayload->setPayload(substr($this->rawMQTTHeaders, 4 + $topicSize));
-
         $this->message = new Message();
-        $this->message->setPayload($simplePayload);
+        $this->message->setPayload(new SimplePayload(substr($this->rawMQTTHeaders, 4 + $topicSize)));
         $this->message->setTopicName(substr($this->rawMQTTHeaders, 4, $topicSize));
 
         return $this;

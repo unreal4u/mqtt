@@ -23,6 +23,13 @@ final class DatedPayload implements PayloadInterface
      */
     public $originalPublishDateTime;
 
+    public function __construct(string $messageContents = null)
+    {
+        if ($messageContents !== null) {
+            $this->setPayload($messageContents);
+        }
+    }
+
     public function setPayload(string $contents): PayloadInterface
     {
         $this->payload = $contents;
