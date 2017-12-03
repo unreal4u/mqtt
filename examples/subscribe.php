@@ -13,10 +13,10 @@ use unreal4u\MQTT\Protocol\Subscribe;
 include __DIR__ . '/00.basics.php';
 
 $keepAlivePeriod = 5;
-$disconnectAutomatically = true;
+$disconnectAutomatically = false;
 
 $logger = new Logger('main');
-$logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 
 $connectionParameters = new Parameters('subscribeToSomething');
 $connectionParameters->setKeepAlivePeriod($keepAlivePeriod);

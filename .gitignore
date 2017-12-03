@@ -1,4 +1,5 @@
 docs/phpdoc-cache-*
 .vagrant
 .idea
+composer.phar
 quicky.php
