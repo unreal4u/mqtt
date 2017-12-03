@@ -16,10 +16,14 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     use ReadableContent;
     use WritableContent;
 
+    public $packetIdentifier = 0;
+
     const CONTROL_PACKET_VALUE = 4;
 
     public function fillObject(): ReadableContentInterface
     {
+        // Fastest conversion? Turn the bytes around instead of trying to arm a number and passing it along
+        $this->packetIdentifier = \ord($this->rawMQTTHeaders{3} . $this->rawMQTTHeaders{2});
         return $this;
     }
 

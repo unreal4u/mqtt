@@ -39,30 +39,40 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         $bitString = $this->createUTF8String($this->message->getTopicName());
+        // Reset the special flags should the object be reused with another message
+        $this->specialFlags = 0;
 
         if ($this->isRedelivery) {
+            $this->logger->debug('Activating redelivery bit');
             // DUP flag: if the message is a re-delivery, mark it as such
-            $this->specialFlags &= 4;
-        }
-
-        if ($this->message->mustRetain()) {
-            // RETAIN flag: should the server retain the message?
-            $this->specialFlags &= 64;
+            $this->specialFlags |= 8;
         }
 
         // Check QoS level and perform the corresponding actions
         switch ($this->message->getQoSLevel()) {
             case 1:
-                $this->specialFlags &= 8;
+                $this->specialFlags |= 2;
+                $this->logger->debug('Activating QoS level 1 bit', ['specialFlags' => $this->specialFlags]);
+                $this->packetIdentifier++;
                 $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
                 break;
             case 2:
-                $this->specialFlags &= 16;
+                $this->specialFlags |= 4;
+                $this->logger->debug('Activating QoS level 2 bit', ['specialFlags' => $this->specialFlags]);
+                $this->packetIdentifier++;
                 $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
                 break;
             default:
                 break;
         }
+
+        if ($this->message->mustRetain()) {
+            // RETAIN flag: should the server retain the message?
+            $this->specialFlags |= 1;
+            $this->logger->debug('Activating retain flag', ['specialFlags' => $this->specialFlags]);
+        }
+
+        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags,]);
 
         return $bitString;
     }

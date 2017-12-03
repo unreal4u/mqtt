@@ -10,11 +10,10 @@ include __DIR__ . '/00.basics.php';
 
 $client = new Client();
 
-$parameters = new Parameters('uniqueClientId123');
 $connect = new Connect();
-$connect->setConnectionParameters($parameters);
+$connect->setConnectionParameters(new Parameters('uniqueClientId123'));
+
 // Example of invalid protocol which will throw an exception:
-#$connect->protocolLevel = '0.0.1';
 /** @var \unreal4u\MQTT\Protocol\Connack $connack */
 $connack = $client->sendData($connect);
 

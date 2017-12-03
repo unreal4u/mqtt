@@ -16,7 +16,7 @@ $keepAlivePeriod = 5;
 $disconnectAutomatically = false;
 
 $logger = new Logger('main');
-$logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
+$logger->pushHandler(new StreamHandler('php://stdout', Logger::ERROR));
 
 $connectionParameters = new Parameters('subscribeToSomething');
 $connectionParameters->setKeepAlivePeriod($keepAlivePeriod);
@@ -34,7 +34,7 @@ if ($client->isConnected() === false) {
 }
 
 $subscribe = new Subscribe($logger);
-$subscribe->topic = 'firstTest';
+$subscribe->topic = COMMON_TOPICNAME;
 
 $client->sendData($subscribe);
 $now = time();
@@ -43,7 +43,7 @@ while ($shouldStayConnected) {
     echo '.';
     $event = $subscribe->checkForEvent($client);
     if ($event instanceof Publish) {
-        var_dump($event->getMessage()->getPayload());
+        printf('%s-- Payload detected: %s + %s%s', PHP_EOL, PHP_EOL, $event->getMessage()->getPayload(), PHP_EOL);
     } else {
         // Only wait if there was nothing in the queue
         usleep(100000);

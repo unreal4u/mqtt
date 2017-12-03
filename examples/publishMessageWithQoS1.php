@@ -26,19 +26,23 @@ $connect->setConnectionParameters($connectionParameters);
 $client = new Client($logger);
 $client->sendData($connect);
 
-define('MAXIMUM', 2);
+define('MAXIMUM', 3);
 if ($client->isConnected()) {
     $payload = new SimplePayload();
     $message = new Message();
-    $message->setTopicName('firstTest');
+    $message->setTopicName(COMMON_TOPICNAME);
     $message->setQoSLevel(1);
-    $publish = new Publish();
+    #$message->setRetainFlag(true);
+    $publish = new Publish($logger);
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
         $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
         $message->setPayload($payload);
         $publish->setMessage($message);
-        var_dump($client->sendData($publish));
+        $pubAck = $client->sendData($publish);
+        if ($pubAck->packetIdentifier === $publish->packetIdentifier) {
+            echo '------- OK' . PHP_EOL;
+        }
         echo '.';
     }
 }

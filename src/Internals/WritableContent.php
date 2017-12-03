@@ -4,11 +4,21 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
+use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * Trait WritableContent
+ * @package unreal4u\MQTT\Internals
+ */
 trait WritableContent
 {
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
     /**
      * Any special flags that are set on runtime
      *
@@ -37,6 +47,13 @@ trait WritableContent
      */
     final public function createFixedHeader(int $variableHeaderLength): string
     {
+        $this->logger->debug('Creating fixed header with values', [
+            'controlPacketValue' => static::CONTROL_PACKET_VALUE,
+            'specialFlags' => $this->specialFlags,
+            'variableHeaderLength' => $variableHeaderLength,
+            'composed' => decbin(\chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags)),
+        ]);
+
         // Binary OR is safe to do because the first 4 bits are always 0 after shifting
         return
             \chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags) .
@@ -79,8 +96,11 @@ trait WritableContent
     final public function createSendableMessage(): string
     {
         $variableHeader = $this->createVariableHeader();
+        $this->logger->debug('Creating variable header', ['variableHeader' => base64_encode($variableHeader)]);
         $payload = $this->createPayload();
+        $this->logger->debug('Creating payload', ['payload' => base64_encode($payload)]);
         $fixedHeader = $this->createFixedHeader(mb_strlen($variableHeader . $payload));
+        $this->logger->debug('Created fixed header', ['fixedHeader' => base64_encode($fixedHeader)]);
 
         return $fixedHeader . $variableHeader . $payload;
     }

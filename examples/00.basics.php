@@ -12,6 +12,8 @@ include __DIR__.'/../vendor/autoload.php';
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
+const COMMON_TOPICNAME = 'firstTest';
+
 function str2bin($str)
 {
     $out=null;

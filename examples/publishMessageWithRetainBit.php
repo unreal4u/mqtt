@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\SimplePayload;
@@ -21,20 +21,16 @@ $connect->setConnectionParameters($connectionParameters);
 $client = new Client();
 $client->sendData($connect);
 
-define('MAXIMUM', 10);
+$now = new \DateTimeImmutable('now');
+
 if ($client->isConnected()) {
-    $payload = new SimplePayload();
     $message = new Message();
     $message->setTopicName(COMMON_TOPICNAME);
+    $message->setRetainFlag(true);
+    $message->setPayload(new SimplePayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained'));
     $publish = new Publish();
-
-    for ($i = 1; $i <= MAXIMUM; $i++) {
-        $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
-        $message->setPayload($payload);
-        #$message->setQoSLevel(1);
-        $publish->setMessage($message);
-        $client->sendData($publish);
-        echo '.';
-    }
+    $publish->setMessage($message);
+    $client->sendData($publish);
+    echo 'Message sent';
 }
 echo PHP_EOL;
