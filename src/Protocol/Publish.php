@@ -139,7 +139,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @return bool
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\InvalidMethod
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     public function performSpecialActions(Client $client): bool

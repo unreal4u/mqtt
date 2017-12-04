@@ -15,7 +15,7 @@ final class Utilities
     public static function convertEndianness(int $number): int
     {
         $finalNumber = hexdec(
-        // Invert first byte and make it a complete hexadecimal number
+            // Invert first byte and make it a complete hexadecimal number
             str_pad(dechex($number & 255), 2, '0', STR_PAD_LEFT) .
             // Invert second byte and make a complete hexadecimal number
             str_pad(dechex($number >> 8), 2, '0', STR_PAD_LEFT)

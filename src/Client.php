@@ -57,7 +57,6 @@ final class Client
      * Be gentle and disconnect gracefully should this class be destroyed
      *
      * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
-     * @throws \unreal4u\MQTT\Exceptions\InvalidMethod
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
@@ -178,7 +177,6 @@ final class Client
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\InvalidMethod
      */
     public function sendData(WritableContentInterface $object): ReadableContentInterface
     {
