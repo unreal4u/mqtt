@@ -7,6 +7,7 @@ namespace tests\unreal4u\MQTT\Mocks;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
+use unreal4u\MQTT\Internals\WritableContentInterface;
 
 class ReadableBaseMock extends ProtocolBase implements ReadableContentInterface
 {
@@ -20,12 +21,9 @@ class ReadableBaseMock extends ProtocolBase implements ReadableContentInterface
     }
 
     /**
-     * Some operations require setting some things in the client, this hook will do so
-     *
-     * @param Client $client
-     * @return bool
+     * @inheritdoc
      */
-    public function performSpecialActions(Client $client): bool
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         return true;
     }

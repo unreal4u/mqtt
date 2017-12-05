@@ -27,7 +27,10 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
         return $this;
     }
 
-    public function performSpecialActions(Client $client): bool
+    /**
+     * @inheritdoc
+     */
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         return true;
     }

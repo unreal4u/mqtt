@@ -198,7 +198,7 @@ final class Client
             'originObject' => $currentObject,
             'responseObject' => \get_class($readableContent),
         ]);
-        $readableContent->performSpecialActions($this);
+        $readableContent->performSpecialActions($this, $object);
 
         return $readableContent;
     }

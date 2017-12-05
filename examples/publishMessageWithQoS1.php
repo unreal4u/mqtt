@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * QoS level 1 and 2 refer to the confirmation the sent message is received by the other party, either broker or client
+ *
+ * In the first case and provided a QoS level 1, if we sent a message to the broker, the broker will respond with a
+ * confirmation message (PubAck) and within that, the packetIdentifier which must match the packetIdentifier we sent to
+ * the broker during Publish.
+ */
+
 declare(strict_types = 1);
 
 use Monolog\Handler\StreamHandler;
@@ -31,18 +39,16 @@ if ($client->isConnected()) {
     $payload = new SimplePayload();
     $message = new Message();
     $message->setTopicName(COMMON_TOPICNAME);
+    // QoS level is set per message, so set it here
     $message->setQoSLevel(1);
-    #$message->setRetainFlag(true);
     $publish = new Publish($logger);
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
         $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
         $message->setPayload($payload);
         $publish->setMessage($message);
-        $pubAck = $client->sendData($publish);
-        if ($pubAck->packetIdentifier === $publish->packetIdentifier) {
-            echo '------- OK' . PHP_EOL;
-        }
+        // The client will perform the check whether the packet identifier is correctly set or not
+        $client->sendData($publish);
         echo '.';
     }
 }

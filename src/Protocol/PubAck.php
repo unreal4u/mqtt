@@ -27,9 +27,16 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
         return $this;
     }
 
-    public function performSpecialActions(Client $client): bool
+    /**
+     * @inheritdoc
+     * @throws \LogicException
+     */
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
-        $client->updateLastCommunication();
+        /** @var Publish $originalRequest */
+        if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
+            throw new \LogicException('Packet identifiers to not match!');
+        }
         return true;
     }
 

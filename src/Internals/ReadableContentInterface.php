@@ -35,7 +35,12 @@ interface ReadableContentInterface
      * Some operations require setting some things in the client, this hook will do so
      *
      * @param Client $client
+     * @param WritableContentInterface $originalRequest Will be used to validate stuff such as packetIdentifier
+     *
      * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
-    public function performSpecialActions(Client $client): bool;
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool;
 }

@@ -8,6 +8,7 @@ use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
+use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
  * This is an example of a payload class that performs some processing on the data
@@ -29,12 +30,9 @@ final class EmptyReadableResponse extends ProtocolBase implements ReadableConten
     }
 
     /**
-     * Some operations require setting some things in the client, this hook will do so
-     *
-     * @param Client $client
-     * @return bool
+     * @inheritdoc
      */
-    public function performSpecialActions(Client $client): bool
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         return false;
     }

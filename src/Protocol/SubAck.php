@@ -8,6 +8,7 @@ use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
+use unreal4u\MQTT\Internals\WritableContentInterface;
 
 final class SubAck extends ProtocolBase implements ReadableContentInterface
 {
@@ -20,10 +21,15 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
         return $this;
     }
 
-    public function performSpecialActions(Client $client): bool
+    /**
+     * @inheritdoc
+     */
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
-        $client->updateLastCommunication();
-        $client->setBlocking(false);
+        $client
+            ->updateLastCommunication()
+            ->setBlocking(false)
+        ;
         return true;
     }
 }

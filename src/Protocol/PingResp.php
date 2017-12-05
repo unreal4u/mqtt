@@ -8,6 +8,7 @@ use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
+use unreal4u\MQTT\Internals\WritableContentInterface;
 
 final class PingResp extends ProtocolBase implements ReadableContentInterface
 {
@@ -20,7 +21,10 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
         return $this;
     }
 
-    public function performSpecialActions(Client $client): bool
+    /**
+     * @inheritdoc
+     */
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         $this->logger->debug('Updating internal last communication', ['object' => \get_class($this)]);
         $client->updateLastCommunication();

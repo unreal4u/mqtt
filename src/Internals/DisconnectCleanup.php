@@ -23,12 +23,9 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
     }
 
     /**
-     * Some operations require setting some things in the client, this hook will do so
-     *
-     * @param Client $client
-     * @return bool
+     * @inheritdoc
      */
-    public function performSpecialActions(Client $client): bool
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         $successFullyClosed = stream_socket_shutdown($client->socket, STREAM_SHUT_RDWR);
         $information['successfullyClosed'] = $successFullyClosed;

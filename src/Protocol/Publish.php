@@ -133,15 +133,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
-     * Some operations require setting some things in the client, this hook will do so
-     *
-     * @param Client $client
-     * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @inheritdoc
      */
-    public function performSpecialActions(Client $client): bool
+    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
         $client->setBlocking(true);
         $qosLevel = $this->message->getQoSLevel();
