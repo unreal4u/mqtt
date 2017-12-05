@@ -4,10 +4,10 @@ Simple MQTT library for PHP 7, with (for now) partial support for
 [MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html), it is a rewrite of 
 [McFizh/libMQTT](https://github.com/McFizh/libMQTT). 
 
-# Current build status
+## Important Badges
 [![Build Status](https://travis-ci.org/unreal4u/mqtt.svg)](https://travis-ci.org/unreal4u/mqtt)
 
-## Important note
+## Stability notes
 
 Please note that for the time being, this is still work in progress! A version will be launched when I believe it to be
 ready for production environments.
@@ -53,7 +53,7 @@ Little note on retainability: it is possible to indicate to the broker that a me
 retain bit and has nothing to do with the QoS of the message.  
 A retained message will be shown to every subscribed client + all the new ones that might subscibe to that same topic.
 
-# Setting up development environment
+# Development environment
 
 * Ensure virtualbox is installed: [https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
 * Ensure vagrant is installed: [https://www.vagrantup.com](https://www.vagrantup.com)
