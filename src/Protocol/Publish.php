@@ -72,7 +72,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $this->logger->debug('Activating retain flag', ['specialFlags' => $this->specialFlags]);
         }
 
-        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags,]);
+        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
 
         return $bitString;
     }
@@ -106,12 +106,23 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         return $pubAck;
     }
 
+    /**
+     * Sets the to be sent message
+     *
+     * @param Message $message
+     * @return WritableContentInterface
+     */
     public function setMessage(Message $message): WritableContentInterface
     {
         $this->message = $message;
         return $this;
     }
 
+    /**
+     * Gets the set message
+     *
+     * @return Message
+     */
     public function getMessage(): Message
     {
         return $this->message;

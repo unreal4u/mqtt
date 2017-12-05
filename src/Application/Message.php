@@ -98,10 +98,10 @@ final class Message
     /**
      * Sets the retain flag to the given value
      *
-     * @param bool $flag
+     * @param bool $flag Set to true if message should be retained, false otherwise (default)
      * @return Message
      */
-    public function setRetainFlag(bool $flag): Message
+    public function shouldRetain(bool $flag): Message
     {
         $this->mustRetain = $flag;
         return $this;
@@ -119,16 +119,31 @@ final class Message
         return $this;
     }
 
+    /**
+     * Gets the topic name
+     *
+     * @return string
+     */
     public function getTopicName(): string
     {
         return $this->topicName;
     }
 
+    /**
+     * Gets the current QoS level
+     *
+     * @return int
+     */
     public function getQoSLevel(): int
     {
         return $this->qosLevel;
     }
 
+    /**
+     * Gets the set retain flag
+     *
+     * @return bool
+     */
     public function mustRetain(): bool
     {
         return $this->mustRetain;

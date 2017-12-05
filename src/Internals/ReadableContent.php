@@ -22,6 +22,7 @@ trait ReadableContent
 
     final public function populate(string $rawMQTTHeaders): ReadableContentInterface
     {
+        //var_dump(base64_encode($rawMQTTHeaders)); // For now: make it a bit easier to create unit tests
         $this->rawMQTTHeaders = $rawMQTTHeaders;
         $this->checkControlPacketValue()->fillObject();
         return $this;

@@ -26,7 +26,7 @@ $now = new \DateTimeImmutable('now');
 if ($client->isConnected()) {
     $message = new Message();
     $message->setTopicName(COMMON_TOPICNAME);
-    $message->setRetainFlag(true);
+    $message->shouldRetain(true);
     $message->setPayload(new SimplePayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained'));
     $publish = new Publish();
     $publish->setMessage($message);
