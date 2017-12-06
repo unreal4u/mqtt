@@ -148,23 +148,31 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {
-        $client->setBlocking(true);
-        $qosLevel = $this->message->getQoSLevel();
-        switch ($qosLevel) {
-            case 1:
-                $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
-                $client->sendData(new PubAck($this->logger));
-                break;
-            case 2:
-                $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
+        if ($this->message->getQoSLevel() === 0) {
+            $this->logger->debug('No response needed', ['qosLevel', $this->message->getQoSLevel()]);
+        } else {
+            $client->setBlocking(true);
+            if ($this->message->getQoSLevel() === 1) {
+                $this->logger->debug('Responding with PubAck', ['qosLevel' => $this->message->getQoSLevel()]);
+                $client->sendData($this->composePubAckAnswer());
+            } elseif ($this->message->getQoSLevel() === 2) {
+                $this->logger->debug('Responding with PubRec', ['qosLevel' => $this->message->getQoSLevel()]);
                 $client->sendData(new PubRec($this->logger));
-                break;
-            default:
-                $this->logger->debug('No response needed', ['qosLevel', $qosLevel]);
-                break;
+            }
+            $client->setBlocking(false);
         }
-        $client->setBlocking(false);
 
         return true;
+    }
+
+    /**
+     * Composes a PubAck answer with the same packetIdentifier as what we received
+     * @return PubAck
+     */
+    private function composePubAckAnswer(): PubAck
+    {
+        $pubAck = new PubAck($this->logger);
+        $pubAck->packetIdentifier = $this->packetIdentifier;
+        return $pubAck;
     }
 }
