@@ -9,4 +9,10 @@ before_script:
   - composer update -o
 
 script:
-  - php ./vendor/bin/phpunit
+  # Setting stty prevents warning on lowest dependencies: https://github.com/sebastianbergmann/phpunit/issues/1976
+  - stty cols 80; vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+  - vendor/bin/phpcs src/ --standard=psr2 -sp
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover

@@ -5,6 +5,7 @@ Simple MQTT library for PHP 7, with (for now) partial support for
 [McFizh/libMQTT](https://github.com/McFizh/libMQTT). 
 
 ## Important Badges
+[![Code Coverage](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Build Status](https://travis-ci.org/unreal4u/mqtt.svg)](https://travis-ci.org/unreal4u/mqtt)
 
 ## Stability notes
