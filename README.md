@@ -4,7 +4,7 @@ Simple MQTT library for PHP 7, with (for now) partial support for
 [MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html), it is a rewrite of 
 [McFizh/libMQTT](https://github.com/McFizh/libMQTT). 
 
-## Important Badges
+## This project in badges
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Build Status](https://travis-ci.org/unreal4u/mqtt.svg)](https://travis-ci.org/unreal4u/mqtt)
