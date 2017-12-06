@@ -49,21 +49,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         // Check QoS level and perform the corresponding actions
-        switch ($this->message->getQoSLevel()) {
-            case 1:
-                $this->specialFlags |= 2;
-                $this->logger->debug('Activating QoS level 1 bit', ['specialFlags' => $this->specialFlags]);
-                $this->packetIdentifier++;
-                $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
-                break;
-            case 2:
-                $this->specialFlags |= 4;
-                $this->logger->debug('Activating QoS level 2 bit', ['specialFlags' => $this->specialFlags]);
-                $this->packetIdentifier++;
-                $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
-                break;
-            default:
-                break;
+        if ($this->message->getQoSLevel() !== 0) {
+            // 2 for QoS lvl1 and 4 for QoS lvl2
+            $this->specialFlags |= ($this->message->getQoSLevel() * 2);
+            $this->packetIdentifier++;
+            $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
+            $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()), [
+                'specialFlags' => $this->specialFlags,
+            ]);
         }
 
         if ($this->message->mustRetain()) {
