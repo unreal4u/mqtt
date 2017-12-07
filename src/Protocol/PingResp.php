@@ -16,11 +16,6 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
 
     const CONTROL_PACKET_VALUE = 13;
 
-    public function fillObject(): ReadableContentInterface
-    {
-        return $this;
-    }
-
     /**
      * @inheritdoc
      */

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -20,19 +19,10 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
 
     const CONTROL_PACKET_VALUE = 5;
 
-    public function fillObject(): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
     {
-        // Fastest conversion? Turn the bytes around instead of trying to arm a number and passing it along
-        $this->packetIdentifier = \ord($this->rawMQTTHeaders{3} . $this->rawMQTTHeaders{2});
+        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
-    {
-        return true;
     }
 
     /**

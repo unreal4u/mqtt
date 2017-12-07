@@ -21,26 +21,25 @@ interface ReadableContentInterface
 
     /**
      * Checks whether the response from the MQTT protocol corresponds to the object we're trying to initialize
+     * @param int $packetControlValue
      * @return ReadableContentInterface
      */
-    public function checkControlPacketValue(): ReadableContentInterface;
+    public function checkControlPacketValue(int $packetControlValue): ReadableContentInterface;
 
     /**
      * Will perform sanity checks and fill in the Readable object with data
+     * @param string $rawMQTTHeaders
      * @return ReadableContentInterface
      */
-    public function fillObject(): ReadableContentInterface;
+    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface;
 
     /**
-     * Some operations require setting some things in the client, this hook will do so
+     * Some operations require setting some things in the client or perform some checks, this hook will allow just that
      *
      * @param Client $client
      * @param WritableContentInterface $originalRequest Will be used to validate stuff such as packetIdentifier
      *
      * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool;
 }

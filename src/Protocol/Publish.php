@@ -28,8 +28,16 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private $message;
 
+    /**
+     * Some interchanges with the broker will send or receive a packet identifier
+     * @var int
+     */
     public $packetIdentifier = 0;
 
+    /**
+     * Flag to check whether a message is a redelivery
+     * @var bool
+     */
     public $isRedelivery = false;
 
     public function createVariableHeader(): string
@@ -123,21 +131,25 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * Will perform sanity checks and fill in the Readable object with data
+     * @param string $rawMQTTHeaders
      * @return ReadableContentInterface
      */
-    public function fillObject(): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
     {
-        $topicSize = \ord($this->rawMQTTHeaders{3});
+        $topicSize = \ord($rawMQTTHeaders{3});
 
         $this->message = new Message();
-        $this->message->setPayload(new SimplePayload(substr($this->rawMQTTHeaders, 4 + $topicSize)));
-        $this->message->setTopicName(substr($this->rawMQTTHeaders, 4, $topicSize));
+        $this->message->setPayload(new SimplePayload(substr($rawMQTTHeaders, 4 + $topicSize)));
+        $this->message->setTopicName(substr($rawMQTTHeaders, 4, $topicSize));
 
         return $this;
     }
 
     /**
      * @inheritdoc
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
     {

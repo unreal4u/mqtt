@@ -7,8 +7,9 @@ namespace unreal4u\MQTT\Application;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
+use unreal4u\MQTT\Internals\ProtocolBase;
 
-final class Message
+final class Message extends ProtocolBase
 {
     /**
      * This field indicates the level of assurance for delivery of an Application Message. Can be 0, 1 or 2

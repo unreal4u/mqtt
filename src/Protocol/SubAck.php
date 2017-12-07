@@ -16,11 +16,6 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
 
     const CONTROL_PACKET_VALUE = 9;
 
-    public function fillObject(): ReadableContentInterface
-    {
-        return $this;
-    }
-
     /**
      * @inheritdoc
      */

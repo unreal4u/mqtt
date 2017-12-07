@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Application;
 
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
  * This is an example of a payload class that performs some processing on the data
@@ -19,21 +17,4 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 final class EmptyReadableResponse extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
-
-    /**
-     * Will perform sanity checks and fill in the Readable object with data
-     * @return ReadableContentInterface
-     */
-    public function fillObject(): ReadableContentInterface
-    {
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
-    {
-        return false;
-    }
 }

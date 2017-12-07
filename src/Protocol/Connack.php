@@ -39,9 +39,21 @@ final class Connack extends ProtocolBase implements ReadableContentInterface
      */
     public $connectReturnCode;
 
-    public function fillObject(): ReadableContentInterface
+    /**
+     * @inheritdoc
+     *
+     * @param string $rawMQTTHeaders
+     * @return ReadableContentInterface
+     * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
+     * @throws \unreal4u\MQTT\Exceptions\Connect\BadUsernameOrPassword
+     * @throws \unreal4u\MQTT\Exceptions\Connect\ServerUnavailable
+     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
+     */
+    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
     {
-        $this->connectReturnCode = \ord($this->rawMQTTHeaders[3]);
+        $this->connectReturnCode = \ord($rawMQTTHeaders{3});
         switch ($this->connectReturnCode) {
             case 0:
                 // Everything correct, do nothing

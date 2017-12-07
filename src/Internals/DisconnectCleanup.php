@@ -14,15 +14,6 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
     use ReadableContent;
 
     /**
-     * Will perform sanity checks and fill in the Readable object with data
-     * @return ReadableContentInterface
-     */
-    public function fillObject(): ReadableContentInterface
-    {
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
@@ -31,6 +22,6 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
         $information['successfullyClosed'] = $successFullyClosed;
         $this->logger->info('Sent shutdown signal to socket', $information);
         $client->setConnected(false);
-        return false;
+        return true;
     }
 }

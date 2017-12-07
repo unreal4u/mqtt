@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Application;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * In order to add functionality to an Application Message, you can implement this Interface so that it complies to the
  * basic stuff this will do.
@@ -14,8 +16,9 @@ interface PayloadInterface
     /**
      * When called with contents, it should set the payload to that content
      * @param string $messageContents
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(string $messageContents = null);
+    public function __construct(string $messageContents = null, LoggerInterface $logger = null);
 
     /**
      * Called by the user with the contents we want the message to be filled with

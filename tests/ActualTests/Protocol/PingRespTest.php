@@ -14,9 +14,11 @@ class PingRespTest extends TestCase
     {
         $success = \chr(208) . \chr(0);
         $pingResp = new PingResp();
-        $pingResp->populate($success);
-        $pingResp->checkControlPacketValue();
+        $pingResp
+            ->populate($success)
+            ->checkControlPacketValue(\ord($success) >> 4);
 
+        // If nothing went wrong above and we are still here, the test is a pass
         $this->assertTrue(true);
     }
 }
