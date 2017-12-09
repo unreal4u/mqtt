@@ -213,16 +213,24 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // Topic size is always the 3rd byte
         $topicSize = \ord($rawMQTTHeaders{3});
 
+        $messageStartPosition = 4;
+        if ($this->message->getQoSLevel() > 0) {
+            // 2 (fixed header) + 2 (topic size) + $topicSize marks the beginning of the 2 packet identifier bytes
+            $this->packetIdentifier = \ord($rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize});
+            $messageStartPosition += 2;
+        }
+
         $this->logger->debug('Determined headers', [
             'topicSize' => $topicSize,
             'QoSLevel' => $this->message->getQoSLevel(),
             'isDuplicate' => $this->isRedelivery,
             'isRetained' => $this->message->mustRetain(),
+            'packetIdentifier' => $this->packetIdentifier,
         ]);
         $payload = clone $this->payloadType;
 
-        $this->message->setPayload($payload->setPayload(substr($rawMQTTHeaders, 4 + $topicSize)));
-        $this->message->setTopicName(substr($rawMQTTHeaders, 4, $topicSize));
+        $this->message->setPayload($payload->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize)));
+        $this->message->setTopicName(substr($rawMQTTHeaders, $messageStartPosition, $topicSize));
 
         return $this;
     }
