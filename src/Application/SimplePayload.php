@@ -50,7 +50,7 @@ final class SimplePayload implements PayloadInterface
 
     public function processIncomingPayload(string $contents): PayloadInterface
     {
-        return $this;
+        return $this->setPayload($contents);
     }
 
     public function getProcessedPayload(): string

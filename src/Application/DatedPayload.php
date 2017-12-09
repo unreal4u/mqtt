@@ -47,6 +47,7 @@ final class DatedPayload implements PayloadInterface
     public function setPayload(string $contents): PayloadInterface
     {
         $this->payload = $contents;
+        $this->originalPublishDateTime = new \DateTimeImmutable('now');
         return $this;
     }
 
