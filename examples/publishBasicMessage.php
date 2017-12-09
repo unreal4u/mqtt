@@ -25,11 +25,13 @@ define('MAXIMUM', 10);
 if ($client->isConnected()) {
     $payload = new SimplePayload();
     $message = new Message();
-    $message->setTopicName(COMMON_TOPICNAME);
     $publish = new Publish();
+    $topics = [0 => COMMON_TOPICNAME, 1 => SECONDARY_TOPICNAME];
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
+        $topicId = random_int(0, 1);
         $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
+        $message->setTopicName($topics[$topicId]);
         $message->setPayload($payload);
         #$message->setQoSLevel(1);
         $publish->setMessage($message);

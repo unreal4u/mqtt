@@ -117,7 +117,7 @@ class ParametersTest extends TestCase
         $willMessage = new Message();
         $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
         $willMessage->setTopicName('client/errors');
-        $willMessage->shouldRetain(true);
+        $willMessage->setRetainFlag(true);
 
         $parameters = new Parameters();
         $parameters->setWill($willMessage);

@@ -13,6 +13,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
 const COMMON_TOPICNAME = 'firstTest';
+const SECONDARY_TOPICNAME = 'secondaryTest';
 
 function str2bin($str)
 {

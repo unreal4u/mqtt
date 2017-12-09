@@ -33,7 +33,7 @@ final class Message extends ProtocolBase
      * topic name
      * @var bool
      */
-    private $mustRetain = false;
+    private $isRetained = false;
 
     /**
      * The Topic Name identifies the information channel to which payload data is published
@@ -102,9 +102,9 @@ final class Message extends ProtocolBase
      * @param bool $flag Set to true if message should be retained, false otherwise (default)
      * @return Message
      */
-    public function shouldRetain(bool $flag): Message
+    public function setRetainFlag(bool $flag): Message
     {
-        $this->mustRetain = $flag;
+        $this->isRetained = $flag;
         return $this;
     }
 
@@ -145,8 +145,8 @@ final class Message extends ProtocolBase
      *
      * @return bool
      */
-    public function mustRetain(): bool
+    public function isRetained(): bool
     {
-        return $this->mustRetain;
+        return $this->isRetained;
     }
 }

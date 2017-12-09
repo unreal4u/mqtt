@@ -291,7 +291,7 @@ final class Parameters
 
             $this
                 ->setWillMessage($message->getPayload())
-                ->setWillRetain($message->mustRetain())
+                ->setWillRetain($message->isRetained())
                 ->setWillTopic($message->getTopicName())
                 ->setWillQoS($message->getQoSLevel());
         }

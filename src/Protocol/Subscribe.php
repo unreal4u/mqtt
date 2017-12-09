@@ -11,6 +11,7 @@ use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
+use unreal4u\MQTT\Protocol\Subscribe\Topic;
 
 final class Subscribe extends ProtocolBase implements WritableContentInterface
 {
@@ -18,11 +19,13 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
     const CONTROL_PACKET_VALUE = 8;
 
-    public $packetIdentifier = 10;
+    public $packetIdentifier = 0;
 
-    public $topic = '';
-
-    public $qosLevel = 0;
+    /**
+     * An array of topics on which to subscribe to
+     * @var Topic[]
+     */
+    private $topics = [];
 
     public function createVariableHeader(): string
     {
@@ -33,11 +36,13 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
     public function createPayload(): string
     {
-        if ($this->topic === '') {
-            throw new \InvalidArgumentException('A topic name must be specified');
-        }
 
-        return $this->createUTF8String($this->topic) . \chr($this->qosLevel);
+        $output = '';
+        foreach ($this->topics as $topic) {
+            // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
+            $output .= $this->createUTF8String($topic->getTopicName()) . \chr($topic->getTopicQoSLevel());
+        }
+        return $output;
     }
 
     /**
@@ -58,6 +63,16 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         return $subAck;
     }
 
+    /**
+     * Performs a check on the socket connection and returns either the contents or an empty object
+     *
+     * @param Client $client
+     * @param PayloadInterface $payloadType
+     * @return ReadableContentInterface
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     */
     public function checkForEvent(Client $client, PayloadInterface $payloadType): ReadableContentInterface
     {
         $this->updateCommunication($client);
@@ -76,6 +91,56 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         return new EmptyReadableResponse($this->logger);
     }
 
+    /**
+     * Performs a simple loop and yields results back whenever they are available
+     *
+     * @param Client $client
+     * @param PayloadInterface $payloadObject
+     * @param int $idleMicroseconds
+     * @return \Generator
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     */
+    public function loop(Client $client, PayloadInterface $payloadObject, int $idleMicroseconds = 100000): \Generator
+    {
+        // First of all: subscribe
+        $client->sendData($this);
+
+        // After we are successfully subscribed, start to listen for events
+        while (true) {
+            $readableContent = $this->checkForEvent($client, $payloadObject);
+
+            // Only if we receive a Publish event from the broker, yield the contents
+            if ($readableContent instanceof Publish) {
+                yield $readableContent->getMessage();
+            } else {
+                // Only wait for a certain amount of time if there was nothing in the queue
+                usleep($idleMicroseconds);
+            }
+        }
+    }
+
+    /**
+     * A subscription is based on filters, this function allows us to pass on filters
+     *
+     * @param Topic[] $topics
+     * @return Subscribe
+     */
+    public function addTopics(Topic ...$topics): Subscribe
+    {
+        $this->topics = $topics;
+
+        return $this;
+    }
+
+    /**
+     * @param Client $client
+     * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     */
     private function updateCommunication(Client $client): bool
     {
         $this->logger->debug('Checking ping');

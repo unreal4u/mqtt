@@ -54,7 +54,7 @@ class PublishTest extends TestCase
     public function test_PublishComplexMessage()
     {
         $this->message->setQoSLevel(1);
-        $this->message->shouldRetain(true);
+        $this->message->setRetainFlag(true);
 
         $this->publish->setMessage($this->message);
         $variableHeader = $this->publish->createVariableHeader();

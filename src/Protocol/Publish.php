@@ -79,7 +79,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             ]);
         }
 
-        if ($this->message->mustRetain()) {
+        if ($this->message->isRetained()) {
             // RETAIN flag: should the server retain the message?
             $this->specialFlags |= 1;
             $this->logger->debug('Activating retain flag', ['specialFlags' => $this->specialFlags]);
@@ -163,10 +163,11 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private function analyzeFirstByte(int $firstByte): Publish
     {
+        $this->logger->debug('Analyzing first byte', [sprintf('%08d', decbin($firstByte))]);
         // Retained bit is bit 0 of first byte
-        $this->message->shouldRetain(false);
+        $this->message->setRetainFlag(false);
         if ($firstByte & 1) {
-            $this->message->shouldRetain(true);
+            $this->message->setRetainFlag(true);
         }
         // QoS level are the last bits 2 & 1 of the first byte
         $this->message->setQoSLevel($this->determineIncomingQoSLevel($firstByte));
@@ -224,7 +225,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             'topicSize' => $topicSize,
             'QoSLevel' => $this->message->getQoSLevel(),
             'isDuplicate' => $this->isRedelivery,
-            'isRetained' => $this->message->mustRetain(),
+            'isRetained' => $this->message->isRetained(),
             'packetIdentifier' => $this->packetIdentifier,
         ]);
         $payload = clone $this->payloadType;
