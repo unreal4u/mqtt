@@ -10,6 +10,7 @@ use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
+use unreal4u\MQTT\Utilities;
 
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
@@ -45,7 +46,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function createVariableHeader(): string
     {
-        // TODO: Implement createVariableHeader() method.
+        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
     }
 
     /**
@@ -54,7 +55,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function createPayload(): string
     {
-        // TODO: Implement createPayload() method.
+        return '';
     }
 
     /**

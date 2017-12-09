@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
+use unreal4u\MQTT\Application\PayloadInterface;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -57,7 +58,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         return $subAck;
     }
 
-    public function checkForEvent(Client $client): ReadableContentInterface
+    public function checkForEvent(Client $client, PayloadInterface $payloadType): ReadableContentInterface
     {
         $this->updateCommunication($client);
         $publishPacketControlField = $client->readSocketData(1);
@@ -66,6 +67,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
             $payload = $client->readSocketData(\ord($restOfBytes));
 
             $publish = new Publish($this->logger);
+            $publish->setPayloadType($payloadType);
             $publish->populate($publishPacketControlField . $restOfBytes . $payload);
             return $publish;
         }

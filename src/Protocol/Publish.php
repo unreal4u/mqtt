@@ -6,8 +6,9 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\SimplePayload;
+use unreal4u\MQTT\Application\PayloadInterface;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -15,6 +16,11 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * A PUBLISH Control Packet is sent from a Client to a Server or vice-versa to transport an Application Message.
+ *
+ * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718037
+ */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent;
@@ -35,10 +41,16 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     public $packetIdentifier = 0;
 
     /**
-     * Flag to check whether a message is a redelivery
+     * Flag to check whether a message is a redelivery (DUP flag)
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718038
      * @var bool
      */
     public $isRedelivery = false;
+
+    /**
+     * @var PayloadInterface
+     */
+    private $payloadType;
 
     public function createVariableHeader(): string
     {
@@ -76,6 +88,19 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
 
         return $bitString;
+    }
+
+    /**
+     * Sets the specific payload we should be listening for on this topic(s)
+     *
+     * @param PayloadInterface $payloadType
+     * @return Publish
+     */
+    public function setPayloadType(PayloadInterface $payloadType): Publish
+    {
+        $this->payloadType = $payloadType;
+
+        return $this;
     }
 
     public function createPayload(): string
@@ -130,16 +155,73 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
+     * Sets several bits and pieces from the first byte of the fixed header for the Publish packet
+     *
+     * @param int $firstByte
+     * @return Publish
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     */
+    private function analyzeFirstByte(int $firstByte): Publish
+    {
+        // Retained bit is bit 0 of first byte
+        $this->message->shouldRetain(false);
+        if ($firstByte & 1) {
+            $this->message->shouldRetain(true);
+        }
+        // QoS level are the last bits 2 & 1 of the first byte
+        $this->message->setQoSLevel($this->determineIncomingQoSLevel($firstByte));
+
+        // Duplicate message must be checked only on QoS > 0, else set it to false
+        $this->isRedelivery = false;
+        if ($firstByte & 8 && $this->message->getQoSLevel() !== 0) {
+            // Is a duplicate is always bit 3 of first byte
+            $this->isRedelivery = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Finds out the QoS level in a fixed header for the Publish object
+     *
+     * @param int $bitString
+     * @return int
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     */
+    private function determineIncomingQoSLevel(int $bitString): int
+    {
+        // QoS lvl 6 does not exist, throw exception
+        if (($bitString & 6) >= 6) {
+            throw new InvalidQoSLevel('Invalid QoS level "' . $bitString . '" found (both bits set?)');
+        }
+
+        // Strange operation, why? Because 4 == QoS lvl2; 2 == QoS lvl1, 0 == QoS lvl0
+        return $bitString & 4 / 2;
+    }
+
+    /**
      * Will perform sanity checks and fill in the Readable object with data
      * @param string $rawMQTTHeaders
      * @return ReadableContentInterface
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
     {
+        $this->message = new Message();
+        $this->analyzeFirstByte(\ord($rawMQTTHeaders{0}));
+
+        // Topic size is always the 3rd byte
         $topicSize = \ord($rawMQTTHeaders{3});
 
-        $this->message = new Message();
-        $this->message->setPayload(new SimplePayload(substr($rawMQTTHeaders, 4 + $topicSize)));
+        $this->logger->debug('Determined headers', [
+            'topicSize' => $topicSize,
+            'QoSLevel' => $this->message->getQoSLevel(),
+            'isDuplicate' => $this->isRedelivery,
+            'isRetained' => $this->message->mustRetain(),
+        ]);
+        $payload = clone $this->payloadType;
+
+        $this->message->setPayload($payload->setPayload(substr($rawMQTTHeaders, 4 + $topicSize)));
         $this->message->setTopicName(substr($rawMQTTHeaders, 4, $topicSize));
 
         return $this;

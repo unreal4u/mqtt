@@ -57,7 +57,7 @@ trait ReadableContent
      */
     final public function readVariableHeader(): int
     {
-        // TODO
+        return 0;
     }
 
     /**
