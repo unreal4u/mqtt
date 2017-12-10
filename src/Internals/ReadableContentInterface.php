@@ -16,7 +16,7 @@ interface ReadableContentInterface
      * @param string $rawMQTTHeaders
      * @return ReadableContentInterface
      */
-    public function populate(string $rawMQTTHeaders): ReadableContentInterface;
+    public function instantiateObject(string $rawMQTTHeaders): ReadableContentInterface;
 
     /**
      * Checks whether the response from the MQTT protocol corresponds to the object we're trying to initialize

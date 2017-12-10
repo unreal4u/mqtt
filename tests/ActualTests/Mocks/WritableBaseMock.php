@@ -36,7 +36,7 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         $connAck = new ConnAck();
-        $connAck->populate($data);
+        $connAck->instantiateObject($data);
 
         return $connAck;
     }

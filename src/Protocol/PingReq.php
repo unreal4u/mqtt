@@ -30,7 +30,7 @@ final class PingReq extends ProtocolBase implements WritableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
         $pingResp = new PingResp($this->logger);
-        $pingResp->populate($data);
+        $pingResp->instantiateObject($data);
         return $pingResp;
     }
 

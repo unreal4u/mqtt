@@ -19,7 +19,7 @@ trait ReadableContent
      */
     protected $variableHeaderSize = 0;
 
-    final public function populate(string $rawMQTTHeaders): ReadableContentInterface
+    final public function instantiateObject(string $rawMQTTHeaders): ReadableContentInterface
     {
         //var_dump(base64_encode($rawMQTTHeaders)); // For now: make it a bit easier to create unit tests
         $this

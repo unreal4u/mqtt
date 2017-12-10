@@ -16,6 +16,6 @@ class ReadableContentTest extends TestCase
         $pingResp = new PingResp();
 
         $this->expectException(InvalidResponseType::class);
-        $pingResp->populate($success);
+        $pingResp->instantiateObject($success);
     }
 }

@@ -128,7 +128,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         $pubAck = new PubAck($this->logger);
-        $pubAck->populate($data);
+        $pubAck->instantiateObject($data);
         return $pubAck;
     }
 
@@ -217,8 +217,10 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
         $messageStartPosition = 4;
         if ($this->message->getQoSLevel() > 0) {
-            // 2 (fixed header) + 2 (topic size) + $topicSize marks the beginning of the 2 packet identifier bytes
-            $this->packetIdentifier = Utilities::convertBinaryStringToNumber($rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize});
+            // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
+            $this->packetIdentifier = Utilities::convertBinaryStringToNumber(
+                $rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize}
+            );
             $messageStartPosition += 2;
         }
 

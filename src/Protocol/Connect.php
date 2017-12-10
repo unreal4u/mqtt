@@ -107,7 +107,7 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
         $connAck = new ConnAck($this->logger);
-        $connAck->populate($data);
+        $connAck->instantiateObject($data);
         return $connAck;
     }
 }

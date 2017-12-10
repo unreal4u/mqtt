@@ -79,7 +79,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
             $returnObject = new Publish($this->logger);
             $returnObject->setPayloadType(new SimplePayload());
         }
-        $returnObject->populate($data);
+        $returnObject->instantiateObject($data);
 
         return $returnObject;
     }
@@ -127,7 +127,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
             $publish = new Publish($this->logger);
             $publish->setPayloadType($payloadType);
-            $publish->populate($publishPacketControlField . $restOfBytes . $payload);
+            $publish->instantiateObject($publishPacketControlField . $restOfBytes . $payload);
             return $publish;
         }
 
@@ -149,7 +149,11 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function loop(Client $client, PayloadInterface $payloadObject, int $idleMicroseconds = 100000): \Generator
     {
         // First of all: subscribe
-        // FIXME: The Server is permitted to start sending PUBLISH packets matching the Subscription before it sends the SUBACK Packet.
+        /**
+         * FIXME: Implement a sort of EventManager because a SUBSCRIBE can return PUBLISH _or_ SUBACK response:
+         * The Server is permitted to start sending PUBLISH packets matching the Subscription before it sends the
+         * SUBACK Packet.
+         */
         $client->sendData($this);
 
         // After we are successfully subscribed, start to listen for events
@@ -187,7 +191,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    private function updateCommunication(Client $client): bool
+    private function updateCommunication(ClientInterface $client): bool
     {
         $this->logger->debug('Checking ping');
         if ($client->isItPingTime()) {
