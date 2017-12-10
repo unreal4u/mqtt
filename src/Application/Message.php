@@ -64,7 +64,7 @@ final class Message extends ProtocolBase
     /**
      * Sets the actual payload to be sent to the message broker
      *
-     * @param PayloadInterface $payload
+     * @param string $payload
      * @return Message
      */
     public function setPayload(string $payload): Message
