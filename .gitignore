@@ -2,6 +2,7 @@ docs/phpdoc-cache-*
 .vagrant
 .idea
 report/
+docs/
 composer.phar
 quicky.php
 phpunit.xml
