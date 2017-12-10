@@ -6,7 +6,6 @@ namespace tests\unreal4u\MQTT\Connect;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 
 class ParametersTest extends TestCase
@@ -103,7 +102,7 @@ class ParametersTest extends TestCase
     public function test_validBasicWillMessage()
     {
         $willMessage = new Message();
-        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
+        $willMessage->setPayload('You will see this if I disconnect without notice');
         $willMessage->setTopicName('client/errors');
 
         $parameters = new Parameters();
@@ -115,7 +114,7 @@ class ParametersTest extends TestCase
     public function test_validRetainedWillMessage()
     {
         $willMessage = new Message();
-        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
+        $willMessage->setPayload('You will see this if I disconnect without notice');
         $willMessage->setTopicName('client/errors');
         $willMessage->setRetainFlag(true);
 
@@ -142,7 +141,7 @@ class ParametersTest extends TestCase
     public function test_validQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult)
     {
         $willMessage = new Message();
-        $willMessage->setPayload(new SimplePayload('You will see this if I disconnect without notice'));
+        $willMessage->setPayload('You will see this if I disconnect without notice');
         $willMessage->setTopicName('client/errors');
         $willMessage->setQoSLevel($QoSLevel);
 

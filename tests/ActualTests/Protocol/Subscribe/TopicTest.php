@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Subscribe;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Protocol\Subscribe\Topic;
 
@@ -16,7 +15,6 @@ class TopicTest extends TestCase
         $topic = new Topic('a topic');
         $this->assertSame('a topic', $topic->getTopicName());
         $this->assertSame(0, $topic->getTopicQoSLevel());
-        $this->assertInstanceOf(SimplePayload::class, $topic->getPayloadType());
     }
 
     public function test_noTopicName()
@@ -30,7 +28,6 @@ class TopicTest extends TestCase
         $topic = new Topic('a topic', 1);
         $this->assertSame('a topic', $topic->getTopicName());
         $this->assertSame(1, $topic->getTopicQoSLevel());
-        $this->assertInstanceOf(SimplePayload::class, $topic->getPayloadType());
     }
 
     public function test_QoSLevel2()
@@ -38,7 +35,6 @@ class TopicTest extends TestCase
         $topic = new Topic('a topic', 2);
         $this->assertSame('a topic', $topic->getTopicName());
         $this->assertSame(2, $topic->getTopicQoSLevel());
-        $this->assertInstanceOf(SimplePayload::class, $topic->getPayloadType());
     }
 
     public function test_invalidQoSLevel()

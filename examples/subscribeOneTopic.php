@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -20,7 +19,7 @@ $client->sendData($connect);
 $subscribe = new Subscribe();
 $subscribe->addTopics(new Topic(COMMON_TOPICNAME));
 $subscribe->setPacketIdentifier(400);
-foreach ($subscribe->loop($client, new SimplePayload()) as $message) {
+foreach ($subscribe->loop($client) as $message) {
     printf(
         '%s-- Payload detected on topic "%s": %s + %s%s',
         PHP_EOL,

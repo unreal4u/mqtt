@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -27,7 +26,7 @@ if ($client->isConnected()) {
     $message = new Message();
     $message->setTopicName(COMMON_TOPICNAME);
     $message->setRetainFlag(true);
-    $message->setPayload(new SimplePayload(''));
+    $message->setPayload('');
     $publish = new Publish();
     $publish->setMessage($message);
     $client->sendData($publish);

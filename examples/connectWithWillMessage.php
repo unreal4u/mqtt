@@ -5,13 +5,12 @@ declare(strict_types = 1);
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Application\Message;
 
 include __DIR__ . '/00.basics.php';
 
 $willMessage = new Message();
-$willMessage->setPayload(new SimplePayload('If I die unexpectedly, please print this message'));
+$willMessage->setPayload('If I die unexpectedly, please print this message');
 $willMessage->setTopicName('client/errors');
 
 $parameters = new Parameters('uniqueClientId123');

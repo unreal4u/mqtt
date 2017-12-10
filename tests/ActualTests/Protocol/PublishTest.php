@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 
@@ -30,7 +29,7 @@ class PublishTest extends TestCase
         $this->publish = new Publish();
 
         $this->message = new Message();
-        $this->message->setPayload(new SimplePayload('Hello test world!'));
+        $this->message->setPayload('Hello test world!');
     }
 
     protected function tearDown()

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -36,7 +35,7 @@ $secondaryTopic = new Topic(SECONDARY_TOPICNAME);
 
 $subscribe = new Subscribe($logger);
 $subscribe->addTopics($mainTopic, $secondaryTopic);
-foreach ($subscribe->loop($client, new SimplePayload()) as $message) {
+foreach ($subscribe->loop($client) as $message) {
     printf(
         '%s-- Payload detected on topic "%s": %s + %s%s',
         PHP_EOL,

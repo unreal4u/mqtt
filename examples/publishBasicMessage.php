@@ -3,7 +3,6 @@
 declare(strict_types = 1);
 
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -23,16 +22,14 @@ $client->sendData($connect);
 
 define('MAXIMUM', 10);
 if ($client->isConnected()) {
-    $payload = new SimplePayload();
     $message = new Message();
     $publish = new Publish();
     $topics = [0 => COMMON_TOPICNAME, 1 => SECONDARY_TOPICNAME];
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
         $topicId = random_int(0, 1);
-        $payload->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
         $message->setTopicName($topics[$topicId]);
-        $message->setPayload($payload);
+        $message->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
         #$message->setQoSLevel(1);
         $publish->setMessage($message);
         $client->sendData($publish);

@@ -23,7 +23,7 @@ final class Message extends ProtocolBase
     private $qosLevel = 0;
 
     /**
-     * @var PayloadInterface
+     * @var string
      */
     private $payload;
 
@@ -54,8 +54,7 @@ final class Message extends ProtocolBase
             throw new MissingTopicName('Topic can\'t be empty, please provide one');
         }
 
-        $processedPayload = $this->payload->getProcessedPayload();
-        if (mb_strlen($processedPayload) > 65535) {
+        if (mb_strlen($this->payload) > 65535) {
             throw new MessageTooBig('Message payload can not exceed 65535 bytes!');
         }
 
@@ -68,7 +67,7 @@ final class Message extends ProtocolBase
      * @param PayloadInterface $payload
      * @return Message
      */
-    public function setPayload(PayloadInterface $payload): Message
+    public function setPayload(string $payload): Message
     {
         $this->payload = $payload;
         return $this;
@@ -76,7 +75,7 @@ final class Message extends ProtocolBase
 
     public function getPayload(): string
     {
-        return $this->payload->getProcessedPayload();
+        return $this->payload;
     }
 
     /**

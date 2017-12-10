@@ -6,7 +6,6 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\PayloadInterface;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -47,11 +46,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public $isRedelivery = false;
 
-    /**
-     * @var PayloadInterface
-     */
-    private $payloadType;
-
     public function createVariableHeader(): string
     {
         if ($this->message === null) {
@@ -88,19 +82,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
 
         return $bitString;
-    }
-
-    /**
-     * Sets the specific payload we should be listening for on this topic(s)
-     *
-     * @param PayloadInterface $payloadType
-     * @return Publish
-     */
-    public function setPayloadType(PayloadInterface $payloadType): Publish
-    {
-        $this->payloadType = $payloadType;
-
-        return $this;
     }
 
     public function createPayload(): string
@@ -231,9 +212,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             'isRetained' => $this->message->isRetained(),
             'packetIdentifier' => $this->packetIdentifier,
         ]);
-        $payload = clone $this->payloadType;
 
-        $this->message->setPayload($payload->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize)));
+        $this->message->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize));
         $this->message->setTopicName(substr($rawMQTTHeaders, $messageStartPosition, $topicSize));
 
         return $this;

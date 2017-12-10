@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
-use unreal4u\MQTT\Application\PayloadInterface;
-use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -77,7 +75,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
             $returnObject = new SubAck($this->logger);
         } elseif (\ord($data[0]) >> 4 === 3) {
             $returnObject = new Publish($this->logger);
-            $returnObject->setPayloadType(new SimplePayload());
         }
         $returnObject->instantiateObject($data);
 
@@ -111,13 +108,12 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      * Performs a check on the socket connection and returns either the contents or an empty object
      *
      * @param Client $client
-     * @param PayloadInterface $payloadType
      * @return ReadableContentInterface
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    public function checkForEvent(Client $client, PayloadInterface $payloadType): ReadableContentInterface
+    public function checkForEvent(Client $client): ReadableContentInterface
     {
         $this->updateCommunication($client);
         $publishPacketControlField = $client->readSocketData(1);
@@ -126,7 +122,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
             $payload = $client->readSocketData(\ord($restOfBytes));
 
             $publish = new Publish($this->logger);
-            $publish->setPayloadType($payloadType);
             $publish->instantiateObject($publishPacketControlField . $restOfBytes . $payload);
             return $publish;
         }
@@ -139,14 +134,13 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      * Performs a simple loop and yields results back whenever they are available
      *
      * @param Client $client
-     * @param PayloadInterface $payloadObject
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
      * @return \Generator
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    public function loop(Client $client, PayloadInterface $payloadObject, int $idleMicroseconds = 100000): \Generator
+    public function loop(Client $client, int $idleMicroseconds = 100000): \Generator
     {
         // First of all: subscribe
         /**
@@ -158,7 +152,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
         // After we are successfully subscribed, start to listen for events
         while (true) {
-            $readableContent = $this->checkForEvent($client, $payloadObject);
+            $readableContent = $this->checkForEvent($client);
 
             // Only if we receive a Publish event from the broker, yield the contents
             if ($readableContent instanceof Publish) {
