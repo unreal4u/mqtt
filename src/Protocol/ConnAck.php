@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Exceptions\Connect\BadUsernameOrPassword;
 use unreal4u\MQTT\Exceptions\Connect\GenericError;
 use unreal4u\MQTT\Exceptions\Connect\IdentifierRejected;
 use unreal4u\MQTT\Exceptions\Connect\NotAuthorized;
 use unreal4u\MQTT\Exceptions\Connect\ServerUnavailable;
 use unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class Connack extends ProtocolBase implements ReadableContentInterface
+/**
+ * Class ConnAck
+ * @package unreal4u\MQTT\Protocol
+ */
+final class ConnAck extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
 
@@ -89,7 +93,7 @@ final class Connack extends ProtocolBase implements ReadableContentInterface
     /**
      * @inheritdoc
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         $client
             ->setConnected(true)

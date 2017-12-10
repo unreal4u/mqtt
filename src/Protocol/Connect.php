@@ -6,6 +6,7 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
@@ -100,13 +101,12 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     }
 
     /**
-     * @param string $data
-     * @return ReadableContentInterface
+     * @inheritdoc
      */
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
-        $connAck = new Connack($this->logger);
+        $connAck = new ConnAck($this->logger);
         $connAck->populate($data);
         return $connAck;
     }

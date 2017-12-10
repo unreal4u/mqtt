@@ -38,9 +38,10 @@ interface WritableContentInterface
      * What specific kind of post we should expect back from this request
      *
      * @param string $data
+     * @param ClientInterface $client
      * @return ReadableContentInterface
      */
-    public function expectAnswer(string $data): ReadableContentInterface;
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface;
 
     /**
      * Some responses won't expect an answer back, others do in some situations

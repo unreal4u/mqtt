@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace tests\unreal4u\MQTT\Mocks;
 
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
-use unreal4u\MQTT\Protocol\Connack;
+use unreal4u\MQTT\Protocol\ConnAck;
 
 class WritableBaseMock extends ProtocolBase implements WritableContentInterface
 {
@@ -30,14 +31,14 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
     }
 
     /**
-     * What specific kind of post we should expect back from this request
-     *
-     * @param string $data
-     * @return ReadableContentInterface
+     * @inheritdoc
      */
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
-        return new Connack($data);
+        $connAck = new ConnAck();
+        $connAck->populate($data);
+
+        return $connAck;
     }
 
     /**

@@ -13,18 +13,15 @@ use unreal4u\MQTT\Protocol\Subscribe\Topic;
 
 include __DIR__ . '/00.basics.php';
 
-$keepAlivePeriod = 5;
-$disconnectAutomatically = false;
-
 $logger = new Logger('main');
-$logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
+$logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 $connectionParameters = new Parameters('subscribeToSomething');
-$connectionParameters->setKeepAlivePeriod($keepAlivePeriod);
+$connectionParameters->setKeepAlivePeriod(5);
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 
-$connect = new Connect($logger);
+$connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);
 
 $client = new Client($logger);

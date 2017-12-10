@@ -124,6 +124,7 @@ trait WritableContent
      *
      * @param string $data
      * @return string
+     * @throws \OutOfRangeException
      */
     final public function createUTF8String(string $data): string
     {

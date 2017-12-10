@@ -18,7 +18,7 @@ class UtilitiesTest extends TestCase
         $mapValues[] = [265, 2305];
         $mapValues[] = [2305, 265];
         $mapValues[] = [2417, 28937];
-        $mapValues[] = [6530, -32231];
+        $mapValues[] = [6530, 33305];
 
         return $mapValues;
     }
@@ -33,6 +33,12 @@ class UtilitiesTest extends TestCase
         $this->assertSame($expectedNumber, Utilities::convertEndianness($number));
     }
 
+    public function test_maximumIntReached()
+    {
+        $this->expectException(\OutOfRangeException::class);
+        Utilities::convertEndianness(65537);
+    }
+
     public function provider_convertNumberToBinaryString(): array
     {
         $mapValues[] = [1, 'AAE='];
@@ -43,8 +49,9 @@ class UtilitiesTest extends TestCase
         $mapValues[] = [2305, 'CQE='];
         $mapValues[] = [2417, 'CXE='];
         $mapValues[] = [6530, 'GYI='];
-        // INT16 has a maximum of 65535, it will cycle after that
-        $mapValues[] = [65536, 'AAE='];
+        $mapValues[] = [32535, 'fxc='];
+        $mapValues[] = [62535, '9Ec='];
+        $mapValues[] = [65535, '//8='];
 
         return $mapValues;
     }
@@ -57,5 +64,21 @@ class UtilitiesTest extends TestCase
     public function test_convertNumberToBinaryString(int $number, string $expectedOutput)
     {
         $this->assertSame($expectedOutput, base64_encode(Utilities::convertNumberToBinaryString($number)));
+    }
+
+    public function test_convertNumberToBinaryStringHighNumber()
+    {
+        $this->expectException(\OutOfRangeException::class);
+        Utilities::convertNumberToBinaryString(65537);
+    }
+
+    /**
+     * @dataProvider provider_convertNumberToBinaryString
+     * @param string $binaryString
+     * @param int $expectedOutput
+     */
+    public function test_convertBinaryStringToNumber(int $expectedOutput, string $binaryString)
+    {
+        $this->assertSame($expectedOutput, Utilities::convertBinaryStringToNumber(base64_decode($binaryString)));
     }
 }

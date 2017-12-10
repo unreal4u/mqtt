@@ -34,6 +34,7 @@
     "monolog/monolog": "~1.17",
     "phpunit/phpunit": "@stable",
     "phpmd/phpmd": "@stable",
+    "phpdocumentor/phpdocumentor": "2.*",
     "squizlabs/php_codesniffer": "^3.0"
   }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
@@ -25,7 +26,7 @@ final class PingReq extends ProtocolBase implements WritableContentInterface
         return '';
     }
 
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
         $pingResp = new PingResp($this->logger);

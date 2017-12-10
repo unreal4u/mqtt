@@ -20,12 +20,12 @@ $connect = new Connect();
 $connect->setConnectionParameters($parameters);
 // Example of invalid protocol which will throw an exception:
 #$connect->protocolLevel = '0.0.1';
-/** @var \unreal4u\MQTT\Protocol\Connack $connack */
+/** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */
 $client = new Client();
-$connack = $client->sendData($connect);
+$connAck = $client->sendData($connect);
 
 var_dump(
-    'connect return code:', $connack->connectReturnCode,
+    'connect return code:', $connAck->connectReturnCode,
     'client is connected?:', $client->isConnected()
 );
 

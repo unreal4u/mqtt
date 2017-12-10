@@ -7,18 +7,23 @@ namespace unreal4u\MQTT;
 use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Exceptions\NotConnected;
 use unreal4u\MQTT\Exceptions\ServerClosedConnection;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Disconnect;
 
-final class Client
+/**
+ * Class Client
+ * @package unreal4u\MQTT
+ */
+final class Client implements ClientInterface
 {
     /**
      * Where all the magic happens
      * @var Resource
      */
-    public $socket;
+    private $socket;
 
     /**
      * Logs all activity
@@ -44,6 +49,9 @@ final class Client
      */
     private $connectionParameters;
 
+    /**
+     * @inheritdoc
+     */
     public function __construct(LoggerInterface $logger = null)
     {
         if ($logger === null) {
@@ -54,9 +62,7 @@ final class Client
     }
 
     /**
-     * Be gentle and disconnect gracefully should this class be destroyed
-     *
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @inheritdoc
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
@@ -71,10 +77,15 @@ final class Client
     }
 
     /**
-     * Allows us to read an arbitrary number of bytes from the socket connection
-     *
-     * @param int $bytes
-     * @return string
+     * @inheritdoc
+     */
+    public function getSocket()
+    {
+        return $this->socket;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function readSocketData(int $bytes): string
     {
@@ -83,8 +94,7 @@ final class Client
     }
 
     /**
-     * The first 4 bytes will _always_ contain basic information with which we'll know what to do afterwards
-     * @return string
+     * @inheritdoc
      */
     public function readSocketHeader(): string
     {
@@ -93,10 +103,7 @@ final class Client
     }
 
     /**
-     * Sends the data to the socket and waits for an answer from the broker
-     *
-     * @param WritableContentInterface $object
-     * @return string
+     * @inheritdoc
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      */
@@ -118,10 +125,7 @@ final class Client
 
             throw new ServerClosedConnection('The server may have disconnected the current client');
         }
-        $this->logger->debug('Sending data to socket', [
-            'writtenBytes' => $writtenBytes,
-            'sizeOfString' => $sizeOfString,
-        ]);
+        $this->logger->debug('Sent data to socket', ['writtenBytes' => $writtenBytes, 'sizeOfString' => $sizeOfString]);
 
         if ($object->shouldExpectAnswer() === true) {
             return $this->readSocketHeader();
@@ -157,12 +161,9 @@ final class Client
     }
 
     /**
-     * Defines whether the following requests should act sync- or asynchronously
-     *
-     * @param bool $newStatus
-     * @return Client
+     * @inheritdoc
      */
-    public function setBlocking(bool $newStatus): Client
+    public function setBlocking(bool $newStatus): ClientInterface
     {
         $this->logger->debug('Setting new blocking status', ['newStatus' => $newStatus]);
         stream_set_blocking($this->socket, $newStatus);
@@ -170,10 +171,7 @@ final class Client
     }
 
     /**
-     * Prepares and sends the given request to the MQTT broker
-     *
-     * @param WritableContentInterface $object
-     * @return ReadableContentInterface
+     * @inheritdoc
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
@@ -188,10 +186,10 @@ final class Client
         }
 
         $this->logger->info('About to send data', ['object' => $currentObject]);
-        $readableContent = $object->expectAnswer($this->sendSocketData($object));
+        $readableContent = $object->expectAnswer($this->sendSocketData($object), $this);
         /*
          * Some objects must perform certain actions on the connection, for example:
-         * - Connack must set the connected bit
+         * - ConnAck must set the connected bit
          * - PingResp must reset the internal last-communication datetime
          */
         $this->logger->debug('Executing special actions for this object', [
@@ -204,14 +202,9 @@ final class Client
     }
 
     /**
-     * Will let us know if we are approaching the time limit in which the broker will disconnect us
-     *
-     * As per protocol, the broker will disconnect us after 1.5 times the configured keepAlive period, so it is safe to
-     * assume that between the keep alive period and that same period * 1.5 we must send in a PINGREQ packet.
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function needsCommunication(): bool
+    public function isItPingTime(): bool
     {
         $secondsDifference = (new \DateTime('now'))->getTimestamp() - $this->lastCommunication->getTimestamp();
         $this->logger->debug('Checking time difference', ['secondsDifference' => $secondsDifference]);
@@ -223,14 +216,9 @@ final class Client
     }
 
     /**
-     * Updates the internal counter to know when was the last known communication with the MQTT broker
-     *
-     * This will create a timestamp with support for microseconds
-     * @see https://gist.github.com/graste/47a4a6433dfe0acf64b7
-     *
-     * @return Client
+     * @inheritdoc
      */
-    public function updateLastCommunication(): Client
+    public function updateLastCommunication(): ClientInterface
     {
         $lastCommunication = null;
         if ($this->lastCommunication !== null) {
@@ -246,12 +234,9 @@ final class Client
     }
 
     /**
-     * Sets an easy bit for us to know whether we are connected to an MQTT broker or not
-     *
-     * @param bool $isConnected
-     * @return Client
+     * @inheritdoc
      */
-    public function setConnected(bool $isConnected): Client
+    public function setConnected(bool $isConnected): ClientInterface
     {
         $this->logger->debug('Setting internal connected property', ['connected' => $isConnected]);
         $this->isConnected = $isConnected;
@@ -263,9 +248,7 @@ final class Client
     }
 
     /**
-     * Will return the status of the connection in an easy way
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isConnected(): bool
     {

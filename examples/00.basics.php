@@ -15,7 +15,7 @@ ini_set('display_errors', '1');
 const COMMON_TOPICNAME = 'firstTest';
 const SECONDARY_TOPICNAME = 'secondaryTest';
 
-function str2bin($str)
+function str2bin(string $str): string
 {
     $out=null;
     $strLength = \strlen($str);

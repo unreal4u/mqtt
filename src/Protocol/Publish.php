@@ -7,8 +7,8 @@ namespace unreal4u\MQTT\Protocol;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\PayloadInterface;
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -121,7 +121,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         return !($this->message->getQoSLevel() === 0);
     }
 
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         if ($this->shouldExpectAnswer() === false) {
             return new EmptyReadableResponse($this->logger);
@@ -204,6 +204,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Will perform sanity checks and fill in the Readable object with data
      * @param string $rawMQTTHeaders
      * @return ReadableContentInterface
+     * @throws \OutOfRangeException
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
@@ -217,7 +218,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $messageStartPosition = 4;
         if ($this->message->getQoSLevel() > 0) {
             // 2 (fixed header) + 2 (topic size) + $topicSize marks the beginning of the 2 packet identifier bytes
-            $this->packetIdentifier = \ord($rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize});
+            $this->packetIdentifier = Utilities::convertBinaryStringToNumber($rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize});
             $messageStartPosition += 2;
         }
 
@@ -242,7 +243,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         if ($this->message->getQoSLevel() === 0) {
             $this->logger->debug('No response needed', ['qosLevel', $this->message->getQoSLevel()]);

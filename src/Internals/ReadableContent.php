@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
+use unreal4u\MQTT\Utilities;
 
+/**
+ * Trait ReadableContent
+ * @package unreal4u\MQTT\Internals
+ */
 trait ReadableContent
 {
     /**
@@ -44,20 +48,11 @@ trait ReadableContent
      *
      * @param string $rawMQTTHeaders
      * @return int
+     * @throws \OutOfRangeException
      */
     private function extractPacketIdentifier(string $rawMQTTHeaders): int
     {
-        // Fastest conversion? Turn the bytes around instead of trying to arm a number and passing it along
-        return \ord($rawMQTTHeaders{3} . $rawMQTTHeaders{2});
-    }
-
-    /**
-     * Returns the number of bytes we'll have to read out from
-     * @return int
-     */
-    final public function readVariableHeader(): int
-    {
-        return 0;
+        return Utilities::convertBinaryStringToNumber($rawMQTTHeaders{2} . $rawMQTTHeaders{3});
     }
 
     /**
@@ -72,11 +67,11 @@ trait ReadableContent
 
     /**
      * Any class can overwrite the default behaviour
-     * @param Client $client
+     * @param ClientInterface $client
      * @param WritableContentInterface $originalRequest
      * @return bool
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         return false;
     }

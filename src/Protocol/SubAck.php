@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Client;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
+/**
+ * Class SubAck
+ * @package unreal4u\MQTT\Protocol
+ */
 final class SubAck extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
@@ -17,10 +21,27 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
     const CONTROL_PACKET_VALUE = 9;
 
     /**
-     * @inheritdoc
+     * @var int
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
+    private $packetIdentifier = 0;
+
+    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
     {
+        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \LogicException
+     */
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
+    {
+        /** @var Subscribe $originalRequest */
+        if ($this->packetIdentifier !== $originalRequest->getPacketIdentifier()) {
+            throw new \LogicException('Packet identifiers do not match!');
+        }
+
         $client
             ->updateLastCommunication()
             ->setBlocking(false)

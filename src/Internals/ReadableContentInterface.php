@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
-use unreal4u\MQTT\Client;
 
 interface ReadableContentInterface
 {
@@ -36,10 +35,10 @@ interface ReadableContentInterface
     /**
      * Some operations require setting some things in the client or perform some checks, this hook will allow just that
      *
-     * @param Client $client
+     * @param ClientInterface $client
      * @param WritableContentInterface $originalRequest Will be used to validate stuff such as packetIdentifier
      *
      * @return bool
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool;
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool;
 }

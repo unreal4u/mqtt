@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
+use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\SimplePayload;
@@ -77,7 +78,7 @@ class PublishTest extends TestCase
     public function test_emptyExpectedAnswer()
     {
         $this->publish->setMessage($this->message);
-        $answer = $this->publish->expectAnswer('000');
+        $answer = $this->publish->expectAnswer('000', new ClientMock());
         $this->assertInstanceOf(EmptyReadableResponse::class, $answer);
     }
 
@@ -87,7 +88,7 @@ class PublishTest extends TestCase
         $this->publish->setMessage($this->message);
         $this->publish->createVariableHeader();
         /** @var PubAck $answer */
-        $answer = $this->publish->expectAnswer(base64_decode('QAIAAQ=='));
+        $answer = $this->publish->expectAnswer(base64_decode('QAIAAQ=='), new ClientMock());
         $this->assertInstanceOf(PubAck::class, $answer);
         $this->assertSame($answer->packetIdentifier, $this->publish->packetIdentifier);
     }

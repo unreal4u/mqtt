@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol\Subscribe;
 
+use unreal4u\MQTT\Application\PayloadInterface;
+use unreal4u\MQTT\Application\SimplePayload;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
 /**
  * When the client wants to subscribe to a topic, this is done by adding a topic filter.
- *
- * This class allows the client to
  */
 final class Topic
 {
@@ -38,7 +38,17 @@ final class Topic
     private $qosLevel = 0;
 
     /**
-     * Topic constructor. If
+     * Allows for a custom payload type per topic, defaults to SimplePayload
+     *
+     * @TODO This is still work in progress and may change in the future
+     *
+     * @see SimplePayload
+     * @var PayloadInterface
+     */
+    private $payloadType;
+
+    /**
+     * Topic constructor.
      * @param string $topicName
      * @param int $qosLevel
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
@@ -48,7 +58,8 @@ final class Topic
     {
         $this
             ->setTopicName($topicName)
-            ->setQoSLevel($qosLevel);
+            ->setQoSLevel($qosLevel)
+            ->setPayloadType(new SimplePayload());
     }
 
     /**
@@ -88,6 +99,19 @@ final class Topic
     }
 
     /**
+     * Allows to set a different payload type for each topic
+     *
+     * @param PayloadInterface $payloadType
+     * @return Topic
+     */
+    public function setPayloadType(PayloadInterface $payloadType): Topic
+    {
+        $this->payloadType = $payloadType;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getTopicName(): string
@@ -101,5 +125,13 @@ final class Topic
     public function getTopicQoSLevel(): int
     {
         return $this->qosLevel;
+    }
+
+    /**
+     * @return PayloadInterface
+     */
+    public function getPayloadType(): PayloadInterface
+    {
+        return $this->payloadType;
     }
 }

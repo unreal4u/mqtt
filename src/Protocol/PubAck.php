@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Client;
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -12,6 +12,10 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * Class PubAck
+ * @package unreal4u\MQTT\Protocol
+ */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent;
@@ -31,7 +35,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
      * @inheritdoc
      * @throws \LogicException
      */
-    public function performSpecialActions(Client $client, WritableContentInterface $originalRequest): bool
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         /** @var Publish $originalRequest */
         if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
@@ -40,10 +44,6 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
         return true;
     }
 
-    /**
-     * Creates the variable header that each method has
-     * @return string
-     */
     public function createVariableHeader(): string
     {
         return Utilities::convertNumberToBinaryString($this->packetIdentifier);
@@ -59,12 +59,9 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     }
 
     /**
-     * What specific kind of post we should expect back from this request
-     *
-     * @param string $data
-     * @return ReadableContentInterface
+     * @inheritdoc
      */
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         return $this;
     }

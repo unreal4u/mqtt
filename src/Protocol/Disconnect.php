@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\DisconnectCleanup;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -26,7 +27,7 @@ final class Disconnect extends ProtocolBase implements WritableContentInterface
         return '';
     }
 
-    public function expectAnswer(string $data): ReadableContentInterface
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         return new DisconnectCleanup($this->logger);
     }
