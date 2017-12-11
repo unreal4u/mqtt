@@ -109,7 +109,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         $pubAck = new PubAck($this->logger);
-        $pubAck->instantiateObject($data);
+        $pubAck->instantiateObject($data, $client);
         return $pubAck;
     }
 
@@ -184,14 +184,30 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * Will perform sanity checks and fill in the Readable object with data
      * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
      * @return ReadableContentInterface
      * @throws \OutOfRangeException
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
+        if (mb_strlen($rawMQTTHeaders) === 1) {
+            $this->logger->debug('Fast check, read rest of data from socket');
+            $restOfBytes = $client->readSocketData(1);
+            $payload = $client->readSocketData(\ord($restOfBytes));
+        } else {
+            $this->logger->debug('Slow form, retransform data and read rest of data');
+            $restOfBytes = $rawMQTTHeaders{1};
+            $payload = mb_substr($rawMQTTHeaders, 2);
+            $exactRest = \ord($restOfBytes) - mb_strlen($payload);
+            $payload .= $client->readSocketData($exactRest);
+            $rawMQTTHeaders = $rawMQTTHeaders{0};
+        }
+
+        // At this point, $rawMQTTHeaders will be always 1 byte long
         $this->message = new Message();
-        $this->analyzeFirstByte(\ord($rawMQTTHeaders{0}));
+        $this->analyzeFirstByte(\ord($rawMQTTHeaders));
+        // $rawMQTTHeaders may be redefined
+        $rawMQTTHeaders = $rawMQTTHeaders . $restOfBytes . $payload;
 
         // Topic size is always the 3rd byte
         $topicSize = \ord($rawMQTTHeaders{3});

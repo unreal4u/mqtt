@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\EventManager;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
@@ -67,20 +67,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         return true;
     }
 
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
-    {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
-
-        if (\ord($data[0]) >> 4 === 9) {
-            $returnObject = new SubAck($this->logger);
-        } elseif (\ord($data[0]) >> 4 === 3) {
-            $returnObject = new Publish($this->logger);
-        }
-        $returnObject->instantiateObject($data);
-
-        return $returnObject;
-    }
-
     /**
      * SUBSCRIBE Control Packets MUST contain a non-zero 16-bit Packet Identifier
      *
@@ -107,23 +93,19 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     /**
      * Performs a check on the socket connection and returns either the contents or an empty object
      *
-     * @param Client $client
+     * @param ClientInterface $client
      * @return ReadableContentInterface
+     * @throws \DomainException
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    public function checkForEvent(Client $client): ReadableContentInterface
+    public function checkForEvent(ClientInterface $client): ReadableContentInterface
     {
-        $this->updateCommunication($client);
         $publishPacketControlField = $client->readSocketData(1);
-        if ((\ord($publishPacketControlField) & 0xf0) > 0) {
-            $restOfBytes = $client->readSocketData(1);
-            $payload = $client->readSocketData(\ord($restOfBytes));
+        $eventManager = new EventManager($this->logger);
 
-            $publish = new Publish($this->logger);
-            $publish->instantiateObject($publishPacketControlField . $restOfBytes . $payload);
-            return $publish;
+        if ((\ord($publishPacketControlField) & 255) > 0) {
+            return $eventManager->analyzeHeaders($publishPacketControlField, $client);
         }
 
         $this->logger->debug('No valid publish packet control field found, returning empty response');
@@ -133,22 +115,25 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     /**
      * Performs a simple loop and yields results back whenever they are available
      *
-     * @param Client $client
+     * @param ClientInterface $client
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
      * @return \Generator
+     * @throws \DomainException
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
-    public function loop(Client $client, int $idleMicroseconds = 100000): \Generator
+    public function loop(ClientInterface $client, int $idleMicroseconds = 100000): \Generator
     {
         // First of all: subscribe
+        $client->setBlocking(true);
+        $readableContent = $client->sendData($this);
         /**
-         * FIXME: Implement a sort of EventManager because a SUBSCRIBE can return PUBLISH _or_ SUBACK response:
          * The Server is permitted to start sending PUBLISH packets matching the Subscription before it sends the
          * SUBACK Packet.
          */
-        $client->sendData($this);
+        if ($readableContent instanceof Publish) {
+            yield $readableContent->getMessage();
+        }
 
         // After we are successfully subscribed, start to listen for events
         while (true) {
@@ -176,25 +161,5 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         $this->logger->debug('One or more topics have been added', ['totalTopics', count($this->topics)]);
 
         return $this;
-    }
-
-    /**
-     * @param Client $client
-     * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     */
-    private function updateCommunication(ClientInterface $client): bool
-    {
-        $this->logger->debug('Checking ping');
-        if ($client->isItPingTime()) {
-            $this->logger->notice('Sending ping');
-            $client->setBlocking(true);
-            $client->sendData(new PingReq($this->logger));
-            $client->setBlocking(false);
-        }
-
-        return true;
     }
 }

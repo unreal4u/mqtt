@@ -25,6 +25,7 @@ abstract class ProtocolBase
             $logger = new DummyLogger();
         }
 
-        $this->logger = $logger;
+        // Insert name of class within the logger
+        $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', \get_class($this)));
     }
 }

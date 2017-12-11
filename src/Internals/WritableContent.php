@@ -130,4 +130,12 @@ trait WritableContent
     {
         return Utilities::convertNumberToBinaryString(mb_strlen($data)) . $data;
     }
+
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    {
+        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
+
+        $eventManager = new EventManager($this->logger);
+        return $eventManager->analyzeHeaders($data, $client);
+    }
 }

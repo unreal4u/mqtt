@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
-use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Exceptions\NotConnected;
 use unreal4u\MQTT\Exceptions\ServerClosedConnection;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect;
@@ -17,19 +17,13 @@ use unreal4u\MQTT\Protocol\Disconnect;
  * Class Client
  * @package unreal4u\MQTT
  */
-final class Client implements ClientInterface
+final class Client extends ProtocolBase implements ClientInterface
 {
     /**
      * Where all the magic happens
      * @var Resource
      */
     private $socket;
-
-    /**
-     * Logs all activity
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * Fast way to know whether we are connected or not
@@ -48,18 +42,6 @@ final class Client implements ClientInterface
      * @var Connect\Parameters
      */
     private $connectionParameters;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct(LoggerInterface $logger = null)
-    {
-        if ($logger === null) {
-            $logger = new DummyLogger();
-        }
-
-        $this->logger = $logger;
-    }
 
     /**
      * @inheritdoc

@@ -22,14 +22,21 @@ use unreal4u\MQTT\Protocol\Subscribe;
 final class EventManager extends ProtocolBase
 {
     /**
+     * Current object as an object
      * @var ReadableContentInterface
      */
     private $currentObject;
 
     /**
+     * Current object in string format
+     * @var string
+     */
+    private $currentObjectType = '';
+
+    /**
      * @var ReadableContentInterface[]
      */
-    private $restrictionObjects = [];
+    private $objectCandidates = [];
 
     /**
      * A list of all Readable objects that this class may instantiate at some point
@@ -45,7 +52,7 @@ final class EventManager extends ProtocolBase
         #6 => PubRel::class, TODO Implement PubRel
         #7 => PubComp::class, TODO Implement PubComp
         9 => SubAck::class,
-        #11 => UnsubAck::class, TODO Implement UbsubAck
+        #11 => UnsubAck::class, TODO Implement UnsubAck
         13 => PingResp::class,
     ];
 
@@ -71,52 +78,38 @@ final class EventManager extends ProtocolBase
     /**
      * Will check within all the Readable objects whether one of those is the correct packet we are looking for
      *
-     * @param string $rawMQTTHeaders
-     * @param ClientInterface $client
-     * @return EventManager
+     * @param string $rawMQTTHeaders Arbitrary size of minimum 1 incoming byte(s)
+     * @param ClientInterface $client Used if the object itself needs to process some more stuff
+     * @return ReadableContentInterface
      * @throws \DomainException
      */
-    public function analyzeHeaders(string $rawMQTTHeaders, ClientInterface $client): EventManager
+    public function analyzeHeaders(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $controlPacketType = \ord($rawMQTTHeaders[0]) >> 4;
 
         if (array_key_exists($controlPacketType, self::$readableObjects)) {
-            $this->currentObject = new self::$readableObjects[$controlPacketType]($this->logger);
-            $this->currentObject->instantiateObject($rawMQTTHeaders);
+            $this->currentObjectType = self::$readableObjects[$controlPacketType];
+            $this->logger->info('Found corresponding object, instantiating', ['type' => $this->currentObjectType]);
+            $this->currentObject = new $this->currentObjectType($this->logger);
+            $this->currentObject->instantiateObject($rawMQTTHeaders, $client);
         } else {
             $this->logger->error('Invalid control packet type found', ['controlPacketType' => $controlPacketType]);
             throw new \DomainException(sprintf('Invalid control packet found (%d)', $controlPacketType));
         }
 
-        /*
-            case 3:
-                $this->currentObject = new Publish($this->logger);
-                $this->updateCommunication($client);
-                $publishPacketControlField = $client->readSocketData(1);
-                if ((\ord($publishPacketControlField) & 0xf0) > 0) {
-                    $restOfBytes = $client->readSocketData(1);
-                    $payload = $client->readSocketData(\ord($restOfBytes));
-
-                    $this->currentObject->setPayloadType($payloadType);
-
-                    $rawMQTTHeaders = $publishPacketControlField . $restOfBytes . $payload;
-                }
-        */
-
-
-        return $this;
+        return $this->currentObject;
     }
 
-    public function addRestriction(ReadableContentInterface ...$restrictionObject): EventManager
+    public function addCandidate(ReadableContentInterface ...$restrictionObject): EventManager
     {
-        $this->restrictionObjects = $restrictionObject;
+        $this->objectCandidates = $restrictionObject;
 
         return $this;
     }
 
     public function getObject(): ReadableContentInterface
     {
-        foreach ($this->restrictionObjects as $restrictionObject) {
+        foreach ($this->objectCandidates as $restrictionObject) {
             $this->logger->debug('Checking whether currentObject is the correct instance', [
                 'currentObject' => \get_class($this->currentObject),
                 'objectCheck' => \get_class($restrictionObject),

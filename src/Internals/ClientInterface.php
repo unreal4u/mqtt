@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
-use unreal4u\MQTT\Client;
 
 /**
  * Interface ClientInterface
@@ -61,7 +60,7 @@ interface ClientInterface
      * user as soon as possible.
      *
      * @param bool $newStatus
-     * @return Client
+     * @return ClientInterface
      */
     public function setBlocking(bool $newStatus): ClientInterface;
 
@@ -89,7 +88,7 @@ interface ClientInterface
      * This will create a timestamp with support for microseconds
      * @see https://gist.github.com/graste/47a4a6433dfe0acf64b7
      *
-     * @return Client
+     * @return ClientInterface
      */
     public function updateLastCommunication(): ClientInterface;
 
@@ -97,7 +96,7 @@ interface ClientInterface
      * Sets an easy bit for us to know whether we are connected to an MQTT broker or not
      *
      * @param bool $isConnected
-     * @return Client
+     * @return ClientInterface
      */
     public function setConnected(bool $isConnected): ClientInterface;
 

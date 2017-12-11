@@ -12,6 +12,11 @@ use Psr\Log\LogLevel;
  */
 final class DummyLogger implements LoggerInterface
 {
+    public function withName(string $name): self
+    {
+        return $this;
+    }
+
     public function emergency($message, array $context = array())
     {
         $this->log(LogLevel::EMERGENCY, $message, $context);

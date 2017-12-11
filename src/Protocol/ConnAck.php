@@ -47,6 +47,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      * @inheritdoc
      *
      * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
      * @return ReadableContentInterface
      * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
      * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
@@ -55,7 +56,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
      * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
-    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $this->connectReturnCode = \ord($rawMQTTHeaders{3});
         switch ($this->connectReturnCode) {

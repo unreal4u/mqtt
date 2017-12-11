@@ -20,7 +20,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
 
     const CONTROL_PACKET_VALUE = 5;
 
-    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
         return $this;

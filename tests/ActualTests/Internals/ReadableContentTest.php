@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Internals;
 
 use PHPUnit\Framework\TestCase;
+use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
 use unreal4u\MQTT\Protocol\PingResp;
 
@@ -16,6 +17,6 @@ class ReadableContentTest extends TestCase
         $pingResp = new PingResp();
 
         $this->expectException(InvalidResponseType::class);
-        $pingResp->instantiateObject($success);
+        $pingResp->instantiateObject($success, new ClientMock());
     }
 }

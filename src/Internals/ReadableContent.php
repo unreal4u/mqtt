@@ -19,17 +19,23 @@ trait ReadableContent
      */
     protected $variableHeaderSize = 0;
 
-    final public function instantiateObject(string $rawMQTTHeaders): ReadableContentInterface
+    final public function instantiateObject(string $rawMQTTHeaders, ClientInterface $client): bool
     {
         //var_dump(base64_encode($rawMQTTHeaders)); // For now: make it a bit easier to create unit tests
-        $this
-            ->checkControlPacketValue(\ord($rawMQTTHeaders[0]) >> 4)
-            ->fillObject($rawMQTTHeaders);
+        $this->checkControlPacketValue(\ord($rawMQTTHeaders[0]) >> 4);
+        $this->fillObject($rawMQTTHeaders, $client);
 
-        return $this;
+        return true;
     }
 
-    final public function checkControlPacketValue(int $controlPacketValue): ReadableContentInterface
+    /**
+     * Checks whether the control packet corresponds to this object
+     *
+     * @param int $controlPacketValue
+     * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     */
+    private function checkControlPacketValue(int $controlPacketValue): bool
     {
         // Check whether the first byte corresponds to the expected control packet value
         if (static::CONTROL_PACKET_VALUE !== $controlPacketValue) {
@@ -40,7 +46,7 @@ trait ReadableContent
             ));
         }
 
-        return $this;
+        return true;
     }
 
     /**
@@ -56,11 +62,12 @@ trait ReadableContent
     }
 
     /**
-     * Any class can overwrite the default behaviour
+     * Any class can overwrite the default behaviour (which is do nothing)
      * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
      * @return ReadableContentInterface
      */
-    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         return $this;
     }

@@ -25,8 +25,13 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
      */
     private $packetIdentifier = 0;
 
-    public function fillObject(string $rawMQTTHeaders): ReadableContentInterface
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
+        // Read the rest of the request out should only 1 byte have come in
+        if (mb_strlen($rawMQTTHeaders) === 1) {
+            $rawMQTTHeaders .= $client->readSocketData(3);
+        }
+
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
         return $this;
     }
