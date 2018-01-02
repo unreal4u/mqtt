@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
-use unreal4u\MQTT\DummyLogger;
+use unreal4u\Dummy\Logger;
 
 abstract class ProtocolBase
 {
@@ -22,7 +22,7 @@ abstract class ProtocolBase
     final public function __construct(LoggerInterface $logger = null)
     {
         if ($logger === null) {
-            $logger = new DummyLogger();
+            $logger = new Logger();
         }
 
         // Insert name of class within the logger

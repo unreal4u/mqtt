@@ -28,7 +28,7 @@
     "php": ">=7.0.0",
     "ext-mbstring": "*",
     "roave/security-advisories": "dev-master",
-    "psr/log": "~1.0"
+    "unreal4u/dummy-logger": "~1.0"
   },
   "require-dev": {
     "monolog/monolog": "~1.17",
