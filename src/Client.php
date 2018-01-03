@@ -32,6 +32,12 @@ final class Client extends ProtocolBase implements ClientInterface
     private $isConnected = false;
 
     /**
+     * Fast way to know whether we are currently in locked mode or not
+     * @var bool
+     */
+    private $isCurrentlyLocked = false;
+
+    /**
      * Annotates the last time there was known to be communication with the MQTT server
      * @var \DateTimeImmutable
      */
@@ -71,7 +77,10 @@ final class Client extends ProtocolBase implements ClientInterface
      */
     public function readSocketData(int $bytes): string
     {
-        $this->logger->debug('Reading bytes from socket', ['numberOfBytes' => $bytes]);
+        $this->logger->debug('Reading bytes from socket', [
+            'numberOfBytes' => $bytes,
+            'isLocked' => $this->isCurrentlyLocked,
+        ]);
         return fread($this->socket, $bytes);
     }
 
@@ -149,6 +158,7 @@ final class Client extends ProtocolBase implements ClientInterface
     {
         $this->logger->debug('Setting new blocking status', ['newStatus' => $newStatus]);
         stream_set_blocking($this->socket, $newStatus);
+        $this->isCurrentlyLocked = $newStatus;
         return $this;
     }
 
@@ -189,7 +199,10 @@ final class Client extends ProtocolBase implements ClientInterface
     public function isItPingTime(): bool
     {
         $secondsDifference = (new \DateTime('now'))->getTimestamp() - $this->lastCommunication->getTimestamp();
-        $this->logger->debug('Checking time difference', ['secondsDifference' => $secondsDifference]);
+        $this->logger->debug('Checking time difference', [
+            'secondsDifference' => $secondsDifference,
+            'keepAlivePeriod' => $this->connectionParameters->getKeepAlivePeriod(),
+        ]);
 
         return
             $this->isConnected() &&

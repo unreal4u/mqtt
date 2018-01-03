@@ -23,8 +23,14 @@ $connectionParameters->setPassword('userpass');
 $connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);
 
-$client = new Client($logger);
-$client->sendData($connect);
+try {
+    $client = new Client($logger);
+    $client->sendData($connect);
+} catch (\Exception $e) {
+    printf($e->getMessage());
+    die();
+}
+$logger->info('Client connected, continuing...');
 
 if ($client->isConnected() === false) {
     throw new DomainException('We are not connected, can not subscribe');
@@ -35,11 +41,24 @@ $secondaryTopic = new Topic(SECONDARY_TOPICNAME);
 
 $subscribe = new Subscribe($logger);
 $subscribe->addTopics($mainTopic, $secondaryTopic);
+/** @var \unreal4u\MQTT\Application\Message $message */
 foreach ($subscribe->loop($client) as $message) {
+    /*
+     * Given the following conditions:
+     *
+     * - A retained message is present at the broker when subscribing
+     * - You are subscribing to multiple topics in one go
+     * - QoS level of the retained message is less than 2
+     *
+     * Then one in about ten attempts to subscribe will return as first message a possibly retained PUBLISH message,
+     * following a SubAck and then the same published retained(?) message again. This isn't a bug of this library, but
+     * rather an implementation detail of the MQTT protocol: a message may arrive or be sent out multiple times.
+     */
     printf(
-        '%s-- Payload detected on topic "%s": %s + %s%s',
+        '%s-- Payload detected on topic "%s" (QoS lvl %d): %s + %s%s',
         PHP_EOL,
         $message->getTopicName(),
+        $message->getQoSLevel(),
         PHP_EOL,
         $message->getPayload(),
         PHP_EOL

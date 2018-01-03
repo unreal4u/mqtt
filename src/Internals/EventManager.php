@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
+use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Exceptions\NonAllowedObject;
 use unreal4u\MQTT\Protocol\ConnAck;
 use unreal4u\MQTT\Protocol\Connect;
@@ -85,6 +86,10 @@ final class EventManager extends ProtocolBase
      */
     public function analyzeHeaders(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
+        if ($rawMQTTHeaders === '') {
+            $this->logger->debug('Empty headers, returning an empty object');
+            return new EmptyReadableResponse($this->logger);
+        }
         $controlPacketType = \ord($rawMQTTHeaders[0]) >> 4;
 
         if (array_key_exists($controlPacketType, self::$readableObjects)) {

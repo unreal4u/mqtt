@@ -59,6 +59,9 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     /**
      * When the Server receives a SUBSCRIBE Packet from a Client, the Server MUST respond with a SUBACK Packet
      *
+     * This can however not be in the same order, as we may be able to receive PUBLISH packets before getting a SUBACK
+     * back
+     *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718134 (MQTT-3.8.4-1)
      * @return bool
      */
@@ -101,9 +104,11 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      */
     public function checkForEvent(ClientInterface $client): ReadableContentInterface
     {
+        $this->checkPingTime($client);
         $publishPacketControlField = $client->readSocketData(1);
         $eventManager = new EventManager($this->logger);
 
+        $this->logger->debug('Checking event', ['ordValue' => \ord($publishPacketControlField) & 255]);
         if ((\ord($publishPacketControlField) & 255) > 0) {
             return $eventManager->analyzeHeaders($publishPacketControlField, $client);
         }
@@ -113,7 +118,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     }
 
     /**
-     * Performs a simple loop and yields results back whenever they are available
+     * Loop and yields different type of results back whenever they are available
      *
      * @param ClientInterface $client
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
@@ -125,27 +130,24 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function loop(ClientInterface $client, int $idleMicroseconds = 100000): \Generator
     {
         // First of all: subscribe
+        $this->logger->debug('Beginning loop', ['idleMicroseconds' => $idleMicroseconds]);
         $client->setBlocking(true);
         $readableContent = $client->sendData($this);
-        /**
-         * The Server is permitted to start sending PUBLISH packets matching the Subscription before it sends the
-         * SUBACK Packet.
-         */
-        if ($readableContent instanceof Publish) {
-            yield $readableContent->getMessage();
-        }
+        // Set blocking explicitly to false due to messages not always arriving in the correct order
+        $client->setBlocking(false);
 
-        // After we are successfully subscribed, start to listen for events
         while (true) {
-            $readableContent = $this->checkForEvent($client);
-
+            $this->logger->debug('--- Loop ---');
             // Only if we receive a Publish event from the broker, yield the contents
             if ($readableContent instanceof Publish) {
                 yield $readableContent->getMessage();
             } else {
                 // Only wait for a certain amount of time if there was nothing in the queue
+                $this->logger->info('Got an incoming object, disregarding', ['class' => \get_class($readableContent)]);
                 usleep($idleMicroseconds);
             }
+
+            $readableContent = $this->checkForEvent($client);
         }
     }
 
@@ -158,8 +160,25 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function addTopics(Topic ...$topics): Subscribe
     {
         $this->topics = $topics;
-        $this->logger->debug('One or more topics have been added', ['totalTopics', count($this->topics)]);
+        $this->logger->debug('Topics added', ['totalTopics', count($this->topics)]);
 
         return $this;
+    }
+
+    /**
+     * @param ClientInterface $client
+     * @return bool
+     */
+    protected function checkPingTime(ClientInterface $client): bool
+    {
+        $this->logger->debug('Checking ping request time');
+        if ($client->isItPingTime()) {
+            $this->logger->notice('PingReq is needed, sending');
+            $client->setBlocking(true);
+            $client->sendData(new PingReq($this->logger));
+            $client->setBlocking(false);
+        }
+
+        return true;
     }
 }
