@@ -45,9 +45,9 @@ MQTT works with a Client and Server model, this means that:
 - A subscription can be seen as a publish done by the server to the client.
 
 With that knowledge, QoS works in the following way:
-- QoS level 0 (default): A publish message may never arrive at the server.
+- QoS level 0 (default): A publish message may never arrive (or several times) at the server.
 - QoS level 1: A publish message must arrive at the server, however, this may occur several times, for example, during an
-intermittent connection to the server.
+intermittent connection to the server or while trying to subscribe to multiple topics in one go.
 - QoS level 2: A publish message must arrive at the server, but exactly one time. The way this is dealt with is to effectively
 start a conversation with the broker in order to assure messages arrive only once.
 
