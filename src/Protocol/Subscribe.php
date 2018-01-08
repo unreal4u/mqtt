@@ -84,6 +84,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         }
 
         $this->packetIdentifier = $packetIdentifier;
+        $this->logger->debug('Setting packet identifier', ['current' => $this->packetIdentifier]);
 
         return $this;
     }

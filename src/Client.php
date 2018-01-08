@@ -108,6 +108,7 @@ final class Client extends ProtocolBase implements ClientInterface
         $writableString = $object->createSendableMessage();
         $sizeOfString = \strlen($writableString);
         $writtenBytes = fwrite($this->socket, $writableString, $sizeOfString);
+        // $this->logger->debug('Sent string', ['binaryString' => str2bin($writableString)]); // Handy for debugging
         if ($writtenBytes !== $sizeOfString) {
             $this->logger->error('Written bytes do NOT correspond with size of string!', [
                 'writtenBytes' => $writtenBytes,
