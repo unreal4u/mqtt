@@ -27,7 +27,6 @@
   "require": {
     "php": ">=7.0.0",
     "ext-mbstring": "*",
-    "roave/security-advisories": "dev-master",
     "unreal4u/dummy-logger": "~1.0"
   },
   "require-dev": {
