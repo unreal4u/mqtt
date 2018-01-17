@@ -126,17 +126,4 @@ final class EventManager extends ProtocolBase
 
         throw new NonAllowedObject('An non allowed object has been found');
     }
-
-    private function updateCommunication(ClientInterface $client): bool
-    {
-        $this->logger->debug('Checking ping');
-        if ($client->isItPingTime()) {
-            $this->logger->notice('Sending ping');
-            $client->setBlocking(true);
-            $client->sendData(new PingReq($this->logger));
-            $client->setBlocking(false);
-        }
-
-        return true;
-    }
 }

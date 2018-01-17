@@ -77,7 +77,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
      * @return Subscribe
      * @throws \OutOfRangeException
      */
-    public function setPacketIdentifier(int $packetIdentifier): Subscribe
+    public function setPacketIdentifier(int $packetIdentifier): self
     {
         if ($packetIdentifier > 65535 || $packetIdentifier < 1) {
             throw new \OutOfRangeException('Packet identifier must fit within 2 bytes');
@@ -95,91 +95,16 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
     }
 
     /**
-     * Performs a check on the socket connection and returns either the contents or an empty object
-     *
-     * @param ClientInterface $client
-     * @return ReadableContentInterface
-     * @throws \DomainException
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     */
-    public function checkForEvent(ClientInterface $client): ReadableContentInterface
-    {
-        $this->checkPingTime($client);
-        $publishPacketControlField = $client->readSocketData(1);
-        $eventManager = new EventManager($this->logger);
-
-        $this->logger->debug('Checking event', ['ordValue' => \ord($publishPacketControlField) & 255]);
-        if ((\ord($publishPacketControlField) & 255) > 0) {
-            return $eventManager->analyzeHeaders($publishPacketControlField, $client);
-        }
-
-        $this->logger->debug('No valid publish packet control field found, returning empty response');
-        return new EmptyReadableResponse($this->logger);
-    }
-
-    /**
-     * Loop and yields different type of results back whenever they are available
-     *
-     * @param ClientInterface $client
-     * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
-     * @return \Generator
-     * @throws \DomainException
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     */
-    public function loop(ClientInterface $client, int $idleMicroseconds = 100000): \Generator
-    {
-        // First of all: subscribe
-        $this->logger->debug('Beginning loop', ['idleMicroseconds' => $idleMicroseconds]);
-        $client->setBlocking(true);
-        $readableContent = $client->sendData($this);
-        // Set blocking explicitly to false due to messages not always arriving in the correct order
-        $client->setBlocking(false);
-
-        while (true) {
-            $this->logger->debug('--- Loop ---');
-            // Only if we receive a Publish event from the broker, yield the contents
-            if ($readableContent instanceof Publish) {
-                yield $readableContent->getMessage();
-            } else {
-                // Only wait for a certain amount of time if there was nothing in the queue
-                $this->logger->info('Got an incoming object, disregarding', ['class' => \get_class($readableContent)]);
-                usleep($idleMicroseconds);
-            }
-
-            $readableContent = $this->checkForEvent($client);
-        }
-    }
-
-    /**
      * A subscription is based on filters, this function allows us to pass on filters
      *
      * @param Topic[] $topics
      * @return Subscribe
      */
-    public function addTopics(Topic ...$topics): Subscribe
+    public function addTopics(Topic ...$topics): self
     {
         $this->topics = $topics;
         $this->logger->debug('Topics added', ['totalTopics', count($this->topics)]);
 
         return $this;
-    }
-
-    /**
-     * @param ClientInterface $client
-     * @return bool
-     */
-    protected function checkPingTime(ClientInterface $client): bool
-    {
-        $this->logger->debug('Checking ping request time');
-        if ($client->isItPingTime()) {
-            $this->logger->notice('PingReq is needed, sending');
-            $client->setBlocking(true);
-            $client->sendData(new PingReq($this->logger));
-            $client->setBlocking(false);
-        }
-
-        return true;
     }
 }

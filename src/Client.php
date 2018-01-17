@@ -119,11 +119,14 @@ final class Client extends ProtocolBase implements ClientInterface
         }
         $this->logger->debug('Sent data to socket', ['writtenBytes' => $writtenBytes, 'sizeOfString' => $sizeOfString]);
 
+        $returnValue = '';
         if ($object->shouldExpectAnswer() === true) {
-            return $this->readSocketHeader();
+            $this->setBlocking(true);
+            $returnValue = $this->readSocketHeader();
+            $this->setBlocking(false);
         }
 
-        return '';
+        return $returnValue;
     }
 
     /**

@@ -250,7 +250,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($this->message->getQoSLevel() === 0) {
             $this->logger->debug('No response needed', ['qosLevel', $this->message->getQoSLevel()]);
         } else {
-            $client->setBlocking(true);
             if ($this->message->getQoSLevel() === 1) {
                 $this->logger->debug('Responding with PubAck', ['qosLevel' => $this->message->getQoSLevel()]);
                 $client->sendData($this->composePubAckAnswer());
@@ -258,7 +257,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
                 $this->logger->debug('Responding with PubRec', ['qosLevel' => $this->message->getQoSLevel()]);
                 $client->sendData(new PubRec($this->logger));
             }
-            $client->setBlocking(false);
         }
 
         return true;

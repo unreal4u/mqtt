@@ -138,7 +138,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         $client->setBlocking(false);
 
         $isSubscribed = true;
-
         while ($isSubscribed) {
             $this->logger->debug('++Loop++');
             if ($readableContent instanceof Publish) {
@@ -180,9 +179,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     {
         if ($client->isItPingTime()) {
             $this->logger->info('Pinging is needed, sending PingReq');
-            $client->setBlocking(true);
             $client->sendData(new PingReq($this->logger));
-            $client->setBlocking(false);
         }
 
         return true;
