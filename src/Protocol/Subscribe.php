@@ -109,8 +109,8 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         $publishPacketControlField = $client->readSocketData(1);
         $eventManager = new EventManager($this->logger);
 
-        $this->logger->debug('Checking event', ['ordValue' => \ord($publishPacketControlField) & 255]);
         if ((\ord($publishPacketControlField) & 255) > 0) {
+            $this->logger->debug('Event received', ['ordValue' => \ord($publishPacketControlField) & 255]);
             return $eventManager->analyzeHeaders($publishPacketControlField, $client);
         }
 
@@ -137,14 +137,20 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         // Set blocking explicitly to false due to messages not always arriving in the correct order
         $client->setBlocking(false);
 
-        while (true) {
-            $this->logger->debug('--- Loop ---');
-            // Only if we receive a Publish event from the broker, yield the contents
+        $isSubscribed = true;
+
+        while ($isSubscribed) {
+            $this->logger->debug('++Loop++');
             if ($readableContent instanceof Publish) {
+                // Only if we receive a Publish event from the broker, yield the contents
                 yield $readableContent->getMessage();
+            } elseif ($readableContent instanceof UnSubAck) {
+                // We have received an UnSubAck, which means we have to break the loop
+                // TODO Improve this
+                $isSubscribed = false;
             } else {
                 // Only wait for a certain amount of time if there was nothing in the queue
-                $this->logger->info('Got an incoming object, disregarding', ['class' => \get_class($readableContent)]);
+                $this->logger->debug('Got an incoming object, disregarding', ['class' => \get_class($readableContent)]);
                 usleep($idleMicroseconds);
             }
 
@@ -172,9 +178,8 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      */
     protected function checkPingTime(ClientInterface $client): bool
     {
-        $this->logger->debug('Checking ping request time');
         if ($client->isItPingTime()) {
-            $this->logger->notice('PingReq is needed, sending');
+            $this->logger->info('Pinging is needed, sending PingReq');
             $client->setBlocking(true);
             $client->sendData(new PingReq($this->logger));
             $client->setBlocking(false);

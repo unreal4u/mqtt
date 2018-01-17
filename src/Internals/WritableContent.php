@@ -128,7 +128,7 @@ trait WritableContent
      */
     final public function createUTF8String(string $data): string
     {
-        return Utilities::convertNumberToBinaryString(mb_strlen($data)) . $data;
+        return Utilities::convertNumberToBinaryString(\strlen($data)) . $data;
     }
 
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface

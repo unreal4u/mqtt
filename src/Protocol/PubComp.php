@@ -11,7 +11,7 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
-final class PubComb extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
+final class PubComp extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent;
     use WritableContent;

@@ -33,7 +33,7 @@ class ConnectTest extends TestCase
     {
         $this->connect->setConnectionParameters(new Parameters('UnitTestClientId'));
         $connectVariableHeader = $this->connect->createVariableHeader();
-        $this->assertSame(10, mb_strlen($connectVariableHeader));
+        $this->assertSame(10, \strlen($connectVariableHeader));
         $this->assertSame('AARNUVRUBAAAPA==', base64_encode($connectVariableHeader));
     }
 
@@ -46,7 +46,7 @@ class ConnectTest extends TestCase
         $this->connect->setConnectionParameters($parameters);
         $connectPayload = $this->connect->createPayload();
 
-        $this->assertSame(41, mb_strlen($connectPayload));
+        $this->assertSame(41, \strlen($connectPayload));
         $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAh1bnJlYWw0dQALanVzdFQzc3Qxbmc=', base64_encode($connectPayload));
     }
 
@@ -71,7 +71,7 @@ class ConnectTest extends TestCase
         $this->connect->setConnectionParameters($parameters);
         $connectPayload = $this->connect->createPayload();
 
-        $this->assertSame(34, mb_strlen($connectPayload));
+        $this->assertSame(34, \strlen($connectPayload));
         $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw==', base64_encode($connectPayload));
     }
 }

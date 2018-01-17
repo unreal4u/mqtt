@@ -99,7 +99,11 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function shouldExpectAnswer(): bool
     {
-        return !($this->message->getQoSLevel() === 0);
+        $shouldExpectAnswer = !($this->message->getQoSLevel() === 0);
+        $this->logger->debug('Checking whether we should expect an answer or not', [
+            'shouldExpectAnswer' => $shouldExpectAnswer,
+        ]);
+        return $shouldExpectAnswer;
     }
 
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
@@ -190,15 +194,15 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        if (mb_strlen($rawMQTTHeaders) === 1) {
+        if (\strlen($rawMQTTHeaders) === 1) {
             $this->logger->debug('Fast check, read rest of data from socket');
             $restOfBytes = $client->readSocketData(1);
             $payload = $client->readSocketData(\ord($restOfBytes));
         } else {
             $this->logger->debug('Slow form, retransform data and read rest of data');
             $restOfBytes = $rawMQTTHeaders{1};
-            $payload = mb_substr($rawMQTTHeaders, 2);
-            $exactRest = \ord($restOfBytes) - mb_strlen($payload);
+            $payload = substr($rawMQTTHeaders, 2);
+            $exactRest = \ord($restOfBytes) - \strlen($payload);
             $payload .= $client->readSocketData($exactRest);
             $rawMQTTHeaders = $rawMQTTHeaders{0};
         }
