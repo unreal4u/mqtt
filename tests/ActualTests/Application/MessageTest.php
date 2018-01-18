@@ -6,6 +6,7 @@ namespace tests\unreal4u\MQTT\Application;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
@@ -38,7 +39,7 @@ class MessageTest extends TestCase
     public function test_messageTooBig()
     {
         $this->message->setPayload(str_repeat('ö', 65536));
-        $this->message->setTopicName('Set up a topic');
+        $this->message->setTopic(new Topic('Set up a topic'));
 
         $this->expectException(MessageTooBig::class);
         $this->message->validateMessage();

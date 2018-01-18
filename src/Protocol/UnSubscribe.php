@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Application\EmptyReadableResponse;
-use unreal4u\MQTT\Internals\ClientInterface;
-use unreal4u\MQTT\Internals\EventManager;
+use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Internals\ProtocolBase;
-use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Protocol\Subscribe\Topic;
 use unreal4u\MQTT\Utilities;
 
 final class UnSubscribe extends ProtocolBase implements WritableContentInterface
@@ -23,19 +20,24 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
     private $packetIdentifier = 0;
 
     /**
-     * An array of topics on which to subscribe to
+     * An array of topics on which unsubscribe to
      * @var Topic[]
      */
     private $topics = [];
 
     /**
      * @return string
+     * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
      * @throws \OutOfRangeException
      * @throws \Exception
      */
     public function createVariableHeader(): string
     {
-        // Subscribe must always send a 2 flag
+        if (count($this->topics) === 0) {
+            throw new MustContainTopic('An unsubscribe command must contain at least one topic');
+        }
+
+        // UnSubscribe must always send a 2 flag
         $this->specialFlags = 2;
 
         // Assign a packet identifier automatically if none has been assigned yet
@@ -74,7 +76,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
      * SUBSCRIBE Control Packets MUST contain a non-zero 16-bit Packet Identifier
      *
      * @param int $packetIdentifier
-     * @return Subscribe
+     * @return UnSubscribe
      * @throws \OutOfRangeException
      */
     public function setPacketIdentifier(int $packetIdentifier): self
@@ -98,7 +100,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
      * A subscription is based on filters, this function allows us to pass on filters
      *
      * @param Topic[] $topics
-     * @return Subscribe
+     * @return UnSubscribe
      */
     public function addTopics(Topic ...$topics): self
     {

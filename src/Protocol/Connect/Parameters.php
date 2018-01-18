@@ -201,6 +201,8 @@ final class Parameters
     }
 
     /**
+     * Is a private method, so can be trusted with just a string name instead of a Topic object
+     *
      * @param string $willTopic
      * @return Parameters
      */

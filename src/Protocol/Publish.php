@@ -6,6 +6,7 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -190,6 +191,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
+     * @throws \OutOfBoundsException
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
@@ -234,7 +238,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         ]);
 
         $this->message->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize));
-        $this->message->setTopicName(substr($rawMQTTHeaders, $messageStartPosition, $topicSize));
+        $this->message->setTopic(new Topic(substr($rawMQTTHeaders, $messageStartPosition, $topicSize)));
 
         return $this;
     }

@@ -37,9 +37,9 @@ final class Message extends ProtocolBase
 
     /**
      * The Topic Name identifies the information channel to which payload data is published
-     * @var string
+     * @var Topic
      */
-    private $topicName = '';
+    private $topic;
 
     /**
      * Will perform validation on the message before sending it to the MQTT broker
@@ -50,8 +50,8 @@ final class Message extends ProtocolBase
      */
     public function validateMessage(): Message
     {
-        if ($this->topicName === '') {
-            throw new MissingTopicName('Topic can\'t be empty, please provide one');
+        if ($this->getTopicName() === '') {
+            throw new MissingTopicName('Topic name can\'t be empty, please provide one');
         }
 
         if (mb_strlen($this->payload) > 65535) {
@@ -110,12 +110,12 @@ final class Message extends ProtocolBase
     /**
      * Sets the topic name to the given value
      *
-     * @param string $topicName
+     * @param Topic $topic
      * @return Message
      */
-    public function setTopicName(string $topicName): Message
+    public function setTopic(Topic $topic): Message
     {
-        $this->topicName = $topicName;
+        $this->topic = $topic;
         return $this;
     }
 
@@ -123,10 +123,15 @@ final class Message extends ProtocolBase
      * Gets the topic name
      *
      * @return string
+     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
      */
     public function getTopicName(): string
     {
-        return $this->topicName;
+        if ($this->topic === null) {
+            throw new MissingTopicName('A topic must be set before calling getTopicName()');
+        }
+
+        return $this->topic->getTopicName();
     }
 
     /**

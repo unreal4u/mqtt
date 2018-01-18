@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace unreal4u\MQTT\Protocol\Subscribe;
+namespace unreal4u\MQTT\Application;
 
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
@@ -12,25 +12,19 @@ use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 final class Topic
 {
     /**
-     * The 1st byte can contain some bits
+     * The Topic Name identifies the information channel to which payload data is published.
      *
-     * The order of these flags are:
-     *
-     *   7-6-5-4-3-2-1-0
-     * b'0-0-0-0-0-0-0-0'
-     *
-     * Bit 7-4: Control packet value ID (3 for PUBLISH)
-     * Bit 3: Duplicate delivery of a PUBLISH Control Packet
-     * Bit 2 & 1: PUBLISH Quality of Service
-     * Bit 0: PUBLISH Retain flag
-     *
-     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_2.2_-
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718106
      * @var string
      */
     private $topicName = '';
 
     /**
-     * The QoS lvl, choose between 0 and 2
+     * The QoS lvl, choose between 0 and 2.
+     *
+     * NOTE: Setting a QoS level where it is not needed (basically anything apart from a subscription) will have no
+     * effect at all, as the QoS level is set not on a Topic level, but on a Message level instead.
+     *
      * @var int
      */
     private $qosLevel = 0;
@@ -39,6 +33,7 @@ final class Topic
      * Topic constructor.
      * @param string $topicName
      * @param int $qosLevel
+     * @throws \OutOfBoundsException
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      * @throws \InvalidArgumentException
      */
@@ -54,12 +49,17 @@ final class Topic
      *
      * @param string $topicName
      * @return Topic
+     * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
-    private function setTopicName(string $topicName): Topic
+    private function setTopicName(string $topicName): self
     {
         if ($topicName === '') {
-            throw new \InvalidArgumentException('Topic name must be set');
+            throw new \InvalidArgumentException('Topic name must be at least 1 character long');
+        }
+
+        if (\strlen($topicName) > 65535) {
+            throw new \OutOfBoundsException('Topic name can not exceed 65535 bytes');
         }
 
         $this->topicName = $topicName;
@@ -74,7 +74,7 @@ final class Topic
      * @return Topic
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    private function setQoSLevel(int $qosLevel): Topic
+    private function setQoSLevel(int $qosLevel): self
     {
         if ($qosLevel > 2 || $qosLevel < 0) {
             throw new InvalidQoSLevel('The provided QoS level is invalid');

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 
@@ -30,6 +31,7 @@ class PublishTest extends TestCase
 
         $this->message = new Message();
         $this->message->setPayload('Hello test world!');
+        $this->message->setTopic(new Topic('t'));
     }
 
     protected function tearDown()
@@ -48,7 +50,7 @@ class PublishTest extends TestCase
     {
         $this->publish->setMessage($this->message);
         $variableHeader = $this->publish->createVariableHeader();
-        $this->assertSame('AAA=', base64_encode($variableHeader));
+        $this->assertSame('AAF0', base64_encode($variableHeader));
     }
 
     public function test_PublishComplexMessage()
@@ -58,7 +60,7 @@ class PublishTest extends TestCase
 
         $this->publish->setMessage($this->message);
         $variableHeader = $this->publish->createVariableHeader();
-        $this->assertSame('AAAAAQ==', base64_encode($variableHeader));
+        $this->assertSame('AAF0AAE=', base64_encode($variableHeader));
     }
 
     public function test_NoAnswerRequired()

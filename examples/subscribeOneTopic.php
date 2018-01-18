@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Subscribe;
-use unreal4u\MQTT\Protocol\Subscribe\Topic;
 
 include __DIR__ . '/00.basics.php';
 

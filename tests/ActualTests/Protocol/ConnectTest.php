@@ -6,6 +6,7 @@ namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -64,7 +65,7 @@ class ConnectTest extends TestCase
     {
         $message = new Message();
         $message->setPayload('Testing');
-        $message->setTopicName('topic');
+        $message->setTopic(new Topic('topic'));
 
         $parameters = new Parameters('UnitTestClientId');
         $parameters->setWill($message);

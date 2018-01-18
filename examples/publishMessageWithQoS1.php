@@ -13,6 +13,7 @@ declare(strict_types = 1);
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -36,7 +37,7 @@ $client->sendData($connect);
 define('MAXIMUM', 3);
 if ($client->isConnected()) {
     $message = new Message();
-    $message->setTopicName(COMMON_TOPICNAME);
+    $message->setTopic(new Topic(COMMON_TOPICNAME));
     // QoS level is set per message, so set it here
     $message->setQoSLevel(1);
     $publish = new Publish($logger);

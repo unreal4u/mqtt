@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -24,7 +25,7 @@ $now = new \DateTimeImmutable('now');
 
 if ($client->isConnected()) {
     $message = new Message();
-    $message->setTopicName(COMMON_TOPICNAME);
+    $message->setTopic(new Topic(COMMON_TOPICNAME));
     $message->setRetainFlag(true);
     $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
     $publish = new Publish();

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\EventManager;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Protocol\Subscribe\Topic;
 use unreal4u\MQTT\Utilities;
 
 final class Subscribe extends ProtocolBase implements WritableContentInterface

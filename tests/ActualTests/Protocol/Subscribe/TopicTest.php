@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Subscribe;
 
 use PHPUnit\Framework\TestCase;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
-use unreal4u\MQTT\Protocol\Subscribe\Topic;
 
 class TopicTest extends TestCase
 {

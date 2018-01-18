@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -25,7 +26,7 @@ $message = new Message();
 $publish = new Publish($logger);
 
 $message
-    ->setTopicName(COMMON_TOPICNAME)
+    ->setTopic(new Topic(COMMON_TOPICNAME))
     ->setPayload('汉A字BC')#->setPayload(str_repeat('𠜎', 65534))
 ;
 $publish->setMessage($message);
