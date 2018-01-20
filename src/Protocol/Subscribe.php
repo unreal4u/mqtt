@@ -29,6 +29,12 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     private $topics = [];
 
     /**
+     * Indicates whether to continue the loop or break it at any point, cleanly without disconnecting from the broker
+     * @var bool
+     */
+    private $shouldLoop = true;
+
+    /**
      * @return string
      * @throws \OutOfRangeException
      * @throws \Exception
@@ -123,38 +129,61 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      *
      * @param ClientInterface $client
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
+     * @param callable|null $hookBeforeLoop
      * @return \Generator
-     * @throws \DomainException
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws \DomainException
      */
-    public function loop(ClientInterface $client, int $idleMicroseconds = 100000): \Generator
+    public function loop(
+        ClientInterface $client,
+        int $idleMicroseconds = 100000,
+        callable $hookBeforeLoop = null
+    ): \Generator
     {
+        $this->shouldLoop = true;
         // First of all: subscribe
         $this->logger->debug('Beginning loop', ['idleMicroseconds' => $idleMicroseconds]);
-        $client->setBlocking(true);
         $readableContent = $client->sendData($this);
-        // Set blocking explicitly to false due to messages not always arriving in the correct order
-        $client->setBlocking(false);
 
-        $isSubscribed = true;
-        while ($isSubscribed) {
+        // Allow the user to do certain stuff before looping, for example: an Unsubscribe
+        if (\is_callable($hookBeforeLoop)) {
+            // "Flushing" the socket seems to work in order to call up an Unsubscribe at this stage
+            $this->logger->notice('Callable detected, "flushing" socket', ['userFunctionName' => $hookBeforeLoop]);
+            $client->readSocketData(4);
+
+            $hookBeforeLoop($this->logger);
+        }
+
+        while ($this->shouldLoop === true) {
             $this->logger->debug('++Loop++');
             if ($readableContent instanceof Publish) {
                 // Only if we receive a Publish event from the broker, yield the contents
                 yield $readableContent->getMessage();
-            } elseif ($readableContent instanceof UnSubAck) {
-                // We have received an UnSubAck, which means we have to break the loop
-                // TODO Improve this
-                $isSubscribed = false;
             } else {
                 // Only wait for a certain amount of time if there was nothing in the queue
-                $this->logger->debug('Got an incoming object, disregarding', ['class' => \get_class($readableContent)]);
+                $this->logger->debug('Got an incoming object, but not a message, disregarding', [
+                    'class' => \get_class($readableContent),
+                ]);
                 usleep($idleMicroseconds);
             }
 
             $readableContent = $this->checkForEvent($client);
         }
+    }
+
+    /**
+     * Call this function to break out of the loop cleanly
+     *
+     * There is no way to know on which topics we are still subscribed on. This function lets us exit the above loop
+     * cleanly without the need to disconnect from the broker.
+     *
+     * @return Subscribe
+     */
+    public function breakLoop(): self
+    {
+        $this->shouldLoop = false;
+        return $this;
     }
 
     /**

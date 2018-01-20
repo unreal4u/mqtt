@@ -18,8 +18,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent;
-    use WritableContent;
+    use ReadableContent, WritableContent;
 
     public $packetIdentifier = 0;
 

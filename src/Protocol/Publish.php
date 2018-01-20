@@ -23,8 +23,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent;
-    use WritableContent;
+    use ReadableContent, WritableContent;
 
     const CONTROL_PACKET_VALUE = 3;
 

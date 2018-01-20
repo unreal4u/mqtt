@@ -149,7 +149,6 @@ final class Client extends ProtocolBase implements ClientInterface
         );
 
         stream_set_timeout($this->socket, (int)floor($this->connectionParameters->getKeepAlivePeriod() * 1.5));
-        $this->setBlocking(true);
 
         $this->logger->debug('Created socket connection successfully, continuing', stream_get_meta_data($this->socket));
         return true;

@@ -11,7 +11,7 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
-final class UnSubscribe extends ProtocolBase implements WritableContentInterface
+final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
     use WritableContent;
 
@@ -37,7 +37,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
             throw new MustContainTopic('An unsubscribe command must contain at least one topic');
         }
 
-        // UnSubscribe must always send a 2 flag
+        // Unsubscribe must always send a 2 flag
         $this->specialFlags = 2;
 
         // Assign a packet identifier automatically if none has been assigned yet
@@ -53,7 +53,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
         $output = '';
         foreach ($this->topics as $topic) {
             // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
-            $output .= $this->createUTF8String($topic->getTopicName()) . \chr($topic->getTopicQoSLevel());
+            $output .= $this->createUTF8String($topic->getTopicName());
         }
         return $output;
     }
@@ -76,7 +76,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
      * SUBSCRIBE Control Packets MUST contain a non-zero 16-bit Packet Identifier
      *
      * @param int $packetIdentifier
-     * @return UnSubscribe
+     * @return Unsubscribe
      * @throws \OutOfRangeException
      */
     public function setPacketIdentifier(int $packetIdentifier): self
@@ -100,7 +100,7 @@ final class UnSubscribe extends ProtocolBase implements WritableContentInterface
      * A subscription is based on filters, this function allows us to pass on filters
      *
      * @param Topic[] $topics
-     * @return UnSubscribe
+     * @return Unsubscribe
      */
     public function addTopics(Topic ...$topics): self
     {

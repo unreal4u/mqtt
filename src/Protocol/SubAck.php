@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
@@ -44,13 +45,10 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
     {
         /** @var Subscribe $originalRequest */
         if ($this->packetIdentifier !== $originalRequest->getPacketIdentifier()) {
-            throw new \LogicException('Packet identifiers do not match!');
+            throw new UnmatchingPacketIdentifiers('Packet identifiers do not match!');
         }
 
-        $client
-            ->updateLastCommunication()
-            ->setBlocking(false)
-        ;
+        $client->updateLastCommunication();
         return true;
     }
 }

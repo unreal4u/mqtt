@@ -24,13 +24,22 @@ $client->sendData($connect);
 $now = new \DateTimeImmutable('now');
 
 if ($client->isConnected()) {
+    $publish = new Publish();
+
     $message = new Message();
     $message->setTopic(new Topic(COMMON_TOPICNAME));
     $message->setRetainFlag(true);
     $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
-    $publish = new Publish();
     $publish->setMessage($message);
     $client->sendData($publish);
-    echo 'Message sent';
+
+    $message = new Message();
+    $message->setTopic(new Topic(SECONDARY_TOPICNAME));
+    $message->setRetainFlag(true);
+    $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
+    $publish->setMessage($message);
+    $client->sendData($publish);
+
+    echo 'Both messages sent';
 }
 echo PHP_EOL;
