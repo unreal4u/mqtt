@@ -139,8 +139,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         ClientInterface $client,
         int $idleMicroseconds = 100000,
         callable $hookBeforeLoop = null
-    ): \Generator
-    {
+    ): \Generator {
         $this->shouldLoop = true;
         // First of all: subscribe
         $this->logger->debug('Beginning loop', ['idleMicroseconds' => $idleMicroseconds]);
