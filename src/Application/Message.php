@@ -51,10 +51,12 @@ final class Message extends ProtocolBase
     public function validateMessage(): Message
     {
         if ($this->getTopicName() === '') {
+            $this->logger->error('Topic name is empty, probably not filled in beforehand');
             throw new MissingTopicName('Topic name can\'t be empty, please provide one');
         }
 
         if (mb_strlen($this->payload) > 65535) {
+            $this->logger->error('Message payload exceeds 65535 bytes');
             throw new MessageTooBig('Message payload can not exceed 65535 bytes!');
         }
 
@@ -88,6 +90,7 @@ final class Message extends ProtocolBase
     public function setQoSLevel(int $level): Message
     {
         if ($level > 2 || $level < 0) {
+            $this->logger->error('Invalid QoS level detected, must be 0, 1 or 2');
             throw new InvalidQoSLevel('The QoS level must be 0, 1 or 2');
         }
 

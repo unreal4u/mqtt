@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol\Connect;
 
+use Psr\Log\LoggerInterface;
+use unreal4u\Dummy\Logger;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
@@ -12,6 +14,11 @@ use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
  */
 final class Parameters
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * The host we'll be connecting to
      *
@@ -32,7 +39,7 @@ final class Parameters
      *
      * @var string
      */
-    public $clientId = '';
+    private $clientId = '';
 
     /**
      * The keep alive is a time interval in seconds (defaults to 60), the clients commits to by sending regular PING
@@ -117,14 +124,55 @@ final class Parameters
      *
      * @param string $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
+     * @param LoggerInterface $logger
      */
-    public function __construct(string $clientId = '', string $host = 'localhost')
+    public function __construct(string $clientId = '', string $host = 'localhost', LoggerInterface $logger = null)
+    {
+        if ($logger === null) {
+            $logger = new Logger();
+        }
+        // Insert name of class within the logger
+        $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', \get_class($this)));
+
+        // Once we have a logger, set the clientId
+        $this->setClientId($clientId);
+
+        $this->host = $host;
+    }
+
+    /**
+     * Handles everything related to setting the ClientId
+     *
+     * @param string $clientId
+     * @return Parameters
+     */
+    public function setClientId(string $clientId = ''): self
     {
         if ($clientId !== '') {
             $this->clientId = $clientId;
+            $clientIdSize = \strlen($this->clientId);
+            $utf8ClientIdSize = \mb_strlen($this->clientId);
+
+            if ($clientIdSize !== $utf8ClientIdSize) {
+                $this->logger->warning('The broker MAY reject the connection because of invalid characters');
+            }
+
+            if ($utf8ClientIdSize > 23) {
+                $this->logger->warning('The broker MAY reject the connection because the ClientId is too long');
+            }
+        } else {
+            /*
+             * If you ever wind up in this situation, search for MQTT-3.1.3-7 on the following document for more
+             * information: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718067
+             */
+            $this->logger->warning('ClientId size is 0 bytes. This has several implications, check comments', [
+                'file' => __FILE__,
+                'line' => __LINE__,
+            ]);
+            $this->cleanSession = true;
         }
 
-        $this->host = $host;
+        return $this;
     }
 
     /**
@@ -159,6 +207,7 @@ final class Parameters
     public function setKeepAlivePeriod(int $keepAlivePeriod): Parameters
     {
         if ($keepAlivePeriod > 65535 || $keepAlivePeriod < 0) {
+            $this->logger->error('Keep alive period must be between 0 and 65535');
             throw new \InvalidArgumentException('Keep alive period must be between 0 and 65535');
         }
 
@@ -177,6 +226,7 @@ final class Parameters
     {
         $this->bitFlag &= ~128;
         if ($username !== '') {
+            $this->logger->debug('Username set, setting username flag');
             $this->bitFlag |= 128;
         }
         $this->username = $username;
@@ -194,6 +244,7 @@ final class Parameters
     {
         $this->bitFlag &= ~64;
         if ($password !== '') {
+            $this->logger->debug('Password set, setting password flag');
             $this->bitFlag |= 64;
         }
         $this->password = $password;
@@ -209,6 +260,7 @@ final class Parameters
     private function setWillTopic(string $willTopic): Parameters
     {
         $this->willTopic = $willTopic;
+        $this->logger->debug('Setting will topic');
         return $this;
     }
 
@@ -219,6 +271,7 @@ final class Parameters
     private function setWillMessage(string $willMessage): Parameters
     {
         $this->willMessage = $willMessage;
+        $this->logger->debug('Setting will message');
         return $this;
     }
 
@@ -233,6 +286,7 @@ final class Parameters
     {
         $this->bitFlag &= ~32;
         if ($willRetain === true) {
+            $this->logger->debug('Setting will retain flag');
             $this->bitFlag |= 32;
         }
         $this->willRetain = $willRetain;
@@ -259,12 +313,15 @@ final class Parameters
                 // Do nothing as the relevant bits will already have been reset
                 break;
             case 1:
+                $this->logger->debug('Setting will QoS level 1 flag');
                 $this->bitFlag |= 8;
                 break;
             case 2:
+                $this->logger->debug('Setting will QoS level 2 flag');
                 $this->bitFlag |= 16;
                 break;
             default:
+                $this->logger->critical('Invalid QoS level detected while setting will');
                 throw new InvalidQoSLevel('Invalid QoS level detected at setting will. This is a bug!');
                 break;
         }
@@ -288,6 +345,7 @@ final class Parameters
         if ($message->validateMessage()) {
             $this->bitFlag &= ~4;
             if ($message->getTopicName() !== '') {
+                $this->logger->debug('Setting will flag');
                 $this->bitFlag |= 4;
             }
 
@@ -311,6 +369,7 @@ final class Parameters
     {
         $this->bitFlag &= ~2;
         if ($cleanSession === true) {
+            $this->logger->debug('Clean session flag set');
             $this->bitFlag |= 2;
         }
         $this->cleanSession = $cleanSession;

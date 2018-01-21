@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Example file of how to connect to a broker
+ */
+
 declare(strict_types = 1);
 
 use unreal4u\MQTT\Client;
@@ -8,9 +12,12 @@ use unreal4u\MQTT\Protocol\Connect\Parameters;
 
 include __DIR__ . '/00.basics.php';
 
+// Instantiate the client
 $client = new Client();
 
+// Create a Connect object
 $connect = new Connect();
+// Set the most basic parameters possible: send just a ClientId
 $connect->setConnectionParameters(new Parameters('uniqueClientId123'));
 
 // Example of invalid protocol which will throw an exception:

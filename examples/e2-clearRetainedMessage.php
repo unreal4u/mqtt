@@ -23,13 +23,22 @@ $client->sendData($connect);
 
 $now = new \DateTimeImmutable('now');
 
+// Perform the following actions only if we are connected to the broker
 if ($client->isConnected()) {
+    // First, create a message object
     $message = new Message();
+    // Set the topic
     $message->setTopic(new Topic(COMMON_TOPICNAME));
+    // Set the retain flag to true
     $message->setRetainFlag(true);
+    // Set the payload to an empty message (this will signal the broker to unset the retained message)
     $message->setPayload('');
+
+    // Finally, make a Publish object
     $publish = new Publish();
+    // Set the message
     $publish->setMessage($message);
+    // And publish the object to the broker
     $client->sendData($publish);
     echo 'Cleared retained message';
 }

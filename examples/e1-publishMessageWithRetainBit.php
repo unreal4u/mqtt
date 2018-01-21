@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This example shows how to publish messages with the retain bit on
+ */
+
 declare(strict_types=1);
 
 use unreal4u\MQTT\Application\Message;
@@ -26,13 +30,16 @@ $now = new \DateTimeImmutable('now');
 if ($client->isConnected()) {
     $publish = new Publish();
 
+    // So basically, everything is pretty standard
     $message = new Message();
     $message->setTopic(new Topic(COMMON_TOPICNAME));
+    // Except that we set the retain flag
     $message->setRetainFlag(true);
     $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
     $publish->setMessage($message);
     $client->sendData($publish);
 
+    // Exactly the same for the SECONDARY_TOPICNAME
     $message = new Message();
     $message->setTopic(new Topic(SECONDARY_TOPICNAME));
     $message->setRetainFlag(true);
