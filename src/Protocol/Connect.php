@@ -63,8 +63,8 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     {
         $output = '';
         // The order in a connect string is clientId first
-        if ($this->connectionParameters->clientId !== '') {
-            $output .= $this->createUTF8String($this->connectionParameters->clientId);
+        if ($this->connectionParameters->getClientId() !== '') {
+            $output .= $this->createUTF8String($this->connectionParameters->getClientId());
         }
 
         // Then the willTopic if it is set

@@ -108,13 +108,19 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
-        if ($this->shouldExpectAnswer() === false) {
-            return new EmptyReadableResponse($this->logger);
+        switch ($this->message->getQoSLevel()) {
+            case 1:
+                $pubAck = new PubAck($this->logger);
+                $pubAck->instantiateObject($data, $client);
+                return $pubAck;
+            case 2:
+                $pubRec = new PubRec($this->logger);
+                $pubRec->instantiateObject($data, $client);
+                return $pubRec;
+            case 0:
+            default:
+                return new EmptyReadableResponse($this->logger);
         }
-
-        $pubAck = new PubAck($this->logger);
-        $pubAck->instantiateObject($data, $client);
-        return $pubAck;
     }
 
     /**

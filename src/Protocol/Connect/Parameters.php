@@ -175,6 +175,11 @@ final class Parameters
         return $this;
     }
 
+    public function getClientId(): string
+    {
+        return $this->clientId;
+    }
+
     /**
      * Returns the connection string
      *
