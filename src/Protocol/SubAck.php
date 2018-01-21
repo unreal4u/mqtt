@@ -26,14 +26,28 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
      */
     private $packetIdentifier = 0;
 
+    /**
+     * Information about each topic
+     * @var string
+     */
+    private $payload = '';
+
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        // Read the rest of the request out should only 1 byte have come in
+        // Read out the remaining length bytes should only 1 byte have come in until now
         if (\strlen($rawMQTTHeaders) === 1) {
-            $rawMQTTHeaders .= $client->readSocketData(3);
+            $rawMQTTHeaders .= $client->readSocketData(1);
+        }
+
+        $remainingLength = \ord($rawMQTTHeaders[1]);
+        // Check if we have a complete message
+        if ($remainingLength + 2 !== \strlen($rawMQTTHeaders)) {
+            $rawMQTTHeaders .= $client->readSocketData($remainingLength + 2 - \strlen($rawMQTTHeaders));
         }
 
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        // TODO Check which QoS corresponds to each topic we are subscribed to
+        $this->payload = substr($rawMQTTHeaders, 4);
         return $this;
     }
 

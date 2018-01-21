@@ -55,7 +55,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function createPayload(): string
     {
         $output = '';
-        foreach ($this->topics as $topic) {
+        foreach ($this->getTopics() as $topic) {
             // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
             $output .= $this->createUTF8String($topic->getTopicName()) . \chr($topic->getTopicQoSLevel());
         }
@@ -148,10 +148,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
         // Allow the user to do certain stuff before looping, for example: an Unsubscribe
         if (\is_callable($hookBeforeLoop)) {
-            // "Flushing" the socket seems to work in order to call up an Unsubscribe at this stage
-            $this->logger->notice('Callable detected, "flushing" socket', ['userFunctionName' => $hookBeforeLoop]);
-            $client->readSocketData(4);
-
+            $this->logger->notice('Callable detected, executing', ['userFunctionName' => $hookBeforeLoop]);
             $hookBeforeLoop($this->logger);
         }
 
@@ -195,9 +192,34 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function addTopics(Topic ...$topics): Subscribe
     {
         $this->topics = $topics;
-        $this->logger->debug('Topics added', ['totalTopics', count($this->topics)]);
+        $this->logger->debug('Topics added', ['totalTopics', $this->getNumberOfTopics()]);
 
         return $this;
+    }
+
+    /**
+     * Returns the current number of topics
+     *
+     * @return int
+     */
+    public function getNumberOfTopics(): int
+    {
+        return count($this->topics);
+    }
+
+    /**
+     * Returns the topics in the order they were inserted / requested
+     *
+     * The order is important because SUBACK will return the status code for each topic in this order, without
+     * explicitly identifying which topic is which
+     *
+     * @return \Generator|Topic[]
+     */
+    public function getTopics(): \Generator
+    {
+        foreach ($this->topics as $topic) {
+            yield $topic;
+        }
     }
 
     /**

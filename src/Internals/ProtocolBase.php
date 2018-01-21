@@ -13,7 +13,7 @@ abstract class ProtocolBase
      * The actual logger object
      * @var LoggerInterface
      */
-    #protected $logger;
+    protected $logger;
 
     /**
      * Base constructor for all protocol stuff
