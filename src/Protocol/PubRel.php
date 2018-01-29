@@ -46,19 +46,11 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     }
 
     /**
-     * @inheritdoc
-     */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
-    {
-        return $this;
-    }
-
-    /**
-     * Some responses won't expect an answer back, others do in some situations
+     * PUBREL should ALWAYS expect an answer back (in the form of a PUBCOMP)
      * @return bool
      */
     public function shouldExpectAnswer(): bool
     {
-        return false;
+        return true;
     }
 }

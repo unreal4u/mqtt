@@ -46,19 +46,27 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
     }
 
     /**
-     * @inheritdoc
-     */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
-    {
-        return $this;
-    }
-
-    /**
      * Some responses won't expect an answer back, others do in some situations
      * @return bool
      */
     public function shouldExpectAnswer(): bool
     {
-        return false;
+        return true;
+    }
+
+    /**
+     * Any class can overwrite the default behaviour
+     * @param ClientInterface $client
+     * @param WritableContentInterface $originalRequest
+     * @return bool
+     */
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
+    {
+        $this->logger->debug('Creating response in the form of a PubRel');
+        $pubRel = new PubRel($this->logger);
+        $pubRel->packetIdentifier = $this->packetIdentifier;
+
+        $pubComp = $client->sendData($pubRel);
+        return true;
     }
 }

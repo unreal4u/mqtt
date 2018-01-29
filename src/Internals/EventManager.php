@@ -11,8 +11,10 @@ use unreal4u\MQTT\Protocol\Disconnect;
 use unreal4u\MQTT\Protocol\PingReq;
 use unreal4u\MQTT\Protocol\PingResp;
 use unreal4u\MQTT\Protocol\PubAck;
+use unreal4u\MQTT\Protocol\PubComp;
 use unreal4u\MQTT\Protocol\Publish;
 use unreal4u\MQTT\Protocol\PubRec;
+use unreal4u\MQTT\Protocol\PubRel;
 use unreal4u\MQTT\Protocol\SubAck;
 use unreal4u\MQTT\Protocol\Subscribe;
 use unreal4u\MQTT\Protocol\UnsubAck;
@@ -40,8 +42,8 @@ final class EventManager extends ProtocolBase
         3 => Publish::class,
         4 => PubAck::class,
         5 => PubRec::class,
-        #6 => PubRel::class, TODO Implement PubRel
-        #7 => PubComp::class, TODO Implement PubComp
+        6 => PubRel::class,
+        7 => PubComp::class,
         9 => SubAck::class,
         11 => UnsubAck::class,
         13 => PingResp::class,
