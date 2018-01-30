@@ -27,14 +27,16 @@ final class QoSLevel
      * @param int $QoSLevel
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    public function __construct(int $QoSLevel = 0)
+    public function __construct(int $qosLevel = 0)
     {
-        if ($QoSLevel > 2 || $QoSLevel < 0) {
+        if ($qosLevel > 2 || $qosLevel < 0) {
             throw new InvalidQoSLevel(sprintf(
                 'The provided QoS level is invalid. Valid values are 0, 1 and 2 (Provided: %d)',
-                $QoSLevel
+                $qosLevel
             ));
         }
+        
+        $this->qosLevel = $qosLevel;
     }
 
     /**
