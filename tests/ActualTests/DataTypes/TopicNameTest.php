@@ -21,7 +21,7 @@ class TopicNameTest extends TestCase
         new TopicName(str_repeat('-', 65537));
     }
 
-    public function provider_validQoSLevels(): array
+    public function provider_validTopicNames(): array
     {
         $mapValues[] = ['First-topic-name'];
         $mapValues[] = ['𠜎𠜱𠝹𠱓'];
@@ -32,10 +32,10 @@ class TopicNameTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validQoSLevels
-     * @param int $level
+     * @dataProvider provider_validTopicNames
+     * @param string $topic
      */
-    public function test_validQoSLevels(string $topic)
+    public function test_validTopicNames(string $topic)
     {
         $topicName = new TopicName($topic);
         $this->assertSame($topic, $topicName->getTopicName());

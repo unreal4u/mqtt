@@ -9,6 +9,8 @@ use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 
@@ -31,7 +33,7 @@ class PublishTest extends TestCase
 
         $this->message = new Message();
         $this->message->setPayload('Hello test world!');
-        $this->message->setTopic(new Topic('t'));
+        $this->message->setTopic(new Topic(new TopicName('t')));
     }
 
     protected function tearDown()
@@ -55,7 +57,7 @@ class PublishTest extends TestCase
 
     public function test_PublishComplexMessage()
     {
-        $this->message->setQoSLevel(1);
+        $this->message->setQoSLevel(new QoSLevel(1));
         $this->message->setRetainFlag(true);
 
         $this->publish->setMessage($this->message);
@@ -71,7 +73,7 @@ class PublishTest extends TestCase
 
     public function test_AnswerRequired()
     {
-        $this->message->setQoSLevel(1);
+        $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
         $this->assertTrue($this->publish->shouldExpectAnswer());
     }
@@ -85,7 +87,7 @@ class PublishTest extends TestCase
 
     public function test_QoSLevel1ExpectedAnswer()
     {
-        $this->message->setQoSLevel(1);
+        $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
         $this->publish->createVariableHeader();
         /** @var PubAck $answer */

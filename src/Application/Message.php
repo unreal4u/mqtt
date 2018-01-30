@@ -136,9 +136,13 @@ final class Message extends ProtocolBase
      * Gets the current QoS level
      *
      * @return int
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function getQoSLevel(): int
     {
+        if ($this->qosLevel === null) {
+            $this->qosLevel = new QoSLevel(0);
+        }
         return $this->qosLevel->getQoSLevel();
     }
 
