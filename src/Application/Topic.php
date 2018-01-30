@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Application;
 
 use unreal4u\MQTT\DataTypes\QoSLevel;
-use unreal4u\MQTT\DataTypes\TopicName;
 
 /**
  * When the client wants to subscribe to a topic, this is done by adding a topic filter.
@@ -16,7 +15,7 @@ final class Topic
      * The Topic Name identifies the information channel to which payload data is published.
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718106
-     * @var TopicName
+     * @var string
      */
     private $topicName;
 
@@ -38,7 +37,7 @@ final class Topic
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      * @throws \InvalidArgumentException
      */
-    public function __construct(TopicName $topicName, QoSLevel $qosLevel = null)
+    public function __construct(string $topicName, QoSLevel $qosLevel = null)
     {
         if ($qosLevel === null) {
             $qosLevel = new QoSLevel(0);
@@ -57,8 +56,16 @@ final class Topic
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
-    private function setTopicName(TopicName $topicName): self
+    private function setTopicName(string $topicName): self
     {
+        if ($topicName === '') {
+            throw new \InvalidArgumentException('Topic name must be at least 1 character long');
+        }
+
+        if (\strlen($topicName) > 65535) {
+            throw new \OutOfBoundsException('Topic name can not exceed 65535 bytes');
+        }
+
         $this->topicName = $topicName;
         return $this;
     }
@@ -82,7 +89,7 @@ final class Topic
      */
     public function getTopicName(): string
     {
-        return $this->topicName->getTopicName();
+        return $this->topicName;
     }
 
     /**

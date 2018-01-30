@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Application;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\DataTypes\TopicName;
+use unreal4u\MQTT\Application\Topic;
 
-class TopicNameTest extends TestCase
+class TopicTest extends TestCase
 {
     public function test_emptyTopicName()
     {
         $this->expectException(\InvalidArgumentException::class);
-        new TopicName('');
+        new Topic('');
     }
 
     public function test_tooBigTopicName()
     {
         $this->expectException(\OutOfBoundsException::class);
-        new TopicName(str_repeat('-', 65537));
+        new Topic(str_repeat('-', 65537));
     }
 
     public function provider_validTopicNames(): array
@@ -37,7 +37,7 @@ class TopicNameTest extends TestCase
      */
     public function test_validTopicNames(string $topic)
     {
-        $topicName = new TopicName($topic);
+        $topicName = new Topic($topic);
         $this->assertSame($topic, $topicName->getTopicName());
     }
 }

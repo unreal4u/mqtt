@@ -15,6 +15,7 @@ use Monolog\Logger;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Publish;
@@ -45,7 +46,7 @@ if ($client->isConnected()) {
     // Set the topic name
     $message->setTopic(new Topic(COMMON_TOPICNAME));
     // QoS level is set per message, so set it here
-    $message->setQoSLevel(1);
+    $message->setQoSLevel(new QoSLevel(1));
     // Create a new Publish object
     $publish = new Publish($logger);
 

@@ -10,7 +10,6 @@ use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
-use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 
@@ -33,7 +32,7 @@ class PublishTest extends TestCase
 
         $this->message = new Message();
         $this->message->setPayload('Hello test world!');
-        $this->message->setTopic(new Topic(new TopicName('t')));
+        $this->message->setTopic(new Topic('t'));
     }
 
     protected function tearDown()

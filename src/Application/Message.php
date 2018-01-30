@@ -50,10 +50,8 @@ final class Message extends ProtocolBase
      */
     public function validateMessage(): Message
     {
-        if ($this->getTopicName() === '') {
-            $this->logger->error('Topic name is empty, probably not filled in beforehand');
-            throw new MissingTopicName('Topic name can\'t be empty, please provide one');
-        }
+        // Getter of topicname will validate whether the topic name is set and valid
+        $this->getTopicName();
 
         if (mb_strlen($this->payload) > 65535) {
             $this->logger->error('Message payload exceeds 65535 bytes');
