@@ -4,12 +4,11 @@ declare(strict_types = 1);
 
 namespace unreal4u\MQTT\DataTypes;
 
-use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
-
 /**
  * This Value Object will always contain a valid topic name.
  */
-final class TopicName {
+final class TopicName
+{
     /**
      *
      * @var string
