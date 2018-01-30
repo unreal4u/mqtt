@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
-class QosLevelTest extends TestCase
+class QoSLevelTest extends TestCase
 {
     public function test_invalidQoSLevel()
     {

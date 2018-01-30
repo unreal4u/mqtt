@@ -7,7 +7,7 @@ namespace unreal4u\MQTT\Protocol\Connect;
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 
 /**
  * Special connection parameters will be defined in this class
@@ -87,9 +87,9 @@ final class Parameters
 
     /**
      * QoS Level of the will
-     * @var int
+     * @var QoSLevel
      */
-    private $willQoS = 0;
+    private $willQoS;
 
     /**
      * Whether the will message should be retained by the server
@@ -302,18 +302,18 @@ final class Parameters
      * Determines and sets the 3rd and 4th bits of the connect flag
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
-     * @param int $QoSLevel
+     * @param QoSLevel $QoSLevel
      * @return Parameters
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    private function setWillQoS(int $QoSLevel): Parameters
+    private function setWillQoS(QoSLevel $QoSLevel): Parameters
     {
         // Reset first the will QoS bits and proceed to set them
         $this->bitFlag &= ~8; // Third bit: 8
         $this->bitFlag &= ~16; // Fourth bit: 16
 
         $this->willQoS = $QoSLevel;
-        switch ($this->willQoS) {
+        switch ($this->willQoS->getQoSLevel()) {
             case 0:
                 // Do nothing as the relevant bits will already have been reset
                 break;
@@ -324,10 +324,6 @@ final class Parameters
             case 2:
                 $this->logger->debug('Setting will QoS level 2 flag');
                 $this->bitFlag |= 16;
-                break;
-            default:
-                $this->logger->critical('Invalid QoS level detected while setting will');
-                throw new InvalidQoSLevel('Invalid QoS level detected at setting will. This is a bug!');
                 break;
         }
 
@@ -358,7 +354,7 @@ final class Parameters
                 ->setWillMessage($message->getPayload())
                 ->setWillRetain($message->isRetained())
                 ->setWillTopic($message->getTopicName())
-                ->setWillQoS($message->getQoSLevel());
+                ->setWillQoS(new QoSLevel($message->getQoSLevel()));
         }
 
         return $this;

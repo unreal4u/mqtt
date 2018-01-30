@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Application;
 
-use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -18,9 +18,9 @@ final class Message extends ProtocolBase
      * 1: At least once delivery
      * 2: Exactly once delivery
      *
-     * @var int
+     * @var QoSLevel
      */
-    private $qosLevel = 0;
+    private $qosLevel;
 
     /**
      * @var string
@@ -83,17 +83,12 @@ final class Message extends ProtocolBase
     /**
      * Sets the QoS level to the indicated value. Must be 0, 1 or 2.
      *
-     * @param int $level
+     * @param QoSLevel $level
      * @return Message
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    public function setQoSLevel(int $level): Message
+    public function setQoSLevel(QosLevel $level): Message
     {
-        if ($level > 2 || $level < 0) {
-            $this->logger->error('Invalid QoS level detected, must be 0, 1 or 2');
-            throw new InvalidQoSLevel('The QoS level must be 0, 1 or 2');
-        }
-
         $this->qosLevel = $level;
         return $this;
     }
@@ -144,7 +139,7 @@ final class Message extends ProtocolBase
      */
     public function getQoSLevel(): int
     {
-        return $this->qosLevel;
+        return $this->qosLevel->getQoSLevel();
     }
 
     /**

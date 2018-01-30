@@ -131,6 +131,15 @@ trait WritableContent
         return Utilities::convertNumberToBinaryString(\strlen($data)) . $data;
     }
 
+    /**
+     * Will return an object of the type the broker has returned to us
+     *
+     * @param string $data
+     * @param ClientInterface $client
+     *
+     * @return ReadableContentInterface
+     * @throws \DomainException
+     */
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);

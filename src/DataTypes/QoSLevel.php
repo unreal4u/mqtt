@@ -20,11 +20,13 @@ final class QoSLevel
      *
      * @var int
      */
-    private $qosLevel = 0;
+    private $qosLevel;
 
     /**
      * QoSLevel constructor.
-     * @param int $QoSLevel
+     *
+     * @param int $qosLevel
+     *
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function __construct(int $qosLevel = 0)
@@ -35,7 +37,7 @@ final class QoSLevel
                 $qosLevel
             ));
         }
-        
+
         $this->qosLevel = $qosLevel;
     }
 
