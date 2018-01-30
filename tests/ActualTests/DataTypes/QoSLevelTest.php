@@ -34,4 +34,14 @@ class QoSLevelTest extends TestCase
         $QoSLevel = new QoSLevel($level);
         $this->assertSame($level, $QoSLevel->getQoSLevel());
     }
+
+    /**
+     * @dataProvider provider_validQoSLevels
+     * @param int $level
+     */
+    public function test_toString(int $level)
+    {
+        $QoSLevel = new QoSLevel($level);
+        $this->assertSame((string)$level, (string)$QoSLevel);
+    }
 }

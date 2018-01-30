@@ -83,7 +83,6 @@ final class Message extends ProtocolBase
      *
      * @param QoSLevel $level
      * @return Message
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function setQoSLevel(QosLevel $level): Message
     {

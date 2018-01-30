@@ -7,7 +7,7 @@ namespace unreal4u\MQTT\Protocol;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
-use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
@@ -182,13 +182,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private function determineIncomingQoSLevel(int $bitString): int
     {
-        // QoS lvl 6 does not exist, throw exception
-        if (($bitString & 6) >= 6) {
-            throw new InvalidQoSLevel('Invalid QoS level "' . $bitString . '" found (both bits set?)');
-        }
-
         // Strange operation, why? Because 4 == QoS lvl2; 2 == QoS lvl1, 0 == QoS lvl0
-        return $bitString & 4 / 2;
+        return (new QoSLevel($bitString & 4 / 2))->getQoSLevel();
     }
 
     /**

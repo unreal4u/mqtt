@@ -304,7 +304,6 @@ final class Parameters
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param QoSLevel $QoSLevel
      * @return Parameters
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     private function setWillQoS(QoSLevel $QoSLevel): Parameters
     {

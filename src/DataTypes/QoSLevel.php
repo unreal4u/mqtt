@@ -50,4 +50,9 @@ final class QoSLevel
     {
         return $this->qosLevel;
     }
+
+    public function __toString(): string
+    {
+        return (string)$this->qosLevel;
+    }
 }
