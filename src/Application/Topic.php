@@ -40,6 +40,7 @@ final class Topic
     public function __construct(string $topicName, QoSLevel $qosLevel = null)
     {
         if ($qosLevel === null) {
+            // QoSLevel defaults at 0
             $qosLevel = new QoSLevel(0);
         }
 
@@ -73,9 +74,8 @@ final class Topic
     /**
      * Requested QoS level is the maximum QoS level at which the Server can send Application Messages to the Client
      *
-     * @param int $qosLevel
+     * @param QoSLevel $qosLevel
      * @return Topic
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     private function setQoSLevel(QoSLevel $qosLevel): self
     {

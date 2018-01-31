@@ -177,13 +177,13 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Finds out the QoS level in a fixed header for the Publish object
      *
      * @param int $bitString
-     * @return int
+     * @return QoSLevel
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    private function determineIncomingQoSLevel(int $bitString): int
+    private function determineIncomingQoSLevel(int $bitString): QoSLevel
     {
         // Strange operation, why? Because 4 == QoS lvl2; 2 == QoS lvl1, 0 == QoS lvl0
-        return (new QoSLevel($bitString & 4 / 2))->getQoSLevel();
+        return new QoSLevel($bitString & 4 / 2);
     }
 
     /**

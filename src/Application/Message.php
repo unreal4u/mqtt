@@ -138,6 +138,7 @@ final class Message extends ProtocolBase
     public function getQoSLevel(): int
     {
         if ($this->qosLevel === null) {
+            // QoSLevel defaults at 0
             $this->qosLevel = new QoSLevel(0);
         }
         return $this->qosLevel->getQoSLevel();
