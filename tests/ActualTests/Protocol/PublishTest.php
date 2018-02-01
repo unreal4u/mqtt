@@ -61,7 +61,7 @@ class PublishTest extends TestCase
 
         $this->publish->setMessage($this->message);
         $variableHeader = $this->publish->createVariableHeader();
-        $this->assertSame('AAF0AAE=', base64_encode($variableHeader));
+        $this->assertSame('AAF0AAA=', base64_encode($variableHeader));
     }
 
     public function test_NoAnswerRequired()
@@ -88,6 +88,7 @@ class PublishTest extends TestCase
     {
         $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
+        $this->publish->packetIdentifier = 1;
         $this->publish->createVariableHeader();
         /** @var PubAck $answer */
         $answer = $this->publish->expectAnswer(base64_decode('QAIAAQ=='), new ClientMock());
