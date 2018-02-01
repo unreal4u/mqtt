@@ -27,7 +27,7 @@ $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 // Set up the connection parameters
-$connectionParameters = new Parameters('publishSomething');
+$connectionParameters = new Parameters(basename(__FILE__));
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 

@@ -46,6 +46,13 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public $isRedelivery = false;
 
+    /**
+     * @return string
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
+     * @throws \OutOfRangeException
+     * @throws \InvalidArgumentException
+     */
     public function createVariableHeader(): string
     {
         if ($this->message === null) {
@@ -64,9 +71,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
         // Check QoS level and perform the corresponding actions
         if ($this->message->getQoSLevel() !== 0) {
-            // 2 for QoS lvl1 and 4 for QoS lvl2
+            // 0 for QoS lvl2 for QoS lvl1 and 4 for QoS lvl2
             $this->specialFlags |= ($this->message->getQoSLevel() * 2);
-            $this->packetIdentifier++;
             $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
             $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()), [
                 'specialFlags' => $this->specialFlags,
@@ -96,6 +102,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * QoS level 0 does not have to wait for a answer, so return false. Any other QoS level returns true
      * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
     public function shouldExpectAnswer(): bool
     {
@@ -245,25 +252,34 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * @inheritdoc
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
-        if ($this->message->getQoSLevel() === 0) {
-            $this->logger->debug('No response needed', ['qosLevel', $this->message->getQoSLevel()]);
+        $qosLevel = $this->message->getQoSLevel();
+        if ($qosLevel === 0) {
+            $this->logger->debug('No response needed', ['qosLevel', $qosLevel]);
         } else {
-            if ($this->message->getQoSLevel() === 1) {
-                $this->logger->debug('Responding with PubAck', ['qosLevel' => $this->message->getQoSLevel()]);
+            if ($qosLevel === 1) {
+                $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
                 $client->sendData($this->composePubAckAnswer());
-            } elseif ($this->message->getQoSLevel() === 2) {
-                $this->logger->debug('Responding with PubRec', ['qosLevel' => $this->message->getQoSLevel()]);
-                $client->sendData(new PubRec($this->logger));
+            } elseif ($qosLevel === 2) {
+                $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
+                $client->sendData($this->composerPubRecAnswer());
             }
         }
 
         return true;
+    }
+
+    private function composerPubRecAnswer(): PubRec
+    {
+        $pubRec = new PubRec($this->logger);
+        $pubRec->packetIdentifier = $this->packetIdentifier;
+        return $pubRec;
     }
 
     /**

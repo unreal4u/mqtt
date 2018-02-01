@@ -10,6 +10,7 @@ use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
+use unreal4u\MQTT\Utilities;
 
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
@@ -28,11 +29,12 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * Creates the variable header that each method has
      * @return string
+     * @throws \OutOfRangeException
      */
     public function createVariableHeader(): string
     {
-        // TODO: Implement createVariableHeader() method.
-        return '';
+        $this->specialFlags |= 2;
+        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
     }
 
     /**
@@ -41,7 +43,6 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function createPayload(): string
     {
-        // TODO: Implement createPayload() method.
         return '';
     }
 
@@ -52,5 +53,21 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     public function shouldExpectAnswer(): bool
     {
         return true;
+    }
+
+    /**
+     * @param ClientInterface $client
+     * @param WritableContentInterface $originalRequest
+     * @return bool
+     * @throws \LogicException
+     */
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
+    {
+        $this->logger->debug('Checking packet identifier on PubRel');
+        /** @var PubRec $originalRequest */
+        if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
+            throw new \LogicException('Packet identifiers to not match!');
+        }
+        return false;
     }
 }

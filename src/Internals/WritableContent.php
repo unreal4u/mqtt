@@ -142,7 +142,7 @@ trait WritableContent
      */
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['class' => \get_class($this)]);
+        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
 
         $eventManager = new EventManager($this->logger);
         return $eventManager->analyzeHeaders($data, $client);
