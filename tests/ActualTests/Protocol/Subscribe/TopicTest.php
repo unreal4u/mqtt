@@ -12,7 +12,7 @@ class TopicTest extends TestCase
 {
     public function test_createDefault()
     {
-        $topic = new Topic('a topic');
+        $topic = new Topic('a topic', new QoSLevel(0));
         $this->assertSame('a topic', $topic->getTopicName());
         $this->assertSame(0, $topic->getTopicQoSLevel());
     }
@@ -26,7 +26,7 @@ class TopicTest extends TestCase
 
     public function test_QoSLevel2()
     {
-        $topic = new Topic('a topic', new QoSLevel(2));
+        $topic = new Topic('a topic');
         $this->assertSame('a topic', $topic->getTopicName());
         $this->assertSame(2, $topic->getTopicQoSLevel());
     }

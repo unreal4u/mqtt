@@ -154,13 +154,14 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         while ($this->shouldLoop === true) {
             $this->logger->debug('++Loop++');
             if ($readableContent instanceof Publish) {
+                $readableContent->performSpecialActions($client, $this);
                 // Only if we receive a Publish event from the broker, yield the contents
                 yield $readableContent->getMessage();
             } else {
                 // Only wait for a certain amount of time if there was nothing in the queue
-                $this->logger->debug('Got an incoming object, but it is not a message, disregarding', [
-                    'class' => \get_class($readableContent),
-                ]);
+                #$this->logger->debug('Disregarding', [
+                #    'class' => \get_class($readableContent),
+                #]);
                 usleep($idleMicroseconds);
             }
 

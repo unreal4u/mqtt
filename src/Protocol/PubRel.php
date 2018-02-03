@@ -68,6 +68,11 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
         if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
             throw new \LogicException('Packet identifiers to not match!');
         }
-        return false;
+
+        $pubComp = new PubComp($this->logger);
+        $pubComp->packetIdentifier = $this->packetIdentifier;
+        $client->sendData($pubComp);
+
+        return true;
     }
 }

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use unreal4u\MQTT\Application\Topic;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Subscribe;
@@ -24,7 +25,7 @@ $client->sendData($connect);
 // Then, we will initialize a new subscription
 $subscribe = new Subscribe();
 // Adding a certain topic is done by providing a Topic object to the addTopics() method of the subscription
-$subscribe->addTopics(new Topic(COMMON_TOPICNAME));
+$subscribe->addTopics(new Topic(COMMON_TOPICNAME, new QoSLevel(0)));
 
 // Handy function: a loop. This will yield any messages that arrive at the topic.
 /** @var \unreal4u\MQTT\Application\Message $message */

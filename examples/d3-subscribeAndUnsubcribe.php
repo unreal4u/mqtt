@@ -41,7 +41,6 @@ if ($client->isConnected() === false) {
     throw new DomainException('We are not connected, can not subscribe');
 }
 
-
 $mainTopic = new Topic(COMMON_TOPICNAME);
 /*
  * We are subscribing to all sensors/# topics. The notation used here is the default supported by the MQTT protocol

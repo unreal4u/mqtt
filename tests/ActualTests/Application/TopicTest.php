@@ -26,18 +26,19 @@ class TopicTest extends TestCase
         $mapValues[] = ['First-topic-name'];
         $mapValues[] = ['𠜎𠜱𠝹𠱓'];
         $mapValues[] = ['Föllinge'];
-        $mapValues[] = ['/Föllinge/First-topic-name/𠜎𠜱𠝹𠱓/normal'];
+        $mapValues[] = ['/Föllinge/First-topic-name1234/𠜎𠜱𠝹𠱓/normal'];
 
         return $mapValues;
     }
 
     /**
      * @dataProvider provider_validTopicNames
-     * @param string $topic
+     * @param string $topicName
      */
-    public function test_validTopicNames(string $topic)
+    public function test_validTopicNames(string $topicName)
     {
-        $topicName = new Topic($topic);
-        $this->assertSame($topic, $topicName->getTopicName());
+        $topic = new Topic($topicName);
+        $this->assertSame($topicName, $topic->getTopicName());
+        $this->assertSame(2, $topic->getTopicQoSLevel());
     }
 }

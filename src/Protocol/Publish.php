@@ -165,6 +165,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // Retained bit is bit 0 of first byte
         $this->message->setRetainFlag(false);
         if ($firstByte & 1) {
+            $this->logger->debug('Setting retain flag to true');
             $this->message->setRetainFlag(true);
         }
         // QoS level are the last bits 2 & 1 of the first byte
@@ -175,6 +176,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($firstByte & 8 && $this->message->getQoSLevel() !== 0) {
             // Is a duplicate is always bit 3 of first byte
             $this->isRedelivery = true;
+            $this->logger->debug('Setting redelivery bit');
         }
 
         return $this;
@@ -190,7 +192,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     private function determineIncomingQoSLevel(int $bitString): QoSLevel
     {
         // Strange operation, why? Because 4 == QoS lvl2; 2 == QoS lvl1, 0 == QoS lvl0
-        return new QoSLevel($bitString & 4 / 2);
+        $incomingQoSLevel = ($bitString & 4) / 2;
+        $this->logger->debug('Setting QoS level', ['incomingQoSLevel' => $incomingQoSLevel]);
+        return new QoSLevel($incomingQoSLevel);
     }
 
     /**
@@ -268,14 +272,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
                 $client->sendData($this->composePubAckAnswer());
             } elseif ($qosLevel === 2) {
                 $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
-                $client->sendData($this->composerPubRecAnswer());
+                $client->sendData($this->composePubRecAnswer());
             }
         }
 
         return true;
     }
 
-    private function composerPubRecAnswer(): PubRec
+    private function composePubRecAnswer(): PubRec
     {
         $pubRec = new PubRec($this->logger);
         $pubRec->packetIdentifier = $this->packetIdentifier;

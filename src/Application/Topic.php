@@ -22,8 +22,11 @@ final class Topic
     /**
      * The QoS lvl of this topic
      *
-     * NOTE: Setting a QoS level where it is not needed (basically anything apart from a subscription) will have no
-     * effect at all, as the QoS level is set not on a Topic level, but on a Message level instead.
+     * NOTE: Setting a QoS level where it is not needed will have no effect at all, as the QoS level is set not on a
+     *       Topic level, but on a Message level instead.
+     * NOTE: The SUBSCRIBE Packet also specifies (for each Subscription) the maximum QoS with which the Server can send
+     *       Application Messages to the Client. So even if the server has QoS lvl 2 messages in the queue, it will send
+     *       them as QoS lvl 0 if we provide lvl 0 as the input for this function. Defaults to QoS lvl 2.
      *
      * @var QoSLevel
      */
@@ -40,8 +43,8 @@ final class Topic
     public function __construct(string $topicName, QoSLevel $qosLevel = null)
     {
         if ($qosLevel === null) {
-            // QoSLevel defaults at 0
-            $qosLevel = new QoSLevel(0);
+            // QoSLevel defaults at 2 (Enable maximum by default)
+            $qosLevel = new QoSLevel(2);
         }
 
         $this
