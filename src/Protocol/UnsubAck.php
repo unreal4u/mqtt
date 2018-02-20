@@ -12,8 +12,7 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
- * Class SubAck
- * @package unreal4u\MQTT\Protocol
+ * The UNSUBACK Packet is sent by the Server to the Client to confirm receipt of an UNSUBSCRIBE Packet.
  */
 final class UnsubAck extends ProtocolBase implements ReadableContentInterface
 {
@@ -50,5 +49,13 @@ final class UnsubAck extends ProtocolBase implements ReadableContentInterface
 
         $client->updateLastCommunication();
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return Unsubscribe::getControlPacketValue();
     }
 }

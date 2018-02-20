@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
+use unreal4u\MQTT\Application\EmptyWritableResponse;
 use unreal4u\MQTT\Exceptions\NotConnected;
 use unreal4u\MQTT\Exceptions\ServerClosedConnection;
 use unreal4u\MQTT\Internals\ClientInterface;
@@ -48,6 +49,12 @@ final class Client extends ProtocolBase implements ClientInterface
      * @var Connect\Parameters
      */
     private $connectionParameters;
+
+    /**
+     * Temporary holder for async requests so that they can be handled synchronously
+     * @var WritableContentInterface[]
+     */
+    private $objectStack = [];
 
     /**
      * @inheritdoc
@@ -166,7 +173,56 @@ final class Client extends ProtocolBase implements ClientInterface
     }
 
     /**
+     * Stuff that has to happen before we actually begin sending data through our socket
+     *
+     * @param WritableContentInterface $object
+     * @return Client
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     */
+    private function preSocketCommunication(WritableContentInterface $object): self
+    {
+        $this->objectStack[$object::getControlPacketValue()] = $object;
+
+        if ($object instanceof Connect) {
+            $this->generateSocketConnection($object);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Checks in the object stack whether there is some method that might issue the current ReadableContent
+     *
+     * @param ReadableContentInterface $readableContent
+     * @return WritableContentInterface
+     * @throws \LogicException
+     */
+    private function postSocketCommunication(ReadableContentInterface $readableContent): WritableContentInterface
+    {
+        $originPacket = null;
+
+        $originPacketIdentifier = $readableContent->originPacketIdentifier();
+        if (array_key_exists($originPacketIdentifier, $this->objectStack)) {
+            $this->logger->debug('Origin packet found, returning it', ['originKey' => $originPacketIdentifier]);
+            $originPacket = $this->objectStack[$originPacketIdentifier];
+            unset($this->objectStack[$originPacketIdentifier]);
+        } elseif ($originPacketIdentifier === 0) {
+            $originPacket = new EmptyWritableResponse($this->logger);
+        } else {
+            $this->logger->error('No origin packet found!', [
+                'originKey' => $originPacketIdentifier,
+                'stack' => array_keys($this->objectStack),
+            ]);
+            throw new \LogicException('No origin instance could be found in the stack, please check');
+        }
+
+        return $originPacket;
+    }
+
+    /**
      * @inheritdoc
+     * @throws \LogicException
+     * @throws \unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
@@ -176,9 +232,7 @@ final class Client extends ProtocolBase implements ClientInterface
         $currentObject = \get_class($object);
         $this->logger->debug('Validating object', ['object' => $currentObject]);
 
-        if ($object instanceof Connect) {
-            $this->generateSocketConnection($object);
-        }
+        $this->preSocketCommunication($object);
 
         $this->logger->info('About to send data', ['object' => $currentObject]);
         $readableContent = $object->expectAnswer($this->sendSocketData($object), $this);
@@ -187,11 +241,12 @@ final class Client extends ProtocolBase implements ClientInterface
          * - ConnAck must set the connected bit
          * - PingResp must reset the internal last-communication datetime
          */
-        $this->logger->debug('Executing special actions for this object', [
+        $this->logger->debug('Checking stack and performing special operations', [
             'originObject' => $currentObject,
             'responseObject' => \get_class($readableContent),
         ]);
-        $readableContent->performSpecialActions($this, $object);
+
+        $readableContent->performSpecialActions($this, $this->postSocketCommunication($readableContent));
 
         return $readableContent;
     }

@@ -17,4 +17,12 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 final class EmptyReadableResponse extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return 0;
+    }
 }

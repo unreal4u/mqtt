@@ -12,6 +12,10 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * After a Network Connection is established by a Client to a Server, the first Packet sent from the Client to the
+ * Server MUST be a CONNECT Packet
+ */
 final class Connect extends ProtocolBase implements WritableContentInterface
 {
     use WritableContent;

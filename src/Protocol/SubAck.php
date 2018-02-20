@@ -12,8 +12,7 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
- * Class SubAck
- * @package unreal4u\MQTT\Protocol
+ * A SUBACK Packet is sent by the Server to the Client to confirm receipt and processing of a SUBSCRIBE Packet.
  */
 final class SubAck extends ProtocolBase implements ReadableContentInterface
 {
@@ -64,5 +63,13 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
 
         $client->updateLastCommunication();
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return Subscribe::getControlPacketValue();
     }
 }

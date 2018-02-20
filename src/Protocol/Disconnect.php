@@ -11,6 +11,11 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
+/**
+ * The DISCONNECT Packet is the final Control Packet sent from the Client to the Server.
+ *
+ * It indicates that the Client is disconnecting cleanly.
+ */
 final class Disconnect extends ProtocolBase implements WritableContentInterface
 {
     use WritableContent;

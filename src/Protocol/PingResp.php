@@ -11,8 +11,9 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
- * Class PingResp
- * @package unreal4u\MQTT\Protocol
+ * A PINGRESP Packet is sent by the Server to the Client in response to a PINGREQ Packet.
+ *
+ * It indicates that the Server is alive.
  */
 final class PingResp extends ProtocolBase implements ReadableContentInterface
 {
@@ -27,5 +28,13 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
     {
         $client->updateLastCommunication();
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return PingReq::getControlPacketValue();
     }
 }

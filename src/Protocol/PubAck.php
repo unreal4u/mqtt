@@ -13,8 +13,7 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
 /**
- * Class PubAck
- * @package unreal4u\MQTT\Protocol
+ * A PUBACK Packet is the response to a PUBLISH Packet with QoS level 1.
  */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
@@ -72,5 +71,13 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     public function shouldExpectAnswer(): bool
     {
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return Publish::getControlPacketValue();
     }
 }

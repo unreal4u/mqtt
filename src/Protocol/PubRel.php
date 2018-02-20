@@ -12,6 +12,11 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * A PUBREL Packet is the response to a PUBREC Packet.
+ *
+ * It is the third packet of the QoS 2 protocol exchange.
+ */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent, WritableContent;
@@ -74,5 +79,13 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
         $client->sendData($pubComp);
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return PubRec::getControlPacketValue();
     }
 }

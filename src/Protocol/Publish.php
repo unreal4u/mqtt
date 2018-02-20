@@ -296,4 +296,12 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $pubAck->packetIdentifier = $this->packetIdentifier;
         return $pubAck;
     }
+
+    /**
+     * PUBLISH packet is the exception to the rule: it is not started on base of a packet that gets sent by us
+     */
+    public function originPacketIdentifier(): int
+    {
+        return 0;
+    }
 }

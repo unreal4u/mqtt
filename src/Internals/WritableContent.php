@@ -147,4 +147,14 @@ trait WritableContent
         $eventManager = new EventManager($this->logger);
         return $eventManager->analyzeHeaders($data, $client);
     }
+
+    /**
+     * Gets the control packet value for this object
+     *
+     * @return int
+     */
+    final public static function getControlPacketValue(): int
+    {
+        return static::CONTROL_PACKET_VALUE;
+    }
 }

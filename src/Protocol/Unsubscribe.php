@@ -11,6 +11,9 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * An UNSUBSCRIBE Packet is sent by the Client to the Server, to unsubscribe from topics.
+ */
 final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
     use WritableContent;

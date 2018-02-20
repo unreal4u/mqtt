@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\ClientInterface;
-use unreal4u\MQTT\Internals\EventManager;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -13,6 +12,11 @@ use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
 
+/**
+ * A PUBREC Packet is the response to a PUBLISH Packet with QoS 2.
+ *
+ * It is the second packet of the QoS 2 protocol exchange.
+ */
 final class PubRec extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent, WritableContent;
@@ -71,25 +75,10 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
     }
 
     /**
-     * Will return an object of the type the broker has returned to us
-     *
-     * @param string $data
-     * @param ClientInterface $client
-     *
-     * @return ReadableContentInterface
-     * @throws \DomainException
+     * @inheritdoc
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function originPacketIdentifier(): int
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
-
-        $eventManager = new EventManager($this->logger);
-        $object = $eventManager->analyzeHeaders($data, $client);
-        if ($object instanceof PubRel) {
-
-        }
-
-        return $object;
+        return Publish::getControlPacketValue();
     }
-
 }

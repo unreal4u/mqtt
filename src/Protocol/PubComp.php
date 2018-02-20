@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
@@ -11,6 +12,11 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
+/**
+ * The PUBCOMP Packet is the response to a PUBREL Packet.
+ *
+ * It is the fourth and final packet of the QoS 2 protocol exchange.
+ */
 final class PubComp extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
     use ReadableContent, WritableContent;
@@ -50,7 +56,7 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
-        return $this;
+        return new EmptyReadableResponse($this->logger);
     }
 
     /**
@@ -60,5 +66,13 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
     public function shouldExpectAnswer(): bool
     {
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return PubRel::getControlPacketValue();
     }
 }

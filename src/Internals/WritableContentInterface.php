@@ -14,6 +14,8 @@ interface WritableContentInterface
      */
     public function __construct(LoggerInterface $logger = null);
 
+    public static function getControlPacketValue(): int;
+
     /**
      * Creates the fixed header each method has
      *

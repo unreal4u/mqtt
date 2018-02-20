@@ -17,8 +17,7 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
- * Class ConnAck
- * @package unreal4u\MQTT\Protocol
+ * The CONNACK Packet is the packet sent by the Server in response to a CONNECT Packet received from a Client.
  */
 final class ConnAck extends ProtocolBase implements ReadableContentInterface
 {
@@ -101,5 +100,13 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
             ->updateLastCommunication();
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return Connect::getControlPacketValue();
     }
 }
