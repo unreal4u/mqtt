@@ -265,7 +265,9 @@ final class Client extends ProtocolBase implements ClientInterface
         return
             $this->isConnected() &&
             $this->connectionParameters->getKeepAlivePeriod() > 0 &&
-            $secondsDifference >= $this->connectionParameters->getKeepAlivePeriod();
+            $secondsDifference >= $this->connectionParameters->getKeepAlivePeriod()# &&
+            #!array_key_exists(PingReq::CONTROL_PACKET_VALUE, $this->objectStack)
+            ;
     }
 
     /**

@@ -227,16 +227,23 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->analyzeFirstByte(\ord($rawMQTTHeaders));
         // $rawMQTTHeaders may be redefined
         $rawMQTTHeaders = $rawMQTTHeaders . $restOfBytes . $payload;
+        #$this->logger->debug('complete headers', ['header' => str2bin($rawMQTTHeaders)]);
 
         // Topic size is always the 3rd byte
         $topicSize = \ord($rawMQTTHeaders{3});
 
         $messageStartPosition = 4;
         if ($this->message->getQoSLevel() > 0) {
+            $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
             $this->packetIdentifier = Utilities::convertBinaryStringToNumber(
-                $rawMQTTHeaders{5 + $topicSize} . $rawMQTTHeaders{4 + $topicSize}
+                $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
             );
+            $this->logger->debug('Determined packet identifier', [
+                'calculated' => $this->packetIdentifier,
+                'firstBit' => \ord($rawMQTTHeaders{4 + $topicSize}),
+                'secondBit' => \ord($rawMQTTHeaders{5 + $topicSize})
+            ]);
             $messageStartPosition += 2;
         }
 
@@ -249,7 +256,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         ]);
 
         $this->message->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize));
-        $this->message->setTopic(new Topic(substr($rawMQTTHeaders, $messageStartPosition, $topicSize)));
+        // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
+        $this->message->setTopic(new Topic(substr($rawMQTTHeaders, 4, $topicSize)));
+        #$this->logger->debug('Found a topic name', ['name' => $this->message->getTopicName()]);
 
         return $this;
     }

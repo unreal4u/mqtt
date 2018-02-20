@@ -124,7 +124,10 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         $eventManager = new EventManager($this->logger);
 
         if ((\ord($publishPacketControlField) & 255) > 0) {
-            $this->logger->debug('Event received', ['ordValue' => \ord($publishPacketControlField) & 255]);
+            $this->logger->debug('Event received', [
+                'ordValue' => \ord($publishPacketControlField) & 255,
+                'length' => \strlen($publishPacketControlField)
+            ]);
             return $eventManager->analyzeHeaders($publishPacketControlField, $client);
         }
 
