@@ -21,4 +21,12 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
         $client->setConnected(false);
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function originPacketIdentifier(): int
+    {
+        return 0;
+    }
 }
