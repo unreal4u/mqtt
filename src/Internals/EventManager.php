@@ -86,7 +86,7 @@ final class EventManager extends ProtocolBase
 
         if (isset(self::$readableObjects[$controlPacketType])) {
             $this->currentObjectType = self::$readableObjects[$controlPacketType];
-            $this->logger->info('Found corresponding object, instantiating', [
+            $this->logger->info('Found a matching object, instantiating', [
                 'type' => $this->currentObjectType,
                 'controlPacketNumber' => $controlPacketType,
             ]);

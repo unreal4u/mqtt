@@ -240,7 +240,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
                 $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
             );
             $this->logger->debug('Determined packet identifier', [
-                'calculated' => $this->packetIdentifier,
+                'PI' => $this->packetIdentifier,
                 'firstBit' => \ord($rawMQTTHeaders{4 + $topicSize}),
                 'secondBit' => \ord($rawMQTTHeaders{5 + $topicSize})
             ]);

@@ -209,11 +209,12 @@ final class Client extends ProtocolBase implements ClientInterface
         } elseif ($originPacketIdentifier === 0) {
             $originPacket = new EmptyWritableResponse($this->logger);
         } else {
-            $this->logger->error('No origin packet found!', [
+            $this->logger->warning('No origin packet found!', [
                 'originKey' => $originPacketIdentifier,
                 'stack' => array_keys($this->objectStack),
             ]);
-            throw new \LogicException('No origin instance could be found in the stack, please check');
+            #throw new \LogicException('No origin instance could be found in the stack, please check');
+            $originPacket = new EmptyWritableResponse($this->logger);
         }
 
         return $originPacket;

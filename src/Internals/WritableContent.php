@@ -96,9 +96,9 @@ trait WritableContent
     final public function createSendableMessage(): string
     {
         $variableHeader = $this->createVariableHeader();
-        $this->logger->debug('Creating variable header', ['variableHeader' => base64_encode($variableHeader)]);
+        $this->logger->debug('Created variable header', ['variableHeader' => base64_encode($variableHeader)]);
         $payload = $this->createPayload();
-        $this->logger->debug('Creating payload', ['payload' => base64_encode($payload)]);
+        $this->logger->debug('Created payload', ['payload' => base64_encode($payload)]);
         $fixedHeader = $this->createFixedHeader(\strlen($variableHeader . $payload));
         $this->logger->debug('Created fixed header', ['fixedHeader' => base64_encode($fixedHeader)]);
 

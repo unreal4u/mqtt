@@ -27,7 +27,17 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
 
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
+        $rawHeadersSize = \strlen($rawMQTTHeaders);
+        // A PubRel message is always 4 bytes in size
+        if ($rawHeadersSize !== 4) {
+            $this->logger->debug('Headers are smaller than 4 bytes, retrieving the rest', [
+                'currentSize' => $rawHeadersSize
+            ]);
+            $rawMQTTHeaders .= $client->readBrokerData(4 - $rawHeadersSize);
+        }
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->logger->debug('Determined packet identifier', ['PI' => $this->packetIdentifier]);
+
         return $this;
     }
 
@@ -68,17 +78,26 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
-        $this->logger->debug('Checking packet identifier on PubRel');
-        /** @var PubRec $originalRequest */
-        if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
-            throw new \LogicException('Packet identifiers to not match!');
+        if ($originalRequest instanceof PubRec) {
+            $this->logger->debug('Checking packet identifier on PubRel', [
+                'pubRelPI' => $this->packetIdentifier,
+                'originalRequestPI' => $originalRequest->packetIdentifier,
+            ]);
+
+            if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
+                throw new \LogicException('Packet identifiers to not match!');
+            }
+
+            $pubComp = new PubComp($this->logger);
+            $pubComp->packetIdentifier = $this->packetIdentifier;
+            $client->processObject($pubComp);
+
+
+            return true;
         }
 
-        $pubComp = new PubComp($this->logger);
-        $pubComp->packetIdentifier = $this->packetIdentifier;
-        $client->processObject($pubComp);
-
-        return true;
+        $this->logger->warning('Original request NOT a PubRec, ignoring object entirely');
+        return false;
     }
 
     /**
