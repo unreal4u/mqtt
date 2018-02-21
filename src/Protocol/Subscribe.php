@@ -120,7 +120,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function checkForEvent(ClientInterface $client): ReadableContentInterface
     {
         $this->checkPingTime($client);
-        $publishPacketControlField = $client->readSocketData(1);
+        $publishPacketControlField = $client->readBrokerData(1);
         $eventManager = new EventManager($this->logger);
 
         if ((\ord($publishPacketControlField) & 255) > 0) {
@@ -154,7 +154,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
         $this->shouldLoop = true;
         // First of all: subscribe
         $this->logger->debug('Beginning loop', ['idleMicroseconds' => $idleMicroseconds]);
-        $readableContent = $client->sendData($this);
+        $readableContent = $client->processObject($this);
 
         // Allow the user to do certain stuff before looping, for example: an Unsubscribe
         if (\is_callable($hookBeforeLoop)) {
@@ -241,7 +241,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     {
         if ($client->isItPingTime()) {
             $this->logger->info('Pinging is needed, sending PingReq');
-            $client->sendData(new PingReq($this->logger));
+            $client->processObject(new PingReq($this->logger));
         }
 
         return true;

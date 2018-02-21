@@ -211,14 +211,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     {
         if (\strlen($rawMQTTHeaders) === 1) {
             $this->logger->debug('Fast check, read rest of data from socket');
-            $restOfBytes = $client->readSocketData(1);
-            $payload = $client->readSocketData(\ord($restOfBytes));
+            $restOfBytes = $client->readBrokerData(1);
+            $payload = $client->readBrokerData(\ord($restOfBytes));
         } else {
             $this->logger->debug('Slow form, retransform data and read rest of data');
             $restOfBytes = $rawMQTTHeaders{1};
             $payload = substr($rawMQTTHeaders, 2);
             $exactRest = \ord($restOfBytes) - \strlen($payload);
-            $payload .= $client->readSocketData($exactRest);
+            $payload .= $client->readBrokerData($exactRest);
             $rawMQTTHeaders = $rawMQTTHeaders{0};
         }
 
@@ -278,10 +278,10 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         } else {
             if ($qosLevel === 1) {
                 $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
-                $client->sendData($this->composePubAckAnswer());
+                $client->processObject($this->composePubAckAnswer());
             } elseif ($qosLevel === 2) {
                 $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
-                $client->sendData($this->composePubRecAnswer());
+                $client->processObject($this->composePubRecAnswer());
             }
         }
 

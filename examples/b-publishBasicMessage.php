@@ -27,7 +27,7 @@ $connect->setConnectionParameters($connectionParameters);
 // Next, we'll setup a Client
 $client = new Client();
 // And perform the connection itself
-$client->sendData($connect);
+$client->processObject($connect);
 
 // Once we are done with that and we are connected, we'll send out 10 messages
 define('MAXIMUM', 10);
@@ -50,7 +50,7 @@ if ($client->isConnected()) {
         // And we'll set the message to the Publish object
         $publish->setMessage($message);
         // Finally, we are ready to send it to the broker
-        $client->sendData($publish);
+        $client->processObject($publish);
         // A small indicator that something is happening
         echo '.';
     }

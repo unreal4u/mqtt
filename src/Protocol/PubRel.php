@@ -76,7 +76,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
 
         $pubComp = new PubComp($this->logger);
         $pubComp->packetIdentifier = $this->packetIdentifier;
-        $client->sendData($pubComp);
+        $client->processObject($pubComp);
 
         return true;
     }

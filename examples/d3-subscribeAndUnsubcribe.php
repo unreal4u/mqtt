@@ -30,7 +30,7 @@ $connect->setConnectionParameters($connectionParameters);
 
 try {
     $client = new Client($logger);
-    $client->sendData($connect);
+    $client->processObject($connect);
 } catch (\Exception $e) {
     printf($e->getMessage());
     die();
@@ -64,7 +64,7 @@ foreach ($subscribe->loop($client, 100000, function (LoggerInterface $logger) us
     $unsubscribe = new Unsubscribe($logger);
     // We will unsubscribe specifically from the SECONDARY_TOPICNAME topic (but not the rest)
     $unsubscribe->addTopics(new Topic(SECONDARY_TOPICNAME));
-    $client->sendData($unsubscribe);
+    $client->processObject($unsubscribe);
 }) as $message) {
     // Any message here should NOT be within the SECONDARY_TOPICNAME topic
     printf(

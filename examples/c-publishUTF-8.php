@@ -26,7 +26,7 @@ $connect->setConnectionParameters(new Parameters('publishSomethingUTF8'));
 
 // Create the client connection and connect to the broker
 $client = new Client();
-$client->sendData($connect);
+$client->processObject($connect);
 
 // Initialize the objects we'll be using for this example
 $message = new Message();
@@ -42,5 +42,5 @@ $message
 ;
 // Setting the message and publishing to broker
 $publish->setMessage($message);
-$client->sendData($publish);
+$client->processObject($publish);
 echo PHP_EOL;

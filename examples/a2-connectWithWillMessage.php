@@ -36,7 +36,7 @@ $connect->setConnectionParameters($parameters);
 // Create a client connection
 $client = new Client();
 // And send the data
-$connAck = $client->sendData($connect);
+$connAck = $client->processObject($connect);
 
 /*
  * If you subscribe to the above topic, a will message will be set when this exception below is thrown

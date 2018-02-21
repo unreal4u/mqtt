@@ -20,7 +20,7 @@ $connect = new Connect();
 $connect->setConnectionParameters(new Parameters('SubscribeOneTopic'));
 
 $client = new Client();
-$client->sendData($connect);
+$client->processObject($connect);
 
 // Then, we will initialize a new subscription
 $subscribe = new Subscribe();

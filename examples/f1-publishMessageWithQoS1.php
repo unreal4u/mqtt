@@ -37,7 +37,7 @@ $connect->setConnectionParameters($connectionParameters);
 
 // Make the initial connection
 $client = new Client($logger);
-$client->sendData($connect);
+$client->processObject($connect);
 
 define('MAXIMUM', 3);
 if ($client->isConnected()) {
@@ -56,7 +56,7 @@ if ($client->isConnected()) {
         // Set the message to the Publish object
         $publish->setMessage($message);
         // The client will perform the check whether the packet identifier is correctly set or not
-        $client->sendData($publish);
+        $client->processObject($publish);
         echo '.';
     }
 }

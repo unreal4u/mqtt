@@ -12,8 +12,6 @@ use unreal4u\MQTT\Protocol\ConnAck;
 
 class ClientMock implements ClientInterface
 {
-    private $socket;
-
     /**
      * @inheritdoc
      */
@@ -31,23 +29,15 @@ class ClientMock implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function getSocket()
+    public function shutdownConnection(): bool
     {
-        return $this->socket;
+        return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function readSocketData(int $bytes): string
-    {
-        return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readSocketHeader(): string
+    public function readBrokerData(int $bytes): string
     {
         return '';
     }
@@ -55,7 +45,7 @@ class ClientMock implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function sendSocketData(WritableContentInterface $object): string
+    public function readBrokerHeader(): string
     {
         return '';
     }
@@ -63,7 +53,15 @@ class ClientMock implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function setBlocking(bool $newStatus): ClientInterface
+    public function sendBrokerData(WritableContentInterface $object): string
+    {
+        return '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function enableSynchronousTransfer(bool $newStatus): ClientInterface
     {
         return $this;
     }
@@ -71,7 +69,7 @@ class ClientMock implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function sendData(WritableContentInterface $object): ReadableContentInterface
+    public function processObject(WritableContentInterface $object): ReadableContentInterface
     {
         return new ConnAck();
     }

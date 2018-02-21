@@ -16,7 +16,7 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
-        $successFullyClosed = stream_socket_shutdown($client->getSocket(), STREAM_SHUT_RDWR);
+        $successFullyClosed = $client->shutdownConnection();
         $this->logger->info('Sent shutdown signal to socket', ['successFullyClosed' => $successFullyClosed]);
         $client->setConnected(false);
         return true;

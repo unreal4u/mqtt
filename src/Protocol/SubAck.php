@@ -35,13 +35,13 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
     {
         // Read out the remaining length bytes should only 1 byte have come in until now
         if (\strlen($rawMQTTHeaders) === 1) {
-            $rawMQTTHeaders .= $client->readSocketData(1);
+            $rawMQTTHeaders .= $client->readBrokerData(1);
         }
 
         $remainingLength = \ord($rawMQTTHeaders[1]);
         // Check if we have a complete message
         if ($remainingLength + 2 !== \strlen($rawMQTTHeaders)) {
-            $rawMQTTHeaders .= $client->readSocketData($remainingLength + 2 - \strlen($rawMQTTHeaders));
+            $rawMQTTHeaders .= $client->readBrokerData($remainingLength + 2 - \strlen($rawMQTTHeaders));
         }
 
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);

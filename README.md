@@ -1,8 +1,8 @@
 # unreal4u/MQTT
 
-Simple MQTT library for PHP 7, with (for now) partial support for 
-[MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html), it is a rewrite of 
-[McFizh/libMQTT](https://github.com/McFizh/libMQTT). 
+Simple MQTT library for PHP 7, with (in the future) full support for 
+[MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html). This package is a rewrite of 
+[McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
 ## This project in badges
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
@@ -13,6 +13,22 @@ Simple MQTT library for PHP 7, with (for now) partial support for
 
 Please note that for the time being, this is still work in progress! A version will be launched when I believe it to be
 ready for production environments.
+
+## Capabilities of this package: 
+
+This package is able to:
+- Connect to the broker (SSL not tested yet). You can connect with virtually all optional parameters the protocol
+supports, including Will Message. The only exception to the rule is the clean session flag. This is not tested and may
+or may not work as intended.
+- Publish QoS level 0 and 1 messages. (Note: level 2 should be working as well, but still fixing some bugs). All
+protocol supported parameters are also supported, such as retained messages and other options.
+- Subscribe on QoS level 0 and 1 topics (Note: level 2 not entirely supported yet, working on that one). Connection
+handling will be done automatically, no need to fiddle with PingRequests and alike.
+- Filters of topics are those used on the protocol itself, which eliminates the likeliness of bugs that may occur from
+incorrectly parsing such filters.
+
+This package uses sockets to communicate (a)synchronously with the broker. If you don't want this, you are free to
+create your own client, for which you'll just have to implement an interface.
 
 # What is MQTT?
 

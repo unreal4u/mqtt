@@ -69,7 +69,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
     {
         $pubRel = new PubRel($this->logger);
         $pubRel->packetIdentifier = $this->packetIdentifier;
-        $pubComp = $client->sendData($pubRel);
+        $pubComp = $client->processObject($pubRel);
         $this->logger->debug('Created PubRel as response, got PubComp back', ['PubComp' => $pubComp]);
         return true;
     }

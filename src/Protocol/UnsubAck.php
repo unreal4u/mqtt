@@ -29,7 +29,7 @@ final class UnsubAck extends ProtocolBase implements ReadableContentInterface
     {
         // Read the rest of the request out should only 1 byte have come in
         if (\strlen($rawMQTTHeaders) === 1) {
-            $rawMQTTHeaders .= $client->readSocketData(3);
+            $rawMQTTHeaders .= $client->readBrokerData(3);
         }
 
         $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);

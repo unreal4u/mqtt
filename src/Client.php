@@ -67,22 +67,22 @@ final class Client extends ProtocolBase implements ClientInterface
         if ($this->socket !== null) {
             $this->logger->info('Currently connected to broker, disconnecting from it');
 
-            $this->sendData(new Disconnect($this->logger));
+            $this->processObject(new Disconnect($this->logger));
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function getSocket()
+    public function shutdownConnection(): bool
     {
-        return $this->socket;
+        return stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
     }
 
     /**
      * @inheritdoc
      */
-    public function readSocketData(int $bytes): string
+    public function readBrokerData(int $bytes): string
     {
         $this->logger->debug('Reading bytes from socket', [
             'numberOfBytes' => $bytes,
@@ -94,10 +94,10 @@ final class Client extends ProtocolBase implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function readSocketHeader(): string
+    public function readBrokerHeader(): string
     {
         $this->logger->debug('Reading header from response');
-        return $this->readSocketData(4);
+        return $this->readBrokerData(4);
     }
 
     /**
@@ -105,7 +105,7 @@ final class Client extends ProtocolBase implements ClientInterface
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      */
-    public function sendSocketData(WritableContentInterface $object): string
+    public function sendBrokerData(WritableContentInterface $object): string
     {
         if ($this->socket === null) {
             $this->logger->alert('Not connected before sending data');
@@ -128,9 +128,9 @@ final class Client extends ProtocolBase implements ClientInterface
 
         $returnValue = '';
         if ($object->shouldExpectAnswer() === true) {
-            $this->setBlocking(true);
-            $returnValue = $this->readSocketHeader();
-            $this->setBlocking(false);
+            $this->enableSynchronousTransfer(true);
+            $returnValue = $this->readBrokerHeader();
+            $this->enableSynchronousTransfer(false);
         }
 
         return $returnValue;
@@ -164,7 +164,7 @@ final class Client extends ProtocolBase implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function setBlocking(bool $newStatus): ClientInterface
+    public function enableSynchronousTransfer(bool $newStatus): ClientInterface
     {
         $this->logger->debug('Setting new blocking status', ['newStatus' => $newStatus]);
         stream_set_blocking($this->socket, $newStatus);
@@ -227,7 +227,7 @@ final class Client extends ProtocolBase implements ClientInterface
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      */
-    public function sendData(WritableContentInterface $object): ReadableContentInterface
+    public function processObject(WritableContentInterface $object): ReadableContentInterface
     {
         $currentObject = \get_class($object);
         $this->logger->debug('Validating object', ['object' => $currentObject]);
@@ -235,7 +235,7 @@ final class Client extends ProtocolBase implements ClientInterface
         $this->preSocketCommunication($object);
 
         $this->logger->info('About to send data', ['object' => $currentObject]);
-        $readableContent = $object->expectAnswer($this->sendSocketData($object), $this);
+        $readableContent = $object->expectAnswer($this->sendBrokerData($object), $this);
         /*
          * Some objects must perform certain actions on the connection, for example:
          * - ConnAck must set the connected bit

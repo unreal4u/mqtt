@@ -23,7 +23,7 @@ $connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);
 
 $client = new Client();
-$client->sendData($connect);
+$client->processObject($connect);
 
 $now = new \DateTimeImmutable('now');
 
@@ -37,15 +37,12 @@ if ($client->isConnected()) {
     $message->setRetainFlag(true);
     $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
     $publish->setMessage($message);
-    $client->sendData($publish);
+    $client->processObject($publish);
 
-    // Exactly the same for the SECONDARY_TOPICNAME
-    $message = new Message();
+    // Exactly the same, but for the SECONDARY_TOPICNAME
     $message->setTopic(new Topic(SECONDARY_TOPICNAME));
-    $message->setRetainFlag(true);
-    $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
     $publish->setMessage($message);
-    $client->sendData($publish);
+    $client->processObject($publish);
 
     echo 'Both messages sent';
 }

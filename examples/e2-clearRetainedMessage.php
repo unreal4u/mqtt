@@ -19,7 +19,7 @@ $connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);
 
 $client = new Client();
-$client->sendData($connect);
+$client->processObject($connect);
 
 $now = new \DateTimeImmutable('now');
 
@@ -39,7 +39,7 @@ if ($client->isConnected()) {
     // Set the message
     $publish->setMessage($message);
     // And publish the object to the broker
-    $client->sendData($publish);
+    $client->processObject($publish);
     echo 'Cleared retained message';
 }
 echo PHP_EOL;

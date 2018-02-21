@@ -30,7 +30,7 @@ $connect->setConnectionParameters($connectionParameters);
 
 try {
     $client = new Client($logger);
-    $client->sendData($connect);
+    $client->processObject($connect);
 } catch (\Exception $e) {
     printf($e->getMessage());
     die();

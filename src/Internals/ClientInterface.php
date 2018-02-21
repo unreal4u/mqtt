@@ -24,11 +24,11 @@ interface ClientInterface
     public function __destruct();
 
     /**
-     * Returns a direct connection to the socket
+     * Handles any special handling for the type of connection.
      *
-     * @return Resource
+     * @return bool
      */
-    public function getSocket();
+    public function shutdownConnection(): bool;
 
     /**
      * Allows us to read an arbitrary number of bytes from the socket connection
@@ -36,13 +36,13 @@ interface ClientInterface
      * @param int $bytes
      * @return string
      */
-    public function readSocketData(int $bytes): string;
+    public function readBrokerData(int $bytes): string;
 
     /**
      * The first 4 bytes will _always_ contain basic information with which we'll know what to do afterwards
      * @return string
      */
-    public function readSocketHeader(): string;
+    public function readBrokerHeader(): string;
 
     /**
      * Sends the data to the socket and waits for an answer from the broker
@@ -50,27 +50,27 @@ interface ClientInterface
      * @param WritableContentInterface $object
      * @return string
      */
-    public function sendSocketData(WritableContentInterface $object): string;
+    public function sendBrokerData(WritableContentInterface $object): string;
 
     /**
      * Defines whether the following request(s) should block further processing
      *
-     * If blocking should occur, we will wait for the socket to deliver some information. Some requests don't need a
+     * If blocking should occur, we will wait for the connection to deliver some information. Some requests don't need a
      * confirmation, so enable those to just omit waiting for some answer to come back and give the control back to the
      * user as soon as possible.
      *
      * @param bool $newStatus
      * @return ClientInterface
      */
-    public function setBlocking(bool $newStatus): ClientInterface;
+    public function enableSynchronousTransfer(bool $newStatus): ClientInterface;
 
     /**
-     * Prepares and sends the given request to the MQTT broker
+     * Prepares and sends the given request to the MQTT broker, will return some ReadableContent
      *
      * @param WritableContentInterface $object
      * @return ReadableContentInterface
      */
-    public function sendData(WritableContentInterface $object): ReadableContentInterface;
+    public function processObject(WritableContentInterface $object): ReadableContentInterface;
 
     /**
      * Will let us know if we are approaching the time limit in which the broker will disconnect us
