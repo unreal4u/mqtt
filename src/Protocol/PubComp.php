@@ -11,6 +11,7 @@ use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
+use unreal4u\MQTT\Utilities;
 
 /**
  * The PUBCOMP Packet is the response to a PUBREL Packet.
@@ -34,11 +35,11 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * Creates the variable header that each method has
      * @return string
+     * @throws \OutOfRangeException
      */
     public function createVariableHeader(): string
     {
-        // TODO: Implement createVariableHeader() method.
-        return '';
+        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
     }
 
     /**
