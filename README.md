@@ -1,6 +1,6 @@
 # unreal4u/MQTT
 
-Simple MQTT library for PHP 7, with (in the future) full support for 
+Simple MQTT library for PHP 7, with full support for 
 [MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html). This package is a rewrite of 
 [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
