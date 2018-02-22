@@ -58,13 +58,15 @@ final class Client extends ProtocolBase implements ClientInterface
 
     /**
      * @inheritdoc
+     * @throws \LogicException
+     * @throws \unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
     public function __destruct()
     {
-        if ($this->socket !== null) {
+        if ($this->isConnected() === true) {
             $this->logger->info('Currently connected to broker, disconnecting from it');
 
             $this->processObject(new Disconnect($this->logger));
@@ -137,10 +139,33 @@ final class Client extends ProtocolBase implements ClientInterface
     }
 
     /**
+     * Checks for socket error connections, will throw an exception if any is found
+     *
+     * @param int $errorCode
+     * @param string $errorDescription
+     * @return Client
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     */
+    private function checkForConnectionErrors(int $errorCode, string $errorDescription): self
+    {
+        if ($errorCode !== 0) {
+            $this->logger->critical('Could not connect to broker', [
+                'errorCode' => $errorCode,
+                'errorDescription' => $errorDescription,
+            ]);
+
+            throw new NotConnected('Could not connect to broker: ' . $errorDescription, $errorCode);
+        }
+
+        return $this;
+    }
+
+    /**
      * Special handling of the connect part: create the socket
      *
      * @param Connect $connection
      * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     private function generateSocketConnection(Connect $connection): bool
@@ -149,11 +174,13 @@ final class Client extends ProtocolBase implements ClientInterface
         $this->connectionParameters = $connection->getConnectionParameters();
         $this->socket = stream_socket_client(
             $this->connectionParameters->getConnectionUrl(),
-            $errorNumber,
-            $errorString,
+            $errorCode,
+            $errorDescription,
             60,
             STREAM_CLIENT_CONNECT
         );
+
+        $this->checkForConnectionErrors($errorCode, $errorDescription);
 
         stream_set_timeout($this->socket, (int)floor($this->connectionParameters->getKeepAlivePeriod() * 1.5));
 
@@ -177,6 +204,7 @@ final class Client extends ProtocolBase implements ClientInterface
      *
      * @param WritableContentInterface $object
      * @return Client
+     * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      */
     private function preSocketCommunication(WritableContentInterface $object): self
