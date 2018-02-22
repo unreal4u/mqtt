@@ -30,7 +30,7 @@ final class PacketIdentifier
      */
     public function __construct(int $packetIdentifier)
     {
-        if ($packetIdentifier > 6535 || $packetIdentifier < 1) {
+        if ($packetIdentifier > 65535 || $packetIdentifier < 1) {
             throw new \InvalidArgumentException(sprintf(
                 'The provided packet identifier is invalid. Valid values are 1-65535 (Provided: %d)',
                 $packetIdentifier
@@ -52,6 +52,8 @@ final class PacketIdentifier
 
     public function __toString(): string
     {
+        // Save to ignore this inspection here because this exception is already handled by the VO itself
+        /** @noinspection MagicMethodsValidityInspection */
         return Utilities::convertNumberToBinaryString($this->packetIdentifier);
     }
 }
