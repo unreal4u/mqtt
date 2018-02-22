@@ -20,10 +20,10 @@ This package is able to:
 - Connect to the broker (SSL not tested yet). You can connect with virtually all optional parameters the protocol
 supports, including Will Message. The only exception to the rule is the clean session flag. This is not tested and may
 or may not work as intended.
-- Publish QoS level 0 and 1 messages. (Note: level 2 should be working as well, but still fixing some bugs). All
-protocol supported parameters are also supported, such as retained messages and other options.
-- Subscribe on QoS level 0 and 1 topics (Note: level 2 not entirely supported yet, working on that one). Connection
-handling will be done automatically, no need to fiddle with PingRequests and alike.
+- Publish QoS level 0, 1 and 2 messages. All protocol supported parameters are also supported, such as retained messages
+and other options.
+- Subscribe on QoS level 0, 1 and 2 topics. Connection handling will be done automatically, no need to fiddle with
+PingRequests and alike.
 - Filters of topics are those used on the protocol itself, which eliminates the likeliness of bugs that may occur from
 incorrectly parsing such filters.
 
