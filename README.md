@@ -1,8 +1,8 @@
 # unreal4u/MQTT
 
-Simple MQTT library for PHP 7, with (in the future) full support for 
-[MQTT version 3.1.1](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html). This package is a rewrite of 
-[McFizh/libMQTT](https://github.com/McFizh/libMQTT).
+Complete PHP7+ MQTT client with full support for 
+[the MQTT version 3.1.1 protocol](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html). This package is an
+entire rewrite of [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
 ## This project in badges
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
@@ -13,6 +13,10 @@ Simple MQTT library for PHP 7, with (in the future) full support for
 
 Please note that for the time being, this is still work in progress! A version will be launched when I believe it to be
 ready for production environments.
+
+## What is MQTT?
+
+Please read the [following wiki page](https://github.com/unreal4u/mqtt/wiki/What-is-MQTT) for that :)
 
 ## Capabilities of this package: 
 
@@ -29,47 +33,6 @@ incorrectly parsing such filters.
 
 This package uses sockets to communicate (a)synchronously with the broker. If you don't want this, you are free to
 create your own client, for which you'll just have to implement an interface.
-
-# What is MQTT?
-
-## Definitions
-
-MQTT is a Client Server publish/subscribe messaging transport protocol. It is light weight, open, simple, and designed so as to be easy to implement. These
-characteristics make it ideal for use in many situations, including constrained environments such as for communication in Machine to Machine (M2M) and
-Internet of Things (IoT) contexts where a small code footprint is required and/or network bandwidth is at a premium.
-
-The protocol runs over TCP/IP, or over other network protocols that provide ordered, lossless, bi-directional connections. Its features include:
-
-- Use of the publish/subscribe message pattern which provides one-to-many message distribution and decoupling of applications.
-- A messaging transport that is agnostic to the content of the payload.
-- Three qualities of service for message delivery:
-  - "At most once", where messages are delivered according to the best efforts of the operating environment. Message loss can occur. This level could be
-  used, for example, with ambient sensor data where it does not matter if an individual reading is lost as the next one will be published soon after.
-  - "At least once", where messages are assured to arrive but duplicates can occur.
-  - "Exactly once", where message are assured to arrive exactly once. This level could be used, for example, with billing systems where duplicate or lost
-  messages could lead to incorrect charges being applied.
-- A small transport overhead and protocol exchanges minimized to reduce network traffic.
-- A mechanism to notify interested parties when an abnormal disconnection occurs.
-
-## Clarifications
-
-MQTT works with a Client and Server model, this means that:
-- A Client will connect to a Server (Also known as a broker).
-- This API implements the Client-side and not the server side.
-- A client can perform different operations, such as subscribing and publishing.
-- A publish action from the client is simply putting a message on the server.
-- A subscription can be seen as a publish done by the server to the client.
-
-With that knowledge, QoS works in the following way:
-- QoS level 0 (default): A publish message may never arrive (or several times) at the server.
-- QoS level 1: A publish message must arrive at the server, however, this may occur several times, for example, during an
-intermittent connection to the server or while trying to subscribe to multiple topics in one go.
-- QoS level 2: A publish message must arrive at the server, but exactly one time. The way this is dealt with is to effectively
-start a conversation with the broker in order to assure messages arrive only once.
-
-Little note on retainability: it is possible to indicate to the broker that a message must be retained. This is done by the
-retain bit and has nothing to do with the QoS of the message.  
-A retained message will be shown to every subscribed client + all the new ones that might subscibe to that same topic.
 
 # Development environment
 
