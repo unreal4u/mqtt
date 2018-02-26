@@ -72,7 +72,7 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return PubRel::getControlPacketValue();
     }

@@ -68,7 +68,7 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return Subscribe::getControlPacketValue();
     }

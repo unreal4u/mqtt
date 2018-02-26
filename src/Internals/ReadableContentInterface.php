@@ -40,7 +40,7 @@ interface ReadableContentInterface
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool;
 
     /**
-     * Returns the origin packet identifier that will issue this type of object
+     * Returns the origin control packet that will issue this type of object
      *
      * This strange construct is better explained with an example:
      * a ConnAck will always come from a Connect packet.
@@ -56,5 +56,5 @@ interface ReadableContentInterface
      *
      * @return int
      */
-    public function originPacketIdentifier(): int;
+    public function getOriginControlPacket(): int;
 }

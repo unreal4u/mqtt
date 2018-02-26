@@ -25,7 +25,7 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return 0;
     }

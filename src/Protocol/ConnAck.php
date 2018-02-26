@@ -105,7 +105,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return Connect::getControlPacketValue();
     }

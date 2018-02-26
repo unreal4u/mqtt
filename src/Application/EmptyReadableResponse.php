@@ -21,7 +21,7 @@ final class EmptyReadableResponse extends ProtocolBase implements ReadableConten
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return 0;
     }

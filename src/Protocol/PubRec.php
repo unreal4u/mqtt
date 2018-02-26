@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\DataTypes\PacketIdentifier as PacketIdentifierDataType;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifier;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -19,15 +21,19 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubRec extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent;
-
-    public $packetIdentifier = 0;
+    use ReadableContent, WritableContent, PacketIdentifier;
 
     const CONTROL_PACKET_VALUE = 5;
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
+     */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifier(new PacketIdentifierDataType($this->extractPacketIdentifier($rawMQTTHeaders)));
         return $this;
     }
 
@@ -38,7 +44,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function createVariableHeader(): string
     {
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
     /**
@@ -77,7 +83,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return Publish::getControlPacketValue();
     }

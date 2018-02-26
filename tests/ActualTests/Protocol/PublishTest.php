@@ -9,6 +9,7 @@ use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
@@ -60,8 +61,9 @@ class PublishTest extends TestCase
         $this->message->setRetainFlag(true);
 
         $this->publish->setMessage($this->message);
+        $this->publish->setPacketIdentifier(new PacketIdentifier(1));
         $variableHeader = $this->publish->createVariableHeader();
-        $this->assertSame('AAF0AAA=', base64_encode($variableHeader));
+        $this->assertSame('AAF0AAE=', base64_encode($variableHeader));
     }
 
     public function test_NoAnswerRequired()
@@ -88,11 +90,11 @@ class PublishTest extends TestCase
     {
         $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
-        $this->publish->packetIdentifier = 1;
+        $this->publish->setPacketIdentifier(new PacketIdentifier(1));
         $this->publish->createVariableHeader();
         /** @var PubAck $answer */
         $answer = $this->publish->expectAnswer(base64_decode('QAIAAQ=='), new ClientMock());
         $this->assertInstanceOf(PubAck::class, $answer);
-        $this->assertSame($answer->packetIdentifier, $this->publish->packetIdentifier);
+        $this->assertSame($answer->packetIdentifier, $this->publish->getPacketIdentifier());
     }
 }

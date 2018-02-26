@@ -7,8 +7,10 @@ namespace unreal4u\MQTT\Protocol;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\PacketIdentifier as PacketIdentifierDataType;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifier;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -23,8 +25,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent/*, PacketIdentifier*/
-        ;
+    use ReadableContent, WritableContent, PacketIdentifier;
 
     const CONTROL_PACKET_VALUE = 3;
 
@@ -33,12 +34,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @var Message
      */
     private $message;
-
-    /**
-     * Some interchanges with the broker will send or receive a packet identifier
-     * @var int
-     */
-    public $packetIdentifier = 0;
 
     /**
      * Flag to check whether a message is a redelivery (DUP flag)
@@ -74,7 +69,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($this->message->getQoSLevel() !== 0) {
             // 0 for QoS lvl2 for QoS lvl1 and 4 for QoS lvl2
             $this->specialFlags |= ($this->message->getQoSLevel() * 2);
-            $bitString .= Utilities::convertNumberToBinaryString($this->packetIdentifier);
+            $bitString .= $this->getPacketIdentifierBinaryRepresentation();
             $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()), [
                 'specialFlags' => $this->specialFlags,
             ]);
@@ -237,9 +232,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($this->message->getQoSLevel() > 0) {
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
-            $this->packetIdentifier = Utilities::convertBinaryStringToNumber(
+            $this->setPacketIdentifier(new PacketIdentifierDataType(Utilities::convertBinaryStringToNumber(
                 $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
-            );
+            )));
             $this->logger->debug('Determined packet identifier', [
                 'PI' => $this->packetIdentifier,
                 'firstBit' => \ord($rawMQTTHeaders{4 + $topicSize}),
@@ -253,7 +248,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             'QoSLevel' => $this->message->getQoSLevel(),
             'isDuplicate' => $this->isRedelivery,
             'isRetained' => $this->message->isRetained(),
-            'packetIdentifier' => $this->packetIdentifier,
+            'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(),
         ]);
 
         $this->message->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize));
@@ -310,7 +305,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * PUBLISH packet is the exception to the rule: it is not started on base of a packet that gets sent by us
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return 0;
     }

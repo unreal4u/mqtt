@@ -33,7 +33,7 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return PingReq::getControlPacketValue();
     }

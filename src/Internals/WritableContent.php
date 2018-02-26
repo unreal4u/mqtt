@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
+use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
 
@@ -34,6 +35,11 @@ trait WritableContent
      * @var string
      */
     public $protocolLevel = '3.1.1';
+
+    /**
+     * @var ProtocolVersion
+     */
+    private $protocolVersion;
 
     /**
      * Returns the fixed header part needed for all methods
@@ -105,13 +111,19 @@ trait WritableContent
         return $fixedHeader . $variableHeader . $payload;
     }
 
+    final public function setProtocolVersion(ProtocolVersion $protocolVersion): self
+    {
+        $this->protocolVersion = $protocolVersion;
+        return $this;
+    }
+
     /**
      * Gets the current protocol lvl bit
      * @return string
      */
-    final public function getProtocolLevel(): string
+    final public function getProtocolVersion(): string
     {
-        if ($this->protocolLevel === '3.1.1') {
+        if ($this->protocolVersion->getProtocolVersion() === '3.1.1') {
             return \chr(4);
         }
 

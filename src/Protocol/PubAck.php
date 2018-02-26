@@ -76,7 +76,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return Publish::getControlPacketValue();
     }

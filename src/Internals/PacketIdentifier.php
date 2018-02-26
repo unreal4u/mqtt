@@ -17,7 +17,7 @@ trait PacketIdentifier
      * The packet identifier variable
      * @var PacketIdentifierDataType
      */
-    private $packetIdentifier = 0;
+    private $packetIdentifier;
 
     final public function setPacketIdentifier(PacketIdentifierDataType $packetIdentifier): self
     {
@@ -36,9 +36,29 @@ trait PacketIdentifier
      * @return string
      * @throws \OutOfRangeException
      */
-    final public function getBinaryRepresentation(): string
+    final public function getPacketIdentifierBinaryRepresentation(): string
     {
+        if ($this->packetIdentifier === null) {
+            $this->generateRandomPacketIdentifier();
+        }
+
         return Utilities::convertNumberToBinaryString($this->packetIdentifier->getPacketIdentifierValue());
+    }
+
+    /**
+     * Sets the packet identifier straight from the raw MQTT headers
+     *
+     * @param string $rawMQTTHeaders
+     * @return self
+     * @throws \OutOfRangeException
+     */
+    final public function setPacketIdentifierFromRawHeaders(string $rawMQTTHeaders): self
+    {
+        $this->packetIdentifier = new PacketIdentifierDataType(Utilities::convertBinaryStringToNumber(
+            $rawMQTTHeaders{2} . $rawMQTTHeaders{3})
+        );
+
+        return $this;
     }
 
     final public function generateRandomPacketIdentifier(): self

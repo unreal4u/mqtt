@@ -26,12 +26,12 @@ final class PacketIdentifier
      * QoSLevel constructor.
      *
      * @param int $packetIdentifier
-     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
      */
     public function __construct(int $packetIdentifier)
     {
         if ($packetIdentifier > 65535 || $packetIdentifier < 1) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \OutOfRangeException(sprintf(
                 'The provided packet identifier is invalid. Valid values are 1-65535 (Provided: %d)',
                 $packetIdentifier
             ));
@@ -41,7 +41,7 @@ final class PacketIdentifier
     }
 
     /**
-     * Gets the current QoS level
+     * Gets the current packet identifier value
      *
      * @return int
      */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifier;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -19,9 +20,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent;
-
-    public $packetIdentifier = 0;
+    use ReadableContent, WritableContent, PacketIdentifier;
 
     const CONTROL_PACKET_VALUE = 6;
 
@@ -35,7 +34,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
             ]);
             $rawMQTTHeaders .= $client->readBrokerData(4 - $rawHeadersSize);
         }
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         $this->logger->debug('Determined packet identifier', ['PI' => $this->packetIdentifier]);
 
         return $this;
@@ -49,7 +48,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     public function createVariableHeader(): string
     {
         $this->specialFlags |= 2;
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
     /**
@@ -103,7 +102,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * @inheritdoc
      */
-    public function originPacketIdentifier(): int
+    public function getOriginControlPacket(): int
     {
         return PubRec::getControlPacketValue();
     }

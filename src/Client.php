@@ -229,7 +229,7 @@ final class Client extends ProtocolBase implements ClientInterface
     {
         $originPacket = null;
 
-        $originPacketIdentifier = $readableContent->originPacketIdentifier();
+        $originPacketIdentifier = $readableContent->getOriginControlPacket();
         if (array_key_exists($originPacketIdentifier, $this->objectStack)) {
             $this->logger->debug('Origin packet found, returning it', ['originKey' => $originPacketIdentifier]);
             $originPacket = $this->objectStack[$originPacketIdentifier];
