@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -58,17 +57,11 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     /**
      * @return string
      * @throws \OutOfRangeException
-     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
     public function createVariableHeader(): string
     {
-        // Initialize a default value if it has not been done so already
-        if ($this->protocolVersion === null) {
-            $this->protocolVersion = new ProtocolVersion();
-        }
-
         $bitString = $this->createUTF8String('MQTT'); // Connect MUST begin with MQTT
-        $bitString .= $this->getProtocolVersion(); // Protocol level
+        $bitString .= $this->connectionParameters->getProtocolVersionBinaryRepresentation(); // Protocol level
         $bitString .= \chr($this->connectionParameters->getFlags());
         $bitString .= Utilities::convertNumberToBinaryString($this->connectionParameters->keepAlivePeriod);
         return $bitString;

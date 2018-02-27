@@ -18,15 +18,19 @@ final class ProtocolVersion
      */
     private $protocolVersion;
 
+    const SUPPORTED_PROTOCOL_VERSIONS = [
+        '3.1.1'
+    ];
+
     /**
      * QoSLevel constructor.
      *
      * @param string $protocolVersion
      * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
-    public function __construct(string $protocolVersion = '3.1.1')
+    public function __construct(string $protocolVersion)
     {
-        if ($protocolVersion !== '3.1.1') {
+        if (\in_array($protocolVersion, self::SUPPORTED_PROTOCOL_VERSIONS, true) === false) {
             throw new UnacceptableProtocolVersion('The specified protocol is invalid');
         }
         $this->protocolVersion = $protocolVersion;
@@ -40,6 +44,16 @@ final class ProtocolVersion
     public function getProtocolVersion(): string
     {
         return $this->protocolVersion;
+    }
+
+    public function getProtocolVersionBinaryRepresentation(): string {
+        if ($this->protocolVersion === '3.1.1') {
+            // Protocol v3.1.1 must return a 4
+            return \chr(4);
+        }
+
+        // Return a default of 0, which will be invalid anyway (but data will be sent to the broker this way)
+        return \chr(0);
     }
 
     public function __toString(): string

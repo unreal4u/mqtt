@@ -7,6 +7,7 @@ namespace unreal4u\MQTT\Protocol\Connect;
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 
 /**
@@ -14,6 +15,11 @@ use unreal4u\MQTT\DataTypes\QoSLevel;
  */
 final class Parameters
 {
+    /**
+     * The default protocol version this library will be talking with
+     */
+    const DEFAULT_PROTOCOL_VERSION = '3.1.1';
+
     /**
      * @var LoggerInterface
      */
@@ -98,6 +104,11 @@ final class Parameters
     private $willRetain = false;
 
     /**
+     * @var ProtocolVersion
+     */
+    private $protocolVersion;
+
+    /**
      * The 10th byte will contain a series of flags
      *
      * The order of these flags are:
@@ -136,8 +147,20 @@ final class Parameters
 
         // Once we have a logger, set the clientId
         $this->setClientId($clientId);
+        $this->setProtocolVersion(new ProtocolVersion(self::DEFAULT_PROTOCOL_VERSION));
 
         $this->host = $host;
+    }
+
+    public function setProtocolVersion(ProtocolVersion $protocolVersion): self
+    {
+        $this->protocolVersion = $protocolVersion;
+        return $this;
+    }
+
+    public function getProtocolVersionBinaryRepresentation(): string
+    {
+        return $this->protocolVersion->getProtocolVersionBinaryRepresentation();
     }
 
     /**

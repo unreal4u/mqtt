@@ -22,12 +22,6 @@ class ProtocolVersionTest extends TestCase
         $this->assertSame('3.1.1', $protocolVersion->getProtocolVersion());
     }
 
-    public function test_validDefaultValue()
-    {
-        $protocolVersion = new ProtocolVersion();
-        $this->assertSame('3.1.1', $protocolVersion->getProtocolVersion());
-    }
-
     public function test_toString()
     {
         $protocolVersion = new ProtocolVersion('3.1.1');

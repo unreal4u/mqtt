@@ -118,20 +118,6 @@ trait WritableContent
     }
 
     /**
-     * Gets the current protocol lvl bit
-     * @return string
-     */
-    final public function getProtocolVersion(): string
-    {
-        if ($this->protocolVersion->getProtocolVersion() === '3.1.1') {
-            return \chr(4);
-        }
-
-        // Return a default of 0, which will be invalid anyway (but data will be sent to the broker this way)
-        return \chr(0);
-    }
-
-    /**
      * Creates a UTF8 big-endian representation of the given string
      *
      * @param string $data
