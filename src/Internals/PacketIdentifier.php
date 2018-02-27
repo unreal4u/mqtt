@@ -54,8 +54,8 @@ trait PacketIdentifier
      */
     final public function setPacketIdentifierFromRawHeaders(string $rawMQTTHeaders): self
     {
-        $this->packetIdentifier = new PacketIdentifierDataType(Utilities::convertBinaryStringToNumber(
-            $rawMQTTHeaders{2} . $rawMQTTHeaders{3})
+        $this->packetIdentifier = new PacketIdentifierDataType(
+            Utilities::convertBinaryStringToNumber($rawMQTTHeaders{2} . $rawMQTTHeaders{3})
         );
 
         return $this;
