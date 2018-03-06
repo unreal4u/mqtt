@@ -136,6 +136,7 @@ final class Parameters
      * @param string $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
      * @param LoggerInterface $logger
+     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
     public function __construct(string $clientId = '', string $host = 'localhost', LoggerInterface $logger = null)
     {

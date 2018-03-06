@@ -6,11 +6,11 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\Topic;
-use unreal4u\MQTT\DataTypes\PacketIdentifier as PacketIdentifierDataType;
+use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
-use unreal4u\MQTT\Internals\PacketIdentifier;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -25,7 +25,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifier;
+    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 3;
 
@@ -194,23 +194,21 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
-     * Will perform sanity checks and fill in the Readable object with data
+     * Gets the full message in case this object needs to
+     *
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
-     * @return ReadableContentInterface
-     * @throws \OutOfBoundsException
+     * @return string
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
      */
-    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    private function getFullRawHeaders(string $rawMQTTHeaders, ClientInterface $client): string
     {
         if (\strlen($rawMQTTHeaders) === 1) {
-            $this->logger->debug('Fast check, read rest of data from socket');
+            $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
             $restOfBytes = $client->readBrokerData(1);
             $payload = $client->readBrokerData(\ord($restOfBytes));
         } else {
-            $this->logger->debug('Slow form, retransform data and read rest of data');
+            $this->logger->debug('More than 1 byte detected, calculating and retrieving the rest');
             $restOfBytes = $rawMQTTHeaders{1};
             $payload = substr($rawMQTTHeaders, 2);
             $exactRest = \ord($restOfBytes) - \strlen($payload);
@@ -222,7 +220,22 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->message = new Message();
         $this->analyzeFirstByte(\ord($rawMQTTHeaders));
         // $rawMQTTHeaders may be redefined
-        $rawMQTTHeaders = $rawMQTTHeaders . $restOfBytes . $payload;
+        return $rawMQTTHeaders . $restOfBytes . $payload;
+    }
+
+    /**
+     * Will perform sanity checks and fill in the Readable object with data
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfBoundsException
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
+     */
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    {
+        $rawMQTTHeaders = $this->getFullRawHeaders($rawMQTTHeaders, $client);
         #$this->logger->debug('complete headers', ['header' => str2bin($rawMQTTHeaders)]);
 
         // Topic size is always the 3rd byte
@@ -232,11 +245,11 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($this->message->getQoSLevel() > 0) {
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
-            $this->setPacketIdentifier(new PacketIdentifierDataType(Utilities::convertBinaryStringToNumber(
+            $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
                 $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
             )));
             $this->logger->debug('Determined packet identifier', [
-                'PI' => $this->packetIdentifier,
+                'PI' => $this->getPacketIdentifier(),
                 'firstBit' => \ord($rawMQTTHeaders{4 + $topicSize}),
                 'secondBit' => \ord($rawMQTTHeaders{5 + $topicSize})
             ]);
@@ -287,7 +300,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     private function composePubRecAnswer(): PubRec
     {
         $pubRec = new PubRec($this->logger);
-        $pubRec->packetIdentifier = $this->packetIdentifier;
+        $pubRec->setPacketIdentifier($this->packetIdentifier);
         return $pubRec;
     }
 
@@ -298,7 +311,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     private function composePubAckAnswer(): PubAck
     {
         $pubAck = new PubAck($this->logger);
-        $pubAck->packetIdentifier = $this->packetIdentifier;
+        $pubAck->setPacketIdentifier($this->packetIdentifier);
         return $pubAck;
     }
 

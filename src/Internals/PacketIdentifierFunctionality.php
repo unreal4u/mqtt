@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
-use unreal4u\MQTT\DataTypes\PacketIdentifier as PacketIdentifierDataType;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Utilities;
 
 /**
  * Trait ReadableContent
  * @package unreal4u\MQTT\Internals
  */
-trait PacketIdentifier
+trait PacketIdentifierFunctionality
 {
     /**
      * The packet identifier variable
-     * @var PacketIdentifierDataType
+     * @var PacketIdentifier
      */
     private $packetIdentifier;
 
-    final public function setPacketIdentifier(PacketIdentifierDataType $packetIdentifier): self
+    final public function setPacketIdentifier(PacketIdentifier $packetIdentifier): self
     {
         $this->packetIdentifier = $packetIdentifier;
         return $this;
@@ -54,7 +54,7 @@ trait PacketIdentifier
      */
     final public function setPacketIdentifierFromRawHeaders(string $rawMQTTHeaders): self
     {
-        $this->packetIdentifier = new PacketIdentifierDataType(
+        $this->packetIdentifier = new PacketIdentifier(
             Utilities::convertBinaryStringToNumber($rawMQTTHeaders{2} . $rawMQTTHeaders{3})
         );
 
@@ -64,7 +64,7 @@ trait PacketIdentifier
     final public function generateRandomPacketIdentifier(): self
     {
         try {
-            $this->packetIdentifier = new PacketIdentifierDataType(random_int(1, 65535));
+            $this->packetIdentifier = new PacketIdentifier(random_int(1, 65535));
         } catch (\Exception $e) {
             /*
              * Default to an older method, there should be no security issues here I believe.
@@ -73,7 +73,7 @@ trait PacketIdentifier
              */
             /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             /** @noinspection RandomApiMigrationInspection */
-            $this->packetIdentifier = new PacketIdentifierDataType(mt_rand(1, 65535));
+            $this->packetIdentifier = new PacketIdentifier(mt_rand(1, 65535));
         }
         return $this;
     }

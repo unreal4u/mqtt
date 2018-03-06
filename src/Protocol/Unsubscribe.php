@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * An UNSUBSCRIBE Packet is sent by the Client to the Server, to unsubscribe from topics.
  */
 final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent;
+    use WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 10;
-
-    private $packetIdentifier = 0;
 
     /**
      * An array of topics on which unsubscribe to
@@ -45,10 +44,10 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 
         // Assign a packet identifier automatically if none has been assigned yet
         if ($this->packetIdentifier === 0) {
-            $this->setPacketIdentifier(random_int(0, 65535));
+            $this->setPacketIdentifier(new PacketIdentifier(random_int(1, 65535)));
         }
 
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
     public function createPayload(): string
@@ -73,30 +72,6 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
     public function shouldExpectAnswer(): bool
     {
         return true;
-    }
-
-    /**
-     * SUBSCRIBE Control Packets MUST contain a non-zero 16-bit Packet Identifier
-     *
-     * @param int $packetIdentifier
-     * @return Unsubscribe
-     * @throws \OutOfRangeException
-     */
-    public function setPacketIdentifier(int $packetIdentifier): self
-    {
-        if ($packetIdentifier > 65535 || $packetIdentifier < 1) {
-            throw new \OutOfRangeException('Packet identifier must fit within 2 bytes');
-        }
-
-        $this->packetIdentifier = $packetIdentifier;
-        $this->logger->debug('Setting packet identifier', ['current' => $this->packetIdentifier]);
-
-        return $this;
-    }
-
-    public function getPacketIdentifier(): int
-    {
-        return $this->packetIdentifier;
     }
 
     /**

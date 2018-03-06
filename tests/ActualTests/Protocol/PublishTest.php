@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\PubAck;
@@ -95,6 +95,6 @@ class PublishTest extends TestCase
         /** @var PubAck $answer */
         $answer = $this->publish->expectAnswer(base64_decode('QAIAAQ=='), new ClientMock());
         $this->assertInstanceOf(PubAck::class, $answer);
-        $this->assertSame($answer->packetIdentifier, $this->publish->getPacketIdentifier());
+        $this->assertSame($answer->getPacketIdentifier(), $this->publish->getPacketIdentifier());
     }
 }

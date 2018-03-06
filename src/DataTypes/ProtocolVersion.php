@@ -46,7 +46,13 @@ final class ProtocolVersion
         return $this->protocolVersion;
     }
 
-    public function getProtocolVersionBinaryRepresentation(): string {
+    /**
+     * Will return the correct connection identifier for the current protocol
+     *
+     * @return string
+     */
+    public function getProtocolVersionBinaryRepresentation(): string
+    {
         if ($this->protocolVersion === '3.1.1') {
             // Protocol v3.1.1 must return a 4
             return \chr(4);

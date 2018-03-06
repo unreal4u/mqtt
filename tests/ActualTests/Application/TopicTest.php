@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Application;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\Topic;
 
 class TopicTest extends TestCase
 {

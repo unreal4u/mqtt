@@ -6,12 +6,12 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * The PUBCOMP Packet is the response to a PUBREL Packet.
@@ -20,15 +20,19 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubComp extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent;
-
-    public $packetIdentifier = 0;
+    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 7;
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
+     */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         return $this;
     }
 
@@ -39,7 +43,7 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function createVariableHeader(): string
     {
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
     /**

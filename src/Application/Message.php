@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Application;
 
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
 use unreal4u\MQTT\Internals\ProtocolBase;

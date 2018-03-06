@@ -6,6 +6,7 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -16,15 +17,16 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class UnsubAck extends ProtocolBase implements ReadableContentInterface
 {
-    use ReadableContent;
+    use ReadableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 11;
 
     /**
-     * @var int
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
      */
-    private $packetIdentifier = 0;
-
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         // Read the rest of the request out should only 1 byte have come in
@@ -32,7 +34,7 @@ final class UnsubAck extends ProtocolBase implements ReadableContentInterface
             $rawMQTTHeaders .= $client->readBrokerData(3);
         }
 
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         return $this;
     }
 
@@ -43,7 +45,7 @@ final class UnsubAck extends ProtocolBase implements ReadableContentInterface
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         /** @var Unsubscribe $originalRequest */
-        if ($this->packetIdentifier !== $originalRequest->getPacketIdentifier()) {
+        if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
             throw new UnmatchingPacketIdentifiers('Packet identifiers do not match!');
         }
 

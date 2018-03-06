@@ -6,7 +6,7 @@ namespace tests\unreal4u\MQTT\Connect;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 

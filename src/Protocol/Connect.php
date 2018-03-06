@@ -33,7 +33,7 @@ final class Connect extends ProtocolBase implements WritableContentInterface
      *
      * @return Connect
      */
-    public function setConnectionParameters(Parameters $connectionParameters): Connect
+    public function setConnectionParameters(Parameters $connectionParameters): self
     {
         $this->connectionParameters = $connectionParameters;
         return $this;

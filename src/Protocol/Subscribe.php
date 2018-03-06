@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
-use unreal4u\MQTT\Application\Topic;
+use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\EventManager;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * The SUBSCRIBE Packet is sent from the Client to the Server to create one or more Subscriptions.
@@ -24,11 +25,9 @@ use unreal4u\MQTT\Utilities;
  */
 final class Subscribe extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent;
+    use WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 8;
-
-    private $packetIdentifier = 0;
 
     /**
      * An array of topics on which to subscribe to
@@ -54,12 +53,16 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
         // Assign a packet identifier automatically if none has been assigned yet
         if ($this->packetIdentifier === 0) {
-            $this->setPacketIdentifier(random_int(0, 65535));
+            $this->setPacketIdentifier(new PacketIdentifier(random_int(1, 65535)));
         }
 
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
+    /**
+     * @return string
+     * @throws \OutOfRangeException
+     */
     public function createPayload(): string
     {
         $output = '';
@@ -82,30 +85,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     public function shouldExpectAnswer(): bool
     {
         return true;
-    }
-
-    /**
-     * SUBSCRIBE Control Packets MUST contain a non-zero 16-bit Packet Identifier
-     *
-     * @param int $packetIdentifier
-     * @return Subscribe
-     * @throws \OutOfRangeException
-     */
-    public function setPacketIdentifier(int $packetIdentifier): Subscribe
-    {
-        if ($packetIdentifier > 65535 || $packetIdentifier < 1) {
-            throw new \OutOfRangeException('Packet identifier must fit within 2 bytes');
-        }
-
-        $this->packetIdentifier = $packetIdentifier;
-        $this->logger->debug('Setting packet identifier', ['current' => $this->packetIdentifier]);
-
-        return $this;
-    }
-
-    public function getPacketIdentifier(): int
-    {
-        return $this->packetIdentifier;
     }
 
     /**

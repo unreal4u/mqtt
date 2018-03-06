@@ -6,6 +6,7 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers;
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -16,14 +17,9 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class SubAck extends ProtocolBase implements ReadableContentInterface
 {
-    use ReadableContent;
+    use ReadableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 9;
-
-    /**
-     * @var int
-     */
-    private $packetIdentifier = 0;
 
     /**
      * Information about each topic
@@ -31,6 +27,12 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
      */
     private $payload = '';
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
+     */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         // Read out the remaining length bytes should only 1 byte have come in until now
@@ -44,7 +46,7 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
             $rawMQTTHeaders .= $client->readBrokerData($remainingLength + 2 - \strlen($rawMQTTHeaders));
         }
 
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         // TODO Check which QoS corresponds to each topic we are subscribed to
         $this->payload = substr($rawMQTTHeaders, 4);
         return $this;
@@ -57,7 +59,7 @@ final class SubAck extends ProtocolBase implements ReadableContentInterface
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         /** @var Subscribe $originalRequest */
-        if ($this->packetIdentifier !== $originalRequest->getPacketIdentifier()) {
+        if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
             throw new UnmatchingPacketIdentifiers('Packet identifiers do not match!');
         }
 

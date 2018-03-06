@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\DataTypes\PacketIdentifier as PacketIdentifierDataType;
 use unreal4u\MQTT\Internals\ClientInterface;
-use unreal4u\MQTT\Internals\PacketIdentifier;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * A PUBREC Packet is the response to a PUBLISH Packet with QoS 2.
@@ -21,7 +19,7 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubRec extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifier;
+    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 5;
 
@@ -33,7 +31,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->setPacketIdentifier(new PacketIdentifierDataType($this->extractPacketIdentifier($rawMQTTHeaders)));
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         return $this;
     }
 
@@ -74,7 +72,7 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         $pubRel = new PubRel($this->logger);
-        $pubRel->packetIdentifier = $this->packetIdentifier;
+        $pubRel->setPacketIdentifier($this->packetIdentifier);
         $pubComp = $client->processObject($pubRel);
         $this->logger->debug('Created PubRel as response, got PubComp back', ['PubComp' => $pubComp]);
         return true;

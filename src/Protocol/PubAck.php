@@ -5,27 +5,31 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * A PUBACK Packet is the response to a PUBLISH Packet with QoS level 1.
  */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent;
-
-    public $packetIdentifier = 0;
+    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 4;
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
+     */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->packetIdentifier = $this->extractPacketIdentifier($rawMQTTHeaders);
+        $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
         return $this;
     }
 
@@ -36,15 +40,19 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         /** @var Publish $originalRequest */
-        if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
+        if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
             throw new \LogicException('Packet identifiers to not match!');
         }
         return true;
     }
 
+    /**
+     * @return string
+     * @throws \OutOfRangeException
+     */
     public function createVariableHeader(): string
     {
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier);
+        return $this->getPacketIdentifierBinaryRepresentation();
     }
 
     /**

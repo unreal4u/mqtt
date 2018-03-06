@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace unreal4u\MQTT\Application;
-
-use unreal4u\MQTT\DataTypes\QoSLevel;
+namespace unreal4u\MQTT\DataTypes;
 
 /**
  * When the client wants to subscribe to a topic, this is done by adding a topic filter.

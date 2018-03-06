@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\ClientInterface;
-use unreal4u\MQTT\Internals\PacketIdentifier;
+use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Utilities;
 
 /**
  * A PUBREL Packet is the response to a PUBREC Packet.
@@ -20,10 +19,16 @@ use unreal4u\MQTT\Utilities;
  */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifier;
+    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 6;
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \OutOfRangeException
+     */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $rawHeadersSize = \strlen($rawMQTTHeaders);
@@ -79,18 +84,17 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     {
         if ($originalRequest instanceof PubRec) {
             $this->logger->debug('Checking packet identifier on PubRel', [
-                'pubRelPI' => $this->packetIdentifier,
-                'originalRequestPI' => $originalRequest->packetIdentifier,
+                'pubRelPI' => $this->getPacketIdentifier(),
+                'originalRequestPI' => $originalRequest->getPacketIdentifier(),
             ]);
 
-            if ($this->packetIdentifier !== $originalRequest->packetIdentifier) {
+            if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
                 throw new \LogicException('Packet identifiers to not match!');
             }
 
             $pubComp = new PubComp($this->logger);
-            $pubComp->packetIdentifier = $this->packetIdentifier;
+            $pubComp->setPacketIdentifier($this->packetIdentifier);
             $client->processObject($pubComp);
-
 
             return true;
         }
