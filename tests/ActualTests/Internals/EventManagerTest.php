@@ -33,4 +33,13 @@ class EventManagerTest extends TestCase
         $this->assertInstanceOf(EmptyReadableResponse::class,
             $this->eventManager->analyzeHeaders('', new ClientMock()));
     }
+
+    public function test_invalidControlPacketValue()
+    {
+        $this->expectException(\DomainException::class);
+        $this->eventManager->analyzeHeaders(
+            base64_decode('ECwABE1RVFQEBAA8ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw=='),
+            new ClientMock()
+        );
+    }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tests\unreal4u\MQTT\Application;
+namespace tests\unreal4u\MQTT\DataTypes;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\DataTypes\QoSLevel;

@@ -96,7 +96,7 @@ final class EventManager extends ProtocolBase
         } else {
             $this->logger->error('Invalid control packet type found', [
                 'controlPacketType' => $controlPacketType,
-                'rawMQTTHeaders' => str2bin($rawMQTTHeaders),
+                #'rawMQTTHeaders' => str2bin($rawMQTTHeaders),
             ]);
             throw new \DomainException(sprintf('Invalid control packet found (%d)', $controlPacketType));
         }

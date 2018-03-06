@@ -75,6 +75,10 @@ class ConnectTest extends TestCase
 
         $this->assertSame(34, \strlen($connectPayload));
         $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw==', base64_encode($connectPayload));
+        $this->assertSame(
+            'ECwABE1RVFQEBAA8ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw==',
+            base64_encode($this->connect->createSendableMessage())
+        );
     }
 
     public function test_shouldExpectAnswer()
