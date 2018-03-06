@@ -25,6 +25,12 @@ class ParametersTest extends TestCase
         $this->assertSame('tcp://192.168.255.3:1883', $parameters->getConnectionUrl());
     }
 
+    public function test_setNonUTF8ClientName()
+    {
+        $parameters = new Parameters('uniqueClientId𠜎𠜱WithComplexUTF8Chars');
+        $this->assertSame('uniqueClientId𠜎𠜱WithComplexUTF8Chars', $parameters->getClientId());
+    }
+
     public function provider_createObjectWithOptions(): array
     {
         $mapValues[] = ['Username', 'asdf', 128];
@@ -111,6 +117,7 @@ class ParametersTest extends TestCase
         $parameters->setWill($willMessage);
 
         $this->assertSame(4, $parameters->getFlags());
+        $this->assertFalse($parameters->getWillRetain());
     }
 
     public function test_validRetainedWillMessage()
@@ -124,6 +131,7 @@ class ParametersTest extends TestCase
         $parameters->setWill($willMessage);
 
         $this->assertSame(36, $parameters->getFlags());
+        $this->assertTrue($parameters->getWillRetain());
     }
 
     public function provider_validQosLevelWillMessage(): array

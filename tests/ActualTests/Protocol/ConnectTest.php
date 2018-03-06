@@ -7,6 +7,7 @@ namespace tests\unreal4u\MQTT;
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -74,5 +75,24 @@ class ConnectTest extends TestCase
 
         $this->assertSame(34, \strlen($connectPayload));
         $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAV0b3BpYwAHVGVzdGluZw==', base64_encode($connectPayload));
+    }
+
+    public function test_shouldExpectAnswer()
+    {
+        $this->assertTrue($this->connect->shouldExpectAnswer());
+    }
+
+    public function test_noConnectionParametersDefinedException()
+    {
+        $this->expectException(NoConnectionParametersDefined::class);
+        $this->connect->getConnectionParameters();
+    }
+
+    public function test_getConnectionParameters()
+    {
+        $parameters = new Parameters('UnitTestClientId');
+
+        $this->connect->setConnectionParameters($parameters);
+        $this->assertSame($parameters, $this->connect->getConnectionParameters());
     }
 }
