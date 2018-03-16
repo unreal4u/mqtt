@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use unreal4u\MQTT\Exceptions\Connect\IdentifierRejected;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
+use unreal4u\MQTT\Internals\ClientInterface;
+use unreal4u\MQTT\Internals\EventManager;
 use unreal4u\MQTT\Internals\ProtocolBase;
+use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -104,5 +108,30 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     public function shouldExpectAnswer(): bool
     {
         return true;
+    }
+
+    /**
+     * Special handling of the ConnAck object: be able to inject more information into the object before throwing it
+     *
+     * @param string $data
+     * @param ClientInterface $client
+     *
+     * @return ReadableContentInterface
+     */
+    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    {
+        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
+
+        $eventManager = new EventManager($this->logger);
+        try {
+            $connAck = $eventManager->analyzeHeaders($data, $client);
+        } catch (IdentifierRejected $e) {
+            // TODO perform all checks here about
+            $e->fillPossibleReason('TODO');
+            // Re-throw the exception with all information filled in
+            throw $e;
+        }
+
+        return $connAck;
     }
 }
