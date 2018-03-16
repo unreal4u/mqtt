@@ -58,36 +58,44 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $this->connectReturnCode = \ord($rawMQTTHeaders{3});
+        if ($this->connectReturnCode !== 0) {
+            // We have detected a problem while connecting to the broker, send out the correct exception
+            $this->throwConnectException();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ConnAck
+     * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
+     * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
+     * @throws \unreal4u\MQTT\Exceptions\Connect\BadUsernameOrPassword
+     * @throws \unreal4u\MQTT\Exceptions\Connect\ServerUnavailable
+     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
+     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
+     */
+    private function throwConnectException(): self
+    {
         switch ($this->connectReturnCode) {
-            case 0:
-                // Everything correct, do nothing
-                break;
             case 1:
                 throw new UnacceptableProtocolVersion(
                     'The Server does not support the level of the MQTT protocol requested by the Client'
                 );
-                break;
             case 2:
-                throw new IdentifierRejected('The Client identifier is correct UTF-8 but not allowed by the Server');
-                break;
+                throw new IdentifierRejected('The Client identifier may be incorrect or broker does not accept it');
             case 3:
                 throw new ServerUnavailable('The Network Connection has been made but the MQTT service is unavailable');
-                break;
             case 4:
                 throw new BadUsernameOrPassword('The data in the user name or password is malformed');
-                break;
             case 5:
                 throw new NotAuthorized('The Client is not authorized to connect');
-                break;
             default:
                 throw new GenericError(sprintf(
                     'Reserved for future use or error not implemented yet (Error code: %d)',
                     $this->connectReturnCode
                 ));
-                break;
         }
-
-        return $this;
     }
 
     /**
