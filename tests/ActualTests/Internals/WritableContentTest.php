@@ -15,6 +15,12 @@ class WritableContentTest extends TestCase
         $this->assertSame('AA5UaGlzIGlzIGEgdGVzdA==', base64_encode($pingRequest->createUTF8String('This is a test')));
     }
 
+    public function test_emptyString()
+    {
+        $pingRequest = new PingReq();
+        $this->assertSame('', base64_encode($pingRequest->createUTF8String('')));
+    }
+
     public function test_createFixedHeader()
     {
         $pingRequest = new PingReq();

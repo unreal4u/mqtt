@@ -126,7 +126,12 @@ trait WritableContent
      */
     final public function createUTF8String(string $data): string
     {
-        return Utilities::convertNumberToBinaryString(\strlen($data)) . $data;
+        $returnString = '';
+        if ($data !== '') {
+            $returnString = Utilities::convertNumberToBinaryString(\strlen($data)) . $data;
+        }
+
+        return $returnString;
     }
 
     /**

@@ -13,6 +13,7 @@ declare(strict_types=1);
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\QoSLevel;
@@ -27,7 +28,7 @@ $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 // Set up the connection parameters
-$connectionParameters = new Parameters(basename(__FILE__));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 

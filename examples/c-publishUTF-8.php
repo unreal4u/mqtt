@@ -8,6 +8,7 @@ declare(strict_types=1);
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
@@ -22,7 +23,7 @@ $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 // Create the Connect object and set the parameters
 $connect = new Connect();
-$connect->setConnectionParameters(new Parameters('publishSomethingUTF8'));
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
 
 // Create the client connection and connect to the broker
 $client = new Client();

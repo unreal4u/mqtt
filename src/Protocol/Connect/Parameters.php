@@ -7,6 +7,7 @@ namespace unreal4u\MQTT\Protocol\Connect;
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 
@@ -41,9 +42,7 @@ final class Parameters
     /**
      * Unique (per broker) client Id. Can be empty if $cleanSession is set to true.
      *
-     * SHOULD be within the character set "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-     *
-     * @var string
+     * @var ClientId
      */
     private $clientId = '';
 
@@ -133,12 +132,12 @@ final class Parameters
     /**
      * Builds up the connection parameters
      *
-     * @param string $clientId Will default to a clientId set by the broker
+     * @param ClientId $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
      * @param LoggerInterface $logger
      * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
-    public function __construct(string $clientId = '', string $host = 'localhost', LoggerInterface $logger = null)
+    public function __construct(ClientId $clientId = null, string $host = 'localhost', LoggerInterface $logger = null)
     {
         if ($logger === null) {
             $logger = new Logger();
@@ -147,6 +146,9 @@ final class Parameters
         $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', \get_class($this)));
 
         // Once we have a logger, set the clientId
+        if ($clientId === null) {
+            $clientId = new ClientId('');
+        }
         $this->setClientId($clientId);
         $this->setProtocolVersion(new ProtocolVersion(self::DEFAULT_PROTOCOL_VERSION));
 
@@ -170,36 +172,19 @@ final class Parameters
      * @param string $clientId
      * @return Parameters
      */
-    public function setClientId(string $clientId = ''): self
+    public function setClientId(ClientId $clientId): self
     {
-        if ($clientId !== '') {
-            $this->clientId = $clientId;
-            $clientIdSize = \strlen($this->clientId);
-            $utf8ClientIdSize = \mb_strlen($this->clientId);
-
-            if ($clientIdSize !== $utf8ClientIdSize) {
-                $this->logger->warning('The broker MAY reject the connection because of invalid characters');
-            }
-
-            if ($utf8ClientIdSize > 23) {
-                $this->logger->warning('The broker MAY reject the connection because the ClientId is too long');
-            }
-        } else {
-            /*
-             * If you ever wind up in this situation, search for MQTT-3.1.3-7 on the following document for more
-             * information: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718067
-             */
-            $this->logger->warning('ClientId size is 0 bytes. This has several implications, check comments', [
-                'file' => __FILE__,
-                'line' => __LINE__,
-            ]);
-            $this->cleanSession = true;
+        $this->clientId = $clientId;
+        $this->logger->debug('Set clientId', ['actualClientString' => (string)$clientId]);
+        if ($this->clientId->isEmptyClientId()) {
+            $this->logger->debug('Empty clientId detected, forcing clean session bit to true');
+            $this->setCleanSession(true);
         }
 
         return $this;
     }
 
-    public function getClientId(): string
+    public function getClientId(): ClientId
     {
         return $this->clientId;
     }

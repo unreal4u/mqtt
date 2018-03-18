@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Protocol\Connect;
@@ -17,7 +18,7 @@ include __DIR__ . '/00.basics.php';
 
 // First, we must connect to the broker
 $connect = new Connect();
-$connect->setConnectionParameters(new Parameters('SubscribeOneTopic'));
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
 
 $client = new Client();
 $client->processObject($connect);

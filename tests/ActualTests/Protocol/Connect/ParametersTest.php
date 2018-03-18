@@ -6,6 +6,7 @@ namespace tests\unreal4u\MQTT\Connect;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -16,25 +17,25 @@ class ParametersTest extends TestCase
     {
         $parameters = new Parameters();
         $this->assertSame('tcp://localhost:1883', $parameters->getConnectionUrl());
-        $this->assertSame(0, $parameters->getFlags());
+        $this->assertSame(2, $parameters->getFlags());
     }
 
     public function test_setHost()
     {
-        $parameters = new Parameters('uniqueClientId', '192.168.255.3');
+        $parameters = new Parameters(new ClientId('uniqueClientId'), '192.168.255.3');
         $this->assertSame('tcp://192.168.255.3:1883', $parameters->getConnectionUrl());
     }
 
     public function test_setNonUTF8ClientName()
     {
-        $parameters = new Parameters('uniqueClientId𠜎𠜱WithComplexUTF8Chars');
-        $this->assertSame('uniqueClientId𠜎𠜱WithComplexUTF8Chars', $parameters->getClientId());
+        $parameters = new Parameters(new ClientId('uniqueClientId𠜎𠜱WithComplexUTF8Chars'));
+        $this->assertSame('uniqueClientId𠜎𠜱WithComplexUTF8Chars', (string)$parameters->getClientId());
     }
 
     public function provider_createObjectWithOptions(): array
     {
-        $mapValues[] = ['Username', 'asdf', 128];
-        $mapValues[] = ['Password', 'asdf', 64];
+        $mapValues[] = ['Username', 'asdf', 130];
+        $mapValues[] = ['Password', 'asdf', 66];
         $mapValues[] = ['CleanSession', true, 2];
 
         return $mapValues;
@@ -61,7 +62,7 @@ class ParametersTest extends TestCase
 
     public function test_createObjectWithMultipleOptions()
     {
-        $parameters = new Parameters('SpecialClientId');
+        $parameters = new Parameters(new ClientId('SpecialClientId'));
         $parameters->setCleanSession(true);
         $this->assertSame(2, $parameters->getFlags());
         $parameters->setUsername('unreal4u');
@@ -94,7 +95,7 @@ class ParametersTest extends TestCase
      */
     public function test_revertBits(string $key, $filledValue, $emptyValue, int $expectedBit)
     {
-        $parameters = new Parameters();
+        $parameters = new Parameters(new ClientId('unittest'));
 
         $setter = 'set' . $key;
 
@@ -116,7 +117,7 @@ class ParametersTest extends TestCase
         $parameters = new Parameters();
         $parameters->setWill($willMessage);
 
-        $this->assertSame(4, $parameters->getFlags());
+        $this->assertSame(6, $parameters->getFlags());
         $this->assertFalse($parameters->getWillRetain());
     }
 
@@ -130,7 +131,7 @@ class ParametersTest extends TestCase
         $parameters = new Parameters();
         $parameters->setWill($willMessage);
 
-        $this->assertSame(36, $parameters->getFlags());
+        $this->assertSame(38, $parameters->getFlags());
         $this->assertTrue($parameters->getWillRetain());
     }
 
@@ -155,7 +156,7 @@ class ParametersTest extends TestCase
         $willMessage->setTopic(new Topic('client/errors'));
         $willMessage->setQoSLevel(new QoSLevel($QoSLevel));
 
-        $parameters = new Parameters();
+        $parameters = new Parameters(new ClientId('unittest'));
         $parameters->setWill($willMessage);
 
         $this->assertSame($parameterFlagResult, $parameters->getFlags());

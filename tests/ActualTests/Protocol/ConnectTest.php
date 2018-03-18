@@ -6,6 +6,7 @@ namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
@@ -33,7 +34,7 @@ class ConnectTest extends TestCase
 
     public function test_createVariableHeaderDefaultValues()
     {
-        $this->connect->setConnectionParameters(new Parameters('UnitTestClientId'));
+        $this->connect->setConnectionParameters(new Parameters(new ClientId('UnitTestClientId')));
         $connectVariableHeader = $this->connect->createVariableHeader();
         $this->assertSame(10, \strlen($connectVariableHeader));
         $this->assertSame('AARNUVRUBAAAPA==', base64_encode($connectVariableHeader));
@@ -41,7 +42,7 @@ class ConnectTest extends TestCase
 
     public function test_userAndPassword()
     {
-        $parameters = new Parameters('UnitTestClientId');
+        $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setUsername('unreal4u');
         $parameters->setPassword('justT3st1ng');
 
@@ -54,7 +55,7 @@ class ConnectTest extends TestCase
 
     public function test_passwordWithoutUsername()
     {
-        $parameters = new Parameters('UnitTestClientId');
+        $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setPassword('justT3st1ng');
 
         $this->connect->setConnectionParameters($parameters);
@@ -68,7 +69,7 @@ class ConnectTest extends TestCase
         $message->setPayload('Testing');
         $message->setTopic(new Topic('topic'));
 
-        $parameters = new Parameters('UnitTestClientId');
+        $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setWill($message);
         $this->connect->setConnectionParameters($parameters);
         $connectPayload = $this->connect->createPayload();
@@ -94,7 +95,7 @@ class ConnectTest extends TestCase
 
     public function test_getConnectionParameters()
     {
-        $parameters = new Parameters('UnitTestClientId');
+        $parameters = new Parameters(new ClientId('UnitTestClientId'));
 
         $this->connect->setConnectionParameters($parameters);
         $this->assertSame($parameters, $this->connect->getConnectionParameters());

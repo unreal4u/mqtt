@@ -9,6 +9,7 @@ declare(strict_types=1);
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -19,7 +20,7 @@ include __DIR__ . '/00.basics.php';
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters('subscribeToSomething');
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
 // Keep alive period is used for connections that must ping the broker more or less frequently. It defaults to 60 secs.
 $connectionParameters->setKeepAlivePeriod(5);
 $connectionParameters->setUsername('testuser');

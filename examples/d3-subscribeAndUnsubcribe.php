@@ -10,6 +10,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -21,7 +22,7 @@ include __DIR__ . '/00.basics.php';
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters('subscribeAndUnsubscribe');
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 

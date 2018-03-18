@@ -73,26 +73,17 @@ final class Connect extends ProtocolBase implements WritableContentInterface
 
     public function createPayload(): string
     {
-        $output = '';
         // The order in a connect string is clientId first
-        if ($this->connectionParameters->getClientId() !== '') {
-            $output .= $this->createUTF8String($this->connectionParameters->getClientId());
-        }
+        $output = $this->createUTF8String((string)$this->connectionParameters->getClientId());
 
         // Then the willTopic if it is set
-        if ($this->connectionParameters->getWillTopic() !== '') {
-            $output .= $this->createUTF8String($this->connectionParameters->getWillTopic());
-        }
+        $output .= $this->createUTF8String($this->connectionParameters->getWillTopic());
 
         // The willMessage will come next
-        if ($this->connectionParameters->getWillMessage() !== '') {
-            $output .= $this->createUTF8String($this->connectionParameters->getWillMessage());
-        }
+        $output .= $this->createUTF8String($this->connectionParameters->getWillMessage());
 
         // If the username is set, it will come next
-        if ($this->connectionParameters->getUsername() !== '') {
-            $output .= $this->createUTF8String($this->connectionParameters->getUsername());
-        }
+        $output .= $this->createUTF8String($this->connectionParameters->getUsername());
 
         // And finally the password as last parameter
         if ($this->connectionParameters->getPassword() !== '') {
@@ -117,6 +108,8 @@ final class Connect extends ProtocolBase implements WritableContentInterface
      * @param ClientInterface $client
      *
      * @return ReadableContentInterface
+     * @throws \DomainException
+     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
      */
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
@@ -126,8 +119,12 @@ final class Connect extends ProtocolBase implements WritableContentInterface
         try {
             $connAck = $eventManager->analyzeHeaders($data, $client);
         } catch (IdentifierRejected $e) {
-            // TODO perform all checks here about
-            $e->fillPossibleReason('TODO');
+            $possibleReasons = '';
+            foreach ($this->connectionParameters->getClientId()->performStrictValidationCheck() as $errorMessage) {
+                $possibleReasons .= $errorMessage . PHP_EOL;
+            }
+
+            $e->fillPossibleReason($possibleReasons);
             // Re-throw the exception with all information filled in
             throw $e;
         }

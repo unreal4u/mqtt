@@ -5,6 +5,7 @@
  */
 declare(strict_types = 1);
 
+use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
@@ -21,7 +22,7 @@ $willMessage->setPayload('If I die unexpectedly, please print this message');
 $willMessage->setTopic(new Topic('client/errors'));
 
 // Now we will setup a new Connect Parameters object
-$parameters = new Parameters('uniqueClientId123');
+$parameters = new Parameters(new ClientId(basename(__FILE__)));
 // Set the will message to the above created message
 $parameters->setWill($willMessage);
 
