@@ -29,4 +29,9 @@ final class DisconnectCleanup extends ProtocolBase implements ReadableContentInt
     {
         return 0;
     }
+
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    {
+        return $this;
+    }
 }
