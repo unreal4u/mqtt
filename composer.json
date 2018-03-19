@@ -21,7 +21,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "tests\\unreal4u\\MQTT\\": "tests/ActualTests"
+      "tests\\unreal4u\\MQTT\\": "tests"
     }
   },
   "require": {

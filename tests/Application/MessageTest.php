@@ -7,7 +7,6 @@ namespace tests\unreal4u\MQTT\Application;
 use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\Topic;
-use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Exceptions\MissingTopicName;
 

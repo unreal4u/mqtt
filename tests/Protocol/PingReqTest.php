@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\DataTypes\Topic;
-use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
-use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Protocol\PingReq;
 
 class PingReqTest extends TestCase
@@ -45,5 +41,4 @@ class PingReqTest extends TestCase
     {
         $this->assertTrue($this->pingReq->shouldExpectAnswer());
     }
-
 }
