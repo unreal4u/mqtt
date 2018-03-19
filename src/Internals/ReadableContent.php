@@ -50,27 +50,12 @@ trait ReadableContent
     }
 
     /**
-     * Extracts the packet identifier from the raw headers
-     *
-     * @param string $rawMQTTHeaders
-     * @return int
-     * @throws \OutOfRangeException
-     */
-    private function extractPacketIdentifier(string $rawMQTTHeaders): int
-    {
-        return Utilities::convertBinaryStringToNumber($rawMQTTHeaders{2} . $rawMQTTHeaders{3});
-    }
-
-    /**
-     * Any class can overwrite the default behaviour (which is do nothing)
+     * All classes must implement how to handle the object filling
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
      */
-    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
-    {
-        return $this;
-    }
+    abstract public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface;
 
     /**
      * Any class can overwrite the default behaviour

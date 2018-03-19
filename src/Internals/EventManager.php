@@ -55,6 +55,7 @@ final class EventManager extends ProtocolBase
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349209
      * @var array
      */
+    /*
     private static $writableObjects = [
         1 => Connect::class,
         3 => Publish::class,
@@ -67,6 +68,7 @@ final class EventManager extends ProtocolBase
         12 => PingReq::class,
         14 => Disconnect::class,
     ];
+    */
 
     /**
      * Will check within all the Readable objects whether one of those is the correct packet we are looking for

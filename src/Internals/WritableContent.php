@@ -111,6 +111,20 @@ trait WritableContent
         return $fixedHeader . $variableHeader . $payload;
     }
 
+    /**
+     * Creates the variable header that each method has
+     *
+     * @return string
+     */
+    abstract public function createVariableHeader(): string;
+
+    /**
+     * Creates the actual payload to be sent
+     *
+     * @return string
+     */
+    abstract public function createPayload(): string;
+
     final public function setProtocolVersion(ProtocolVersion $protocolVersion): self
     {
         $this->protocolVersion = $protocolVersion;
