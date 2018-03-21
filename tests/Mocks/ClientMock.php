@@ -14,6 +14,7 @@ class ClientMock implements ClientInterface
 {
     private $updateLastCommunicationWasCalled = false;
     private $setConnectedWasCalled = false;
+    private $shutdownConnectionWasCalled = false;
 
     /**
      * @inheritdoc
@@ -34,6 +35,7 @@ class ClientMock implements ClientInterface
      */
     public function shutdownConnection(): bool
     {
+        $this->shutdownConnectionWasCalled = true;
         return false;
     }
 
@@ -119,5 +121,10 @@ class ClientMock implements ClientInterface
     public function updateLastCommunicationWasCalled(): bool
     {
         return $this->updateLastCommunicationWasCalled;
+    }
+
+    public function shutdownConnectionWasCalled(): bool
+    {
+        return $this->shutdownConnectionWasCalled;
     }
 }

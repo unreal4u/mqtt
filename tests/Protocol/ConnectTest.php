@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Tests the CONNECT object
+ *
+ * This was part of the actual first tests of this library, and because of that, it will contain some integration tests
+ * instead of pure unit tests.
+ *
+ * I won't be removing these mainly because they are also useful and because the system as a whole should work well :)
+ */
+
 declare(strict_types=1);
 
 namespace tests\unreal4u\MQTT;
