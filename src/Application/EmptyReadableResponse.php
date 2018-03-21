@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Application;
 
+use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
@@ -24,5 +25,10 @@ final class EmptyReadableResponse extends ProtocolBase implements ReadableConten
     public function getOriginControlPacket(): int
     {
         return 0;
+    }
+
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    {
+        return $this;
     }
 }

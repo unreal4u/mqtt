@@ -100,6 +100,20 @@ trait WritableContent
     }
 
     /**
+     * Creates the variable header that each method has
+     *
+     * @return string
+     */
+    abstract public function createVariableHeader(): string;
+
+    /**
+     * Creates the actual payload to be sent
+     *
+     * @return string
+     */
+    abstract public function createPayload(): string;
+
+    /**
      * Creates a UTF8 big-endian representation of the given string
      *
      * @param string $data

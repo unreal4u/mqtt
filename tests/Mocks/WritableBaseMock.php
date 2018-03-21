@@ -36,7 +36,7 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
     public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
     {
         $connAck = new ConnAck();
-        $connAck->instantiateObject($data);
+        $connAck->instantiateObject($data, $client);
 
         return $connAck;
     }
@@ -58,7 +58,7 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
      */
     public function createFixedHeader(int $variableHeaderLength): string
     {
-        // TODO: Implement createFixedHeader() method.
+        return '';
     }
 
     /**
@@ -67,6 +67,11 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
      */
     public function createSendableMessage(): string
     {
-        // TODO: Implement createSendableMessage() method.
+        return '';
+    }
+
+    public static function getControlPacketValue(): int
+    {
+        return 0;
     }
 }

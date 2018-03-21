@@ -37,4 +37,9 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
     {
         return PingReq::getControlPacketValue();
     }
+
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    {
+        return $this;
+    }
 }

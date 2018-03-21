@@ -19,24 +19,19 @@ systemctl start firewalld
 # Set the correct time
 ntpdate -u pool.ntp.org
 
+# Install minimum required PHP version (composer update will be done with this version)
+yum install php70-php php70-php-opcache php70-php-mbstring php70-php-xml
+
+# Also install latest available PHP version and make that the default
 PHP_VERSION="72"
 # PHP 7.2.x install:
 yum install -q -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum install -q -y \
   php${PHP_VERSION}-php \
-  php${PHP_VERSION}-php-fpm \
-  php${PHP_VERSION}-php-mysqlnd \
-  php${PHP_VERSION}-php-intl \
   php${PHP_VERSION}-php-opcache \
-  php${PHP_VERSION}-php-gd \
   php${PHP_VERSION}-php-mbstring \
-  php${PHP_VERSION}-php-pecl-memcache \
-  php${PHP_VERSION}-php-imap \
-  php${PHP_VERSION}-php-bcmath \
   php${PHP_VERSION}-php-xml \
-  php${PHP_VERSION}-php-process \
   php${PHP_VERSION}-php-pecl-xdebug \
-  php${PHP_VERSION}-php-pecl-zip \
   php${PHP_VERSION}-php-dbg
 ln -s /usr/bin/php${PHP_VERSION} /usr/bin/php
 ln -s /usr/bin/php${PHP_VERSION}-phpdbg /usr/bin/phpdbg
