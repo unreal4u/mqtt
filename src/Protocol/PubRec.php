@@ -68,9 +68,11 @@ final class PubRec extends ProtocolBase implements ReadableContentInterface, Wri
      * @param ClientInterface $client
      * @param WritableContentInterface $originalRequest
      * @return bool
+     * @throws \LogicException
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
+        $this->controlPacketIdentifiers($originalRequest);
         $pubRel = new PubRel($this->logger);
         $pubRel->setPacketIdentifier($this->packetIdentifier);
         $pubComp = $client->processObject($pubRel);

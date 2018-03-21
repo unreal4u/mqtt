@@ -83,15 +83,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
         if ($originalRequest instanceof PubRec) {
-            $this->logger->debug('Checking packet identifier on PubRel', [
-                'pubRelPI' => $this->getPacketIdentifier(),
-                'originalRequestPI' => $originalRequest->getPacketIdentifier(),
-            ]);
-
-            if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
-                throw new \LogicException('Packet identifiers to not match!');
-            }
-
+            $this->controlPacketIdentifiers($originalRequest);
             $pubComp = new PubComp($this->logger);
             $pubComp->setPacketIdentifier($this->packetIdentifier);
             $client->processObject($pubComp);

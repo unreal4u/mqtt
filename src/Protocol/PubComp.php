@@ -37,6 +37,15 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
+     * @inheritdoc
+     * @throws \LogicException
+     */
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
+    {
+        return $this->controlPacketIdentifiers($originalRequest);
+    }
+
+    /**
      * Creates the variable header that each method has
      * @return string
      * @throws \OutOfRangeException
@@ -52,7 +61,6 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function createPayload(): string
     {
-        // TODO: Implement createPayload() method.
         return '';
     }
 

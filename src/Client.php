@@ -59,7 +59,7 @@ final class Client extends ProtocolBase implements ClientInterface
     /**
      * @inheritdoc
      * @throws \LogicException
-     * @throws \unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers
+     * @throws \unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers
      * @throws \unreal4u\MQTT\Exceptions\NotConnected
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
@@ -251,7 +251,7 @@ final class Client extends ProtocolBase implements ClientInterface
     /**
      * @inheritdoc
      * @throws \LogicException
-     * @throws \unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers
+     * @throws \unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
      * @throws \unreal4u\MQTT\Exceptions\NotConnected

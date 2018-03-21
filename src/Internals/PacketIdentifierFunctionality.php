@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
+use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Utilities;
 
 /**
@@ -76,5 +77,22 @@ trait PacketIdentifierFunctionality
             $this->packetIdentifier = new PacketIdentifier(mt_rand(1, 65535));
         }
         return $this;
+    }
+
+    /**
+     * Checks whether the original request with the current stored packet identifier matches
+     *
+     * @param WritableContentInterface $originalRequest
+     * @throws NonMatchingPacketIdentifiers
+     * @return bool
+     */
+    private function controlPacketIdentifiers(WritableContentInterface $originalRequest): bool
+    {
+        /** @var PacketIdentifierFunctionality $originalRequest */
+        if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
+            throw new NonMatchingPacketIdentifiers('Packet identifiers to not match!');
+        }
+
+        return true;
     }
 }

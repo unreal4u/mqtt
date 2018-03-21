@@ -7,6 +7,7 @@ namespace tests\unreal4u\MQTT;
 use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
+use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 
@@ -61,8 +62,8 @@ class PubAckTest extends TestCase
         $publish = new Publish();
         $publish->setPacketIdentifier(new PacketIdentifier(44));
 
-        $this->expectException(\LogicException::class);
-        $this->assertTrue($this->pubAck->performSpecialActions($clientMock, $publish));
+        $this->expectException(NonMatchingPacketIdentifiers::class);
+        $this->pubAck->performSpecialActions($clientMock, $publish);
     }
 
     public function test_shouldExpectAnswer()

@@ -53,7 +53,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
 
         // Assign a packet identifier automatically if none has been assigned yet
         if ($this->getPacketIdentifier() === 0) {
-            $this->setPacketIdentifier(new PacketIdentifier(random_int(1, 65535)));
+            $this->generateRandomPacketIdentifier();
         }
 
         return $this->getPacketIdentifierBinaryRepresentation();

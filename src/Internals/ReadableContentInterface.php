@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
-use unreal4u\MQTT\Exceptions\UnmatchingPacketIdentifiers;
+use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 
 interface ReadableContentInterface
 {
@@ -35,7 +35,7 @@ interface ReadableContentInterface
      * @param WritableContentInterface $originalRequest Will be used to validate stuff such as packetIdentifier
      *
      * @return bool
-     * @throws UnmatchingPacketIdentifiers
+     * @throws NonMatchingPacketIdentifiers
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool;
 

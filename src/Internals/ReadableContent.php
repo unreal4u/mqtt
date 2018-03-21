@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
-use unreal4u\MQTT\Utilities;
 
 /**
  * Trait ReadableContent
