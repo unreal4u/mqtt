@@ -12,8 +12,9 @@ class ClientIdTest extends TestCase
     public function test_perfectClientId()
     {
         $clientId = new ClientId('test');
-
         $this->assertSame('test', $clientId->getClientId());
+        // Assert that printing the object as a string will deliver the same result as above
+        $this->assertSame('test', (string)$clientId);
     }
 
     public function provider_warnedClientIds(): array

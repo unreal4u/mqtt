@@ -67,6 +67,10 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
     }
 
     /**
+     * Will throw an exception in case there is something bad with the connection
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc385349257
+     *
      * @return ConnAck
      * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
      * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
@@ -83,7 +87,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
                     'The Server does not support the level of the MQTT protocol requested by the Client'
                 );
             case 2:
-                throw new IdentifierRejected('The Client identifier may be incorrect or broker does not accept it');
+                throw new IdentifierRejected('The Client identifier is correct UTF-8 but not allowed by the Server');
             case 3:
                 throw new ServerUnavailable('The Network Connection has been made but the MQTT service is unavailable');
             case 4:

@@ -26,18 +26,24 @@ $parameters = new Parameters(new ClientId(basename(__FILE__)));
 // Set the will message to the above created message
 $parameters->setWill($willMessage);
 
+// Example of invalid protocol which will throw an exception:
+#$parameters->setProtocolVersion(new unreal4u\MQTT\DataTypes\ProtocolVersion('0.0.1'));
 // Setup the connection
 $connect = new Connect();
 // And set the parameters
 $connect->setConnectionParameters($parameters);
-// Example of invalid protocol which will throw an exception:
-#$connect->protocolLevel = '0.0.1';
-/** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */
 
 // Create a client connection
 $client = new Client();
 // And send the data
-$connAck = $client->processObject($connect);
+try {
+    /** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */
+    $connAck = $client->processObject($connect);
+} catch (\Exception $e) {
+    // We couldn't even connect, so die early
+    var_dump($e);
+    die();
+}
 
 /*
  * If you subscribe to the above topic, a will message will be set when this exception below is thrown

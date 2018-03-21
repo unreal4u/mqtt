@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use Psr\Log\LoggerInterface;
-use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
 
@@ -29,17 +28,6 @@ trait WritableContent
      * @var int
      */
     protected $specialFlags = 0;
-
-    /**
-     * The protocol version we are talking with. Currently only v3.1.1 is supported
-     * @var string
-     */
-    public $protocolLevel = '3.1.1';
-
-    /**
-     * @var ProtocolVersion
-     */
-    private $protocolVersion;
 
     /**
      * Returns the fixed header part needed for all methods
@@ -109,12 +97,6 @@ trait WritableContent
         $this->logger->debug('Created fixed header', ['fixedHeader' => base64_encode($fixedHeader)]);
 
         return $fixedHeader . $variableHeader . $payload;
-    }
-
-    final public function setProtocolVersion(ProtocolVersion $protocolVersion): self
-    {
-        $this->protocolVersion = $protocolVersion;
-        return $this;
     }
 
     /**

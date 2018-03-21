@@ -12,6 +12,9 @@ use unreal4u\MQTT\Protocol\ConnAck;
 
 class ClientMock implements ClientInterface
 {
+    private $updateLastCommunicationWasCalled = false;
+    private $setConnectedWasCalled = false;
+
     /**
      * @inheritdoc
      */
@@ -87,6 +90,7 @@ class ClientMock implements ClientInterface
      */
     public function updateLastCommunication(): ClientInterface
     {
+        $this->updateLastCommunicationWasCalled = true;
         return $this;
     }
 
@@ -95,6 +99,7 @@ class ClientMock implements ClientInterface
      */
     public function setConnected(bool $isConnected): ClientInterface
     {
+        $this->setConnectedWasCalled = true;
         return $this;
     }
 
@@ -104,5 +109,15 @@ class ClientMock implements ClientInterface
     public function isConnected(): bool
     {
         return false;
+    }
+
+    public function setConnectedWasCalled(): bool
+    {
+        return $this->setConnectedWasCalled;
+    }
+
+    public function updateLastCommunicationWasCalled(): bool
+    {
+        return $this->updateLastCommunicationWasCalled;
     }
 }
