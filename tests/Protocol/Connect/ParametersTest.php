@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Connect;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -110,12 +110,11 @@ class ParametersTest extends TestCase
      */
     public function test_validBasicWillMessage()
     {
-        $willMessage = new Message();
-        $willMessage->setPayload('You will see this if I disconnect without notice');
-        $willMessage->setTopic(new Topic('client/errors'));
-
         $parameters = new Parameters();
-        $parameters->setWill($willMessage);
+        $parameters->setWill(new Message(
+                'You will see this if I disconnect without notice',
+                new Topic('client/errors'))
+        );
 
         $this->assertSame(6, $parameters->getFlags());
         $this->assertFalse($parameters->getWillRetain());
@@ -123,9 +122,7 @@ class ParametersTest extends TestCase
 
     public function test_validRetainedWillMessage()
     {
-        $willMessage = new Message();
-        $willMessage->setPayload('You will see this if I disconnect without notice');
-        $willMessage->setTopic(new Topic('client/errors'));
+        $willMessage = new Message('You will see this if I disconnect without notice', new Topic('client/errors'));
         $willMessage->setRetainFlag(true);
 
         $parameters = new Parameters();
@@ -151,9 +148,7 @@ class ParametersTest extends TestCase
      */
     public function test_validQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult)
     {
-        $willMessage = new Message();
-        $willMessage->setPayload('You will see this if I disconnect without notice');
-        $willMessage->setTopic(new Topic('client/errors'));
+        $willMessage = new Message('You will see this if I disconnect without notice', new Topic('client/errors'));
         $willMessage->setQoSLevel(new QoSLevel($QoSLevel));
 
         $parameters = new Parameters(new ClientId('unittest'));

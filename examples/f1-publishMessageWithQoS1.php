@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\QoSLevel;
@@ -42,19 +42,15 @@ $client->processObject($connect);
 
 define('MAXIMUM', 3);
 if ($client->isConnected()) {
-    // If we are connected, set up a new message
-    $message = new Message();
-    // Set the topic name
-    $message->setTopic(new Topic(COMMON_TOPICNAME));
-    // QoS level is set per message, so set it here
-    $message->setQoSLevel(new QoSLevel(1));
+    // Set main topic (equal for all messages)
+    $topic = new Topic(COMMON_TOPICNAME);
     // Create a new Publish object
     $publish = new Publish($logger);
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
-        // Set the payload
-        $message->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
+        $message = new Message(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM), $topic);
         // Set the message to the Publish object
+        $message->setQoSLevel(new QoSLevel(1));
         $publish->setMessage($message);
         // The client will perform the check whether the packet identifier is correctly set or not
         $client->processObject($publish);

@@ -44,7 +44,7 @@ if ($client->isConnected() === false) {
 $subscribe = new Subscribe($logger);
 $subscribe->addTopics(new Topic(COMMON_TOPICNAME));
 
-/** @var \unreal4u\MQTT\Application\Message $message */
+/** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
     // Any message here should NOT be within the SECONDARY_TOPICNAME topic
     printf(

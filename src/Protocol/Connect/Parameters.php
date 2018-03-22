@@ -6,8 +6,8 @@ namespace unreal4u\MQTT\Protocol\Connect;
 
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\ProtocolVersion;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 
@@ -351,19 +351,17 @@ final class Parameters
     public function setWill(Message $message): Parameters
     {
         // Proceed only if we have a valid message
-        if ($message->validateMessage()) {
-            $this->bitFlag &= ~4;
-            if ($message->getTopicName() !== '') {
-                $this->logger->debug('Setting will flag');
-                $this->bitFlag |= 4;
-            }
-
-            $this
-                ->setWillMessage($message->getPayload())
-                ->setWillRetain($message->isRetained())
-                ->setWillTopic($message->getTopicName())
-                ->setWillQoS(new QoSLevel($message->getQoSLevel()));
+        $this->bitFlag &= ~4;
+        if ($message->getTopicName() !== '') {
+            $this->logger->debug('Setting will flag');
+            $this->bitFlag |= 4;
         }
+
+        $this
+            ->setWillMessage($message->getPayload())
+            ->setWillRetain($message->isRetained())
+            ->setWillTopic($message->getTopicName())
+            ->setWillQoS(new QoSLevel($message->getQoSLevel()));
 
         return $this;
     }

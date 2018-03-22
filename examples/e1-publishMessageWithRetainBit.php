@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -32,16 +32,22 @@ if ($client->isConnected()) {
     $publish = new Publish();
 
     // So basically, everything is pretty standard
-    $message = new Message();
-    $message->setTopic(new Topic(COMMON_TOPICNAME));
+    $message = new Message(
+        'Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained',
+        new Topic(COMMON_TOPICNAME)
+    );
     // Except that we set the retain flag
     $message->setRetainFlag(true);
-    $message->setPayload('Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained');
     $publish->setMessage($message);
     $client->processObject($publish);
 
     // Exactly the same, but for the SECONDARY_TOPICNAME
-    $message->setTopic(new Topic(SECONDARY_TOPICNAME));
+    $message = new Message(
+        'Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained',
+        new Topic(SECONDARY_TOPICNAME)
+    );
+    // Except that we set the retain flag
+    $message->setRetainFlag(true);
     $publish->setMessage($message);
     $client->processObject($publish);
 

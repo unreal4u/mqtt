@@ -60,7 +60,7 @@ $subscribe->addTopics($mainTopic, $secondaryTopic);
  *
  * Any callable can use one optional argument: the Logger. This may or may not change in the future.
  */
-/** @var \unreal4u\MQTT\Application\Message $message */
+/** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client, 100000, function (LoggerInterface $logger) use ($client) {
     $unsubscribe = new Unsubscribe($logger);
     // We will unsubscribe specifically from the SECONDARY_TOPICNAME topic (but not the rest)

@@ -37,7 +37,7 @@ final class DebugTools
         $output = '';
         $binaryStringLength = \strlen($binaryRepresentation);
         for ($i = 0; $i < $binaryStringLength; $i += 8) {
-            $output .= \chr(base_convert(substr($binaryRepresentation, $i, 8), 2, 10));
+            $output .= \chr((int)base_convert(substr($binaryRepresentation, $i, 8), 2, 10));
         }
 
         if ($applyBase64 === true) {

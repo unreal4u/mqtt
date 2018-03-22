@@ -6,20 +6,16 @@
 declare(strict_types = 1);
 
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
-use unreal4u\MQTT\Application\Message;
 
 include __DIR__ . '/00.basics.php';
 
 // Create a new Message object
-$willMessage = new Message();
-// Set the payload
-$willMessage->setPayload('If I die unexpectedly, please print this message');
-// And set the topic
-$willMessage->setTopic(new Topic('client/errors'));
+$willMessage = new Message('If I die unexpectedly, please print this message', new Topic('client/errors'));
 
 // Now we will setup a new Connect Parameters object
 $parameters = new Parameters(new ClientId(basename(__FILE__)));

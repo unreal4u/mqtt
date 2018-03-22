@@ -49,7 +49,7 @@ $secondaryTopic = new Topic(SECONDARY_TOPICNAME);
 $subscribe = new Subscribe($logger);
 // And provide multiple arguments to the subscription's addTopics() method
 $subscribe->addTopics($mainTopic, $secondaryTopic);
-/** @var \unreal4u\MQTT\Application\Message $message */
+/** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
     /*
      * Given the following conditions:

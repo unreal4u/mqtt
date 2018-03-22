@@ -2,15 +2,11 @@
 
 declare(strict_types=1);
 
-namespace unreal4u\MQTT\Application;
+namespace unreal4u\MQTT\DataTypes;
 
-use unreal4u\MQTT\DataTypes\QoSLevel;
-use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
-use unreal4u\MQTT\Exceptions\MissingTopicName;
-use unreal4u\MQTT\Internals\ProtocolBase;
 
-final class Message extends ProtocolBase
+final class Message
 {
     /**
      * This field indicates the level of assurance for delivery of an Application Message. Can be 0, 1 or 2
@@ -43,40 +39,19 @@ final class Message extends ProtocolBase
     private $topic;
 
     /**
-     * Will perform validation on the message before sending it to the MQTT broker
-     *
-     * @return Message
-     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
+     * Message constructor.
+     * @param string $payload
+     * @param Topic $topic
      * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      */
-    public function validateMessage(): Message
+    public function __construct(string $payload, Topic $topic)
     {
-        // Getter of topicname will validate whether the topic name is set and valid
-        $this->getTopicName();
-
-        if (mb_strlen($this->payload) > 65535) {
-            $this->logger->error('Message payload exceeds 65535 bytes');
-            throw new MessageTooBig('Message payload can not exceed 65535 bytes!');
+        $this->topic = $topic;
+        if (mb_strlen($payload) > 65535) {
+            throw new MessageTooBig('Message payload can not exceed 65535 characters!');
         }
 
-        return $this;
-    }
-
-    /**
-     * Sets the actual payload to be sent to the message broker
-     *
-     * @param string $payload
-     * @return Message
-     */
-    public function setPayload(string $payload): Message
-    {
         $this->payload = $payload;
-        return $this;
-    }
-
-    public function getPayload(): string
-    {
-        return $this->payload;
     }
 
     /**
@@ -103,30 +78,18 @@ final class Message extends ProtocolBase
         return $this;
     }
 
-    /**
-     * Sets the topic name to the given value
-     *
-     * @param Topic $topic
-     * @return Message
-     */
-    public function setTopic(Topic $topic): Message
+    public function getPayload(): string
     {
-        $this->topic = $topic;
-        return $this;
+        return $this->payload;
     }
 
     /**
      * Gets the topic name
      *
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
      */
     public function getTopicName(): string
     {
-        if ($this->topic === null) {
-            throw new MissingTopicName('A topic must be set before calling getTopicName()');
-        }
-
         return $this->topic->getTopicName();
     }
 

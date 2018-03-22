@@ -29,7 +29,7 @@ $subscribe = new Subscribe();
 $subscribe->addTopics(new Topic(COMMON_TOPICNAME, new QoSLevel(0)));
 
 // Handy function: a loop. This will yield any messages that arrive at the topic.
-/** @var \unreal4u\MQTT\Application\Message $message */
+/** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
     // Now that we have a message, we can do whatever we like with it
     printf(

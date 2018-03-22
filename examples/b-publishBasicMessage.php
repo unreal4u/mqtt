@@ -5,8 +5,8 @@
  */
 declare(strict_types = 1);
 
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
@@ -43,13 +43,10 @@ if ($client->isConnected()) {
     for ($i = 1; $i <= MAXIMUM; $i++) {
         // We'll pick a random topic
         $topicId = random_int(0, 1);
-        // And set it to the message
-        $message->setTopic(new Topic($topics[$topicId]));
-        // Next, we'll setup the payload
-        $message->setPayload(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM));
 
         // And we'll set the message to the Publish object
-        $publish->setMessage($message);
+        $publish->setMessage(new Message(sprintf('Hello world!! (%d / %d)', $i, MAXIMUM),
+            new Topic($topics[$topicId])));
         // Finally, we are ready to send it to the broker
         $client->processObject($publish);
         // A small indicator that something is happening

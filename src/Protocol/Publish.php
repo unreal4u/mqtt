@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
-use unreal4u\MQTT\Application\Message;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
+use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
@@ -86,12 +86,17 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         return $bitString;
     }
 
+    /**
+     * @return string
+     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
+     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @throws \InvalidArgumentException
+     */
     public function createPayload(): string
     {
-        if (!$this->message->validateMessage()) {
-            throw new \InvalidArgumentException('Invalid message');
+        if ($this->message === null) {
+            throw new \InvalidArgumentException('A message must be set before publishing');
         }
-
         return $this->message->getPayload();
     }
 
@@ -152,10 +157,11 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Sets several bits and pieces from the first byte of the fixed header for the Publish packet
      *
      * @param int $firstByte
+     * @param QoSLevel $qoSLevel
      * @return Publish
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    private function analyzeFirstByte(int $firstByte): Publish
+    private function analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel): Publish
     {
         $this->logger->debug('Analyzing first byte', [sprintf('%08d', decbin($firstByte))]);
         // Retained bit is bit 0 of first byte
@@ -165,7 +171,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $this->message->setRetainFlag(true);
         }
         // QoS level are the last bits 2 & 1 of the first byte
-        $this->message->setQoSLevel($this->determineIncomingQoSLevel($firstByte));
+        $this->message->setQoSLevel($qoSLevel);
 
         // Duplicate message must be checked only on QoS > 0, else set it to false
         $this->isRedelivery = false;
@@ -199,9 +205,12 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return string
+     * @throws \OutOfBoundsException
+     * @throws \InvalidArgumentException
+     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      */
-    private function getFullRawHeaders(string $rawMQTTHeaders, ClientInterface $client): string
+    private function completePossibleIncompleteMessage(string $rawMQTTHeaders, ClientInterface $client): string
     {
         if (\strlen($rawMQTTHeaders) === 1) {
             $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
@@ -216,9 +225,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $rawMQTTHeaders = $rawMQTTHeaders{0};
         }
 
-        // At this point, $rawMQTTHeaders will be always 1 byte long
-        $this->message = new Message();
-        $this->analyzeFirstByte(\ord($rawMQTTHeaders));
         // $rawMQTTHeaders may be redefined
         return $rawMQTTHeaders . $restOfBytes . $payload;
     }
@@ -228,6 +234,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
+     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      * @throws \OutOfBoundsException
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      * @throws \InvalidArgumentException
@@ -235,14 +242,16 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $rawMQTTHeaders = $this->getFullRawHeaders($rawMQTTHeaders, $client);
+        $rawMQTTHeaders = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
         #$this->logger->debug('complete headers', ['header' => str2bin($rawMQTTHeaders)]);
 
         // Topic size is always the 3rd byte
+        $firstByte = \ord($rawMQTTHeaders{0});
         $topicSize = \ord($rawMQTTHeaders{3});
+        $qosLevel = $this->determineIncomingQoSLevel($firstByte);
 
         $messageStartPosition = 4;
-        if ($this->message->getQoSLevel() > 0) {
+        if ($qosLevel->getQoSLevel() > 0) {
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
             $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
@@ -256,6 +265,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $messageStartPosition += 2;
         }
 
+        // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
+        $this->message = new Message(
+        // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
+            substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
+            new Topic(substr($rawMQTTHeaders, 4, $topicSize))
+        );
+        $this->analyzeFirstByte(\ord($rawMQTTHeaders{0}), $qosLevel);
+
         $this->logger->debug('Determined headers', [
             'topicSize' => $topicSize,
             'QoSLevel' => $this->message->getQoSLevel(),
@@ -264,10 +281,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(),
         ]);
 
-        $this->message->setPayload(substr($rawMQTTHeaders, $messageStartPosition + $topicSize));
-        // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
-        $this->message->setTopic(new Topic(substr($rawMQTTHeaders, 4, $topicSize)));
-        #$this->logger->debug('Found a topic name', ['name' => $this->message->getTopicName()]);
 
         return $this;
     }

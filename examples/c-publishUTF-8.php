@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
@@ -30,17 +30,12 @@ $client = new Client();
 $client->processObject($connect);
 
 // Initialize the objects we'll be using for this example
-$message = new Message();
+// Below kanjis are 3 bytes long, combined with "normal" 1 byte characters
+// Example of a veeeeery long message with multibyte (4) UTF-8 characters
+#str_repeat('𠜎', 65534)
+$message = new Message('汉A字BC', new Topic(COMMON_TOPICNAME));
 $publish = new Publish($logger);
 
-// Set the topic and the payload
-$message
-    ->setTopic(new Topic(COMMON_TOPICNAME))
-    // Below kanjis are 3 bytes long, combined with "normal" 1 byte characters
-    ->setPayload('汉A字BC')
-    // Example of a veeeeery long message with multibyte (4) UTF-8 characters
-    #->setPayload(str_repeat('𠜎', 65534))
-;
 // Setting the message and publishing to broker
 $publish->setMessage($message);
 $client->processObject($publish);

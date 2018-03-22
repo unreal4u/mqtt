@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use unreal4u\MQTT\Application\Message;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
@@ -26,14 +26,10 @@ $now = new \DateTimeImmutable('now');
 
 // Perform the following actions only if we are connected to the broker
 if ($client->isConnected()) {
-    // First, create a message object
-    $message = new Message();
-    // Set the topic
-    $message->setTopic(new Topic(COMMON_TOPICNAME));
+    // Set the payload to an empty message (this will signal the broker to unset the retained message)
+    $message = new Message('', new Topic(COMMON_TOPICNAME));
     // Set the retain flag to true
     $message->setRetainFlag(true);
-    // Set the payload to an empty message (this will signal the broker to unset the retained message)
-    $message->setPayload('');
 
     // Finally, make a Publish object
     $publish = new Publish();
