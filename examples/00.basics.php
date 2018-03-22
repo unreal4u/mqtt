@@ -23,23 +23,3 @@ ini_set('display_errors', '1');
 // For all our tests, we will define 2 topics on which to execute them
 const COMMON_TOPICNAME = 'firstTest';
 const SECONDARY_TOPICNAME = 'sensors/baseroom';
-
-/**
- * Handy function to show the composition in bits of a string
- *
- * Copy-pasted from around the internet
- *
- * @param string $str
- * @return string
- */
-function str2bin(string $str): string
-{
-    $out=null;
-    $strLength = \strlen($str);
-    for($a=0; $a < $strLength; $a++) {
-        $dec = \ord(substr($str, $a, 1)); //determine symbol ASCII-code
-        $bin = sprintf('%08d', base_convert($dec, 10, 2)); //convert to binary representation and add leading zeros
-        $out .= $bin;
-    }
-    return $out;
-}
