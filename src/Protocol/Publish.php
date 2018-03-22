@@ -267,7 +267,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
         // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
         $this->message = new Message(
-        // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
+            // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
             substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
             new Topic(substr($rawMQTTHeaders, 4, $topicSize))
         );
