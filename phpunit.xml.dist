@@ -2,6 +2,9 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/</directory>
+            <exclude>
+                <file>./src/Client.php</file>
+            </exclude>
         </whitelist>
         <blacklist>
             <directory suffix=".php">./vendor</directory>
