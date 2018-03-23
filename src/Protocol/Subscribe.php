@@ -6,7 +6,6 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\Topic;
-use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\EventManager;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
@@ -50,12 +49,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     {
         // Subscribe must always send a 2 flag
         $this->specialFlags = 2;
-
-        // Assign a packet identifier automatically if none has been assigned yet
-        if ($this->getPacketIdentifier() === 0) {
-            $this->generateRandomPacketIdentifier();
-        }
-
         return $this->getPacketIdentifierBinaryRepresentation();
     }
 
@@ -181,7 +174,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      */
     public function addTopics(Topic ...$topics): Subscribe
     {
-        $this->topics = $topics;
+        $this->topics = array_merge($this->topics, $topics);
         $this->logger->debug('Topics added', ['totalTopics', $this->getNumberOfTopics()]);
 
         return $this;

@@ -28,6 +28,10 @@ trait PacketIdentifierFunctionality
 
     final public function getPacketIdentifier(): int
     {
+        if ($this->packetIdentifier === null) {
+            $this->generateRandomPacketIdentifier();
+        }
+
         return $this->packetIdentifier->getPacketIdentifierValue();
     }
 
@@ -39,11 +43,7 @@ trait PacketIdentifierFunctionality
      */
     final public function getPacketIdentifierBinaryRepresentation(): string
     {
-        if ($this->packetIdentifier === null) {
-            $this->generateRandomPacketIdentifier();
-        }
-
-        return Utilities::convertNumberToBinaryString($this->packetIdentifier->getPacketIdentifierValue());
+        return Utilities::convertNumberToBinaryString($this->getPacketIdentifier());
     }
 
     /**
@@ -90,7 +90,10 @@ trait PacketIdentifierFunctionality
     {
         /** @var PacketIdentifierFunctionality $originalRequest */
         if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
-            throw new NonMatchingPacketIdentifiers('Packet identifiers to not match!');
+            $e = new NonMatchingPacketIdentifiers('Packet identifiers do not match');
+            $e->setOriginPacketIdentifier(new PacketIdentifier($originalRequest->getPacketIdentifier()));
+            $e->setReturnedPacketIdentifier($this->packetIdentifier);
+            throw $e;
         }
 
         return true;
