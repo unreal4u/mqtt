@@ -33,8 +33,6 @@ $client->processObject($connect);
 // Once we are done with that and we are connected, we'll send out 10 messages
 define('MAXIMUM', 10);
 if ($client->isConnected()) {
-    // So, set up the Message
-    $message = new Message();
     // We will also set up a Publish object
     $publish = new Publish();
     // And we'll define 2 topics

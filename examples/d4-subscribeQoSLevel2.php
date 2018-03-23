@@ -20,7 +20,7 @@ include __DIR__ . '/00.basics.php';
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters(new ClientId(basename(basename(__FILE__))));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
 $connectionParameters->setUsername('testuser');
 $connectionParameters->setPassword('userpass');
 $connectionParameters->setKeepAlivePeriod(6);
