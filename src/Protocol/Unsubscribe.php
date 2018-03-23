@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\DataTypes\Topic;
-use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -31,7 +30,6 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
      * @return string
      * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
      * @throws \OutOfRangeException
-     * @throws \Exception
      */
     public function createVariableHeader(): string
     {
@@ -44,7 +42,7 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 
         // Assign a packet identifier automatically if none has been assigned yet
         if ($this->getPacketIdentifier() === 0) {
-            $this->setPacketIdentifier(new PacketIdentifier(random_int(1, 65535)));
+            $this->generateRandomPacketIdentifier();
         }
 
         return $this->getPacketIdentifierBinaryRepresentation();
@@ -82,7 +80,7 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
      */
     public function addTopics(Topic ...$topics): self
     {
-        $this->topics = $topics;
+        $this->topics = array_merge($this->topics, $topics);
         $this->logger->debug('Topics added', ['totalTopics', count($this->topics)]);
 
         return $this;
