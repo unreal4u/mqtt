@@ -166,16 +166,16 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->logger->debug('Analyzing first byte', [sprintf('%08d', decbin($firstByte))]);
         // Retained bit is bit 0 of first byte
         $this->message->setRetainFlag(false);
-        if ($firstByte & 1) {
+        if (($firstByte & 1) === 1) {
             $this->logger->debug('Setting retain flag to true');
             $this->message->setRetainFlag(true);
         }
-        // QoS level are the last bits 2 & 1 of the first byte
+        // QoS level is already been taken care of, assign it to the message at this point
         $this->message->setQoSLevel($qoSLevel);
 
         // Duplicate message must be checked only on QoS > 0, else set it to false
         $this->isRedelivery = false;
-        if ($firstByte & 8 && $this->message->getQoSLevel() !== 0) {
+        if (($firstByte & 8) === 8 && $this->message->getQoSLevel() !== 0) {
             // Is a duplicate is always bit 3 of first byte
             $this->isRedelivery = true;
             $this->logger->debug('Setting redelivery bit');

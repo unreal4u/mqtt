@@ -151,4 +151,36 @@ class PublishTest extends TestCase
         $qosLevel = $method->invoke(new Publish(), $bitString);
         $this->assertSame($expectedQoS, $qosLevel->getQoSLevel());
     }
+
+    public function provider_analyzeFirstByte(): array
+    {
+        $mapValues[] = [48, new QoSLevel(0), false, false];
+        $mapValues[] = [50, new QoSLevel(1), false, false];
+        $mapValues[] = [51, new QoSLevel(1), true, false];
+        $mapValues[] = [58, new QoSLevel(1), false, true];
+        $mapValues[] = [59, new QoSLevel(1), true, true];
+        $mapValues[] = [52, new QoSLevel(2), false, false];
+        $mapValues[] = [53, new QoSLevel(2), true, false];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_analyzeFirstByte
+     * @param int $firstByte
+     * @param QoSLevel $qoSLevel
+     * @param bool $isRetained
+     * @param bool $isRedelivery
+     * @throws \ReflectionException
+     */
+    public function test_analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel, bool $isRetained, bool $isRedelivery)
+    {
+        $method = new \ReflectionMethod(Publish::class, 'analyzeFirstByte');
+        $method->setAccessible(true);
+
+        $this->publish->setMessage($this->message);
+        $publishObject = $method->invoke($this->publish, $firstByte, $qoSLevel);
+        $this->assertSame($isRetained, $publishObject->getMessage()->isRetained());
+        $this->assertSame($isRedelivery, $publishObject->isRedelivery);
+    }
 }
