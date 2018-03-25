@@ -13,6 +13,7 @@ use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
+use unreal4u\MQTT\Protocol\PubRec;
 
 class PublishTest extends TestCase
 {
@@ -95,6 +96,18 @@ class PublishTest extends TestCase
         $this->assertSame($answer->getPacketIdentifier(), $this->publish->getPacketIdentifier());
     }
 
+    public function test_QoSLevel2ExpectedAnswer()
+    {
+        $this->message->setQoSLevel(new QoSLevel(2));
+        $this->publish->setMessage($this->message);
+        $this->publish->setPacketIdentifier(new PacketIdentifier(111));
+        $this->publish->createVariableHeader();
+        /** @var PubAck $answer */
+        $answer = $this->publish->expectAnswer(base64_decode('UAIAbw=='), new ClientMock());
+        $this->assertInstanceOf(PubRec::class, $answer);
+        $this->assertSame($answer->getPacketIdentifier(), $this->publish->getPacketIdentifier());
+    }
+
     public function test_noPayloadException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -105,5 +118,37 @@ class PublishTest extends TestCase
     {
         $this->publish->setMessage($this->message);
         $this->assertSame('Hello test world!', $this->publish->createPayload());
+    }
+
+    public function test_getMessage()
+    {
+        $this->publish->setMessage($this->message);
+        $objectMessage = $this->publish->getMessage();
+        $this->assertSame($this->message, $objectMessage);
+    }
+
+    public function provider_calculateIncomingQoSLevel(): array
+    {
+        $mapValues[] = [48, 0];
+        $mapValues[] = [50, 1];
+        $mapValues[] = [58, 1]; // Redelivery of QoS level 1 type message
+        $mapValues[] = [52, 2];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_calculateIncomingQoSLevel
+     * @param int $bitString
+     * @param int $expectedQoS
+     * @throws \ReflectionException
+     */
+    public function test_calculateIncomingQoSLevel(int $bitString, int $expectedQoS)
+    {
+        $method = new \ReflectionMethod(Publish::class, 'determineIncomingQoSLevel');
+        $method->setAccessible(true);
+
+        $qosLevel = $method->invoke(new Publish(), $bitString);
+        $this->assertSame($expectedQoS, $qosLevel->getQoSLevel());
     }
 }

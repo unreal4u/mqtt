@@ -34,15 +34,6 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     }
 
     /**
-     * @inheritdoc
-     * @throws \LogicException
-     */
-    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
-    {
-        return $this->controlPacketIdentifiers($originalRequest);
-    }
-
-    /**
      * @return string
      * @throws \OutOfRangeException
      */

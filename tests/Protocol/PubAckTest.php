@@ -46,24 +46,7 @@ class PubAckTest extends TestCase
         $publish = new Publish();
         $publish->setPacketIdentifier(new PacketIdentifier(44));
 
-        $this->assertTrue($this->pubAck->performSpecialActions($clientMock, $publish));
-    }
-
-    public function test_badPacketIdentifier()
-    {
-        $clientMock = new ClientMock();
-
-        $this->assertInstanceOf(
-            PubAck::class,
-            // Packet identifier: 45
-            $this->pubAck->fillObject(base64_decode('QAIALQ=='), $clientMock)
-        );
-
-        $publish = new Publish();
-        $publish->setPacketIdentifier(new PacketIdentifier(44));
-
-        $this->expectException(NonMatchingPacketIdentifiers::class);
-        $this->pubAck->performSpecialActions($clientMock, $publish);
+        $this->assertFalse($this->pubAck->performSpecialActions($clientMock, $publish));
     }
 
     public function test_shouldExpectAnswer()

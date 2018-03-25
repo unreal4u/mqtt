@@ -193,9 +193,17 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private function determineIncomingQoSLevel(int $bitString): QoSLevel
     {
-        // Strange operation, why? Because 4 == QoS lvl2; 2 == QoS lvl1, 0 == QoS lvl0
-        $incomingQoSLevel = ($bitString & 4) / 2;
-        $this->logger->debug('Setting QoS level', ['incomingQoSLevel' => $incomingQoSLevel]);
+        // QoS lvl are in bit positions 1-2. Shifting is strictly speaking not needed, but increases human comprehension
+        $shiftedBits = $bitString >> 1;
+        $incomingQoSLevel = 0;
+        if (($shiftedBits & 1) === 1) {
+            $incomingQoSLevel = 1;
+        }
+        if (($shiftedBits & 2) === 2) {
+            $incomingQoSLevel = 2;
+        }
+
+        $this->logger->debug('Setting QoS level', ['bitString' => $bitString, 'incomingQoSLevel' => $incomingQoSLevel]);
         return new QoSLevel($incomingQoSLevel);
     }
 
@@ -243,7 +251,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         $rawMQTTHeaders = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
-        #$this->logger->debug('complete headers', ['header' => str2bin($rawMQTTHeaders)]);
+        // Handy to maintain for debugging purposes
+        #$this->logger->debug('Headers in binary form', [DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
         // Topic size is always the 3rd byte
         $firstByte = \ord($rawMQTTHeaders{0});
@@ -278,7 +287,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             'QoSLevel' => $this->message->getQoSLevel(),
             'isDuplicate' => $this->isRedelivery,
             'isRetained' => $this->message->isRetained(),
-            'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(),
+            #'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(), // This is not always set!
         ]);
 
 
