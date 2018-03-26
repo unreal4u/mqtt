@@ -16,6 +16,14 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  * A PUBREL Packet is the response to a PUBREC Packet.
  *
  * It is the third packet of the QoS 2 protocol exchange.
+ *
+ * QoS lvl2:
+ *   First packet: PUBLISH
+ *   Second packet: PUBREC
+ *   Third packet: PUBREL
+ *   Fourth packet: PUBCOMP
+ *
+ * @see https://go.gliffy.com/go/publish/12498076
  */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {

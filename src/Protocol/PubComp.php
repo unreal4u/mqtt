@@ -17,6 +17,14 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  * The PUBCOMP Packet is the response to a PUBREL Packet.
  *
  * It is the fourth and final packet of the QoS 2 protocol exchange.
+ *
+ * QoS lvl2:
+ *   First packet: PUBLISH
+ *   Second packet: PUBREC
+ *   Third packet: PUBREL
+ *   Fourth packet: PUBCOMP
+ *
+ * @see https://go.gliffy.com/go/publish/12498076
  */
 final class PubComp extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {

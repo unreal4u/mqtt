@@ -9,6 +9,7 @@ use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\Exceptions\InvalidRequest;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -22,6 +23,18 @@ use unreal4u\MQTT\Utilities;
  * A PUBLISH Control Packet is sent from a Client to a Server or vice-versa to transport an Application Message.
  *
  * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718037
+ *
+ * QoS lvl1:
+ *   First packet: PUBLISH
+ *   Second packet: PUBACK
+ *
+ * QoS lvl2:
+ *   First packet: PUBLISH
+ *   Second packet: PUBREC
+ *   Third packet: PUBREL
+ *   Fourth packet: PUBCOMP
+ *
+ * @see https://go.gliffy.com/go/publish/12498076
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
@@ -319,8 +332,15 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         return true;
     }
 
+    /**
+     * Composes a PubRec answer with the same packetIdentifier as what we received
+     *
+     * @return PubRec
+     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
+     */
     private function composePubRecAnswer(): PubRec
     {
+        $this->checkForValidPacketIdentifier();
         $pubRec = new PubRec($this->logger);
         $pubRec->setPacketIdentifier($this->packetIdentifier);
         return $pubRec;
@@ -328,13 +348,32 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * Composes a PubAck answer with the same packetIdentifier as what we received
+     *
      * @return PubAck
+     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
      */
     private function composePubAckAnswer(): PubAck
     {
+        $this->checkForValidPacketIdentifier();
         $pubAck = new PubAck($this->logger);
         $pubAck->setPacketIdentifier($this->packetIdentifier);
         return $pubAck;
+    }
+
+    /**
+     * Will check whether the current object has a packet identifier set. If not, we are in serious problems!
+     *
+     * @return Publish
+     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
+     */
+    private function checkForValidPacketIdentifier(): self
+    {
+        if ($this->packetIdentifier === null) {
+            $this->logger->critical('No valid packet identifier found at a stage where there MUST be one set');
+            throw new InvalidRequest('You are trying to send a request without a valid packet identifier');
+        }
+
+        return $this;
     }
 
     /**

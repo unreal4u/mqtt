@@ -35,7 +35,7 @@ class NonMatchingPacketIdentifiers extends \LogicException
         return $this->originPacketIdentifier->getPacketIdentifierValue();
     }
 
-    public function getReturnedPacketIdentifier(): int
+    public function getReturnedPacketIdentifierValue(): int
     {
         return $this->returnedPacketIdentifier->getPacketIdentifierValue();
     }

@@ -11,6 +11,8 @@ use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\Exceptions\InvalidRequest;
+use unreal4u\MQTT\Protocol\PingReq;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 use unreal4u\MQTT\Protocol\PubRec;
@@ -38,6 +40,11 @@ class PublishTest extends TestCase
     {
         parent::tearDown();
         $this->publish = null;
+    }
+
+    public function test_getOriginControlPacket()
+    {
+        $this->assertSame(0, $this->publish->getOriginControlPacket());
     }
 
     public function test_throwExceptionNoMessageProvided()
@@ -182,5 +189,76 @@ class PublishTest extends TestCase
         $publishObject = $method->invoke($this->publish, $firstByte, $qoSLevel);
         $this->assertSame($isRetained, $publishObject->getMessage()->isRetained());
         $this->assertSame($isRedelivery, $publishObject->isRedelivery);
+    }
+
+    public function provider_performSpecialActions(): array
+    {
+        $mapValues[] = [0, 126, ''];
+        $mapValues[] = [1, 127, PubAck::class];
+        $mapValues[] = [2, 128, PubRec::class];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_performSpecialActions
+     * @param int $QoSLevel
+     * @param int $packetIdentifier
+     * @param string $expectedClassType
+     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     */
+    public function test_performSpecialActions(int $QoSLevel, int $packetIdentifier, string $expectedClassType)
+    {
+        $clientMock = new ClientMock();
+        $this->message->setQoSLevel(new QoSLevel($QoSLevel));
+        // Emulate an incoming message
+        $this->publish->setMessage($this->message);
+        $this->publish->setPacketIdentifier(new PacketIdentifier($packetIdentifier));
+
+        $result = $this->publish->performSpecialActions($clientMock, new PingReq());
+        $this->assertTrue($result);
+        $this->assertSame($expectedClassType, $clientMock->processObjectWasCalledWithObjectType());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function test_composePubRecAnswer()
+    {
+        $this->publish->setPacketIdentifier(new PacketIdentifier(123));
+        $method = new \ReflectionMethod(Publish::class, 'composePubRecAnswer');
+        $method->setAccessible(true);
+
+        /** @var PubRec $pubRec */
+        $pubRec = $method->invoke($this->publish);
+        $this->assertInstanceOf(PubRec::class, $pubRec);
+        $this->assertSame(123, $pubRec->getPacketIdentifier());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function test_composePubAckAnswer()
+    {
+        $this->publish->setPacketIdentifier(new PacketIdentifier(124));
+        $method = new \ReflectionMethod(Publish::class, 'composePubAckAnswer');
+        $method->setAccessible(true);
+
+        /** @var PubRec $pubRec */
+        $pubAck = $method->invoke($this->publish);
+        $this->assertInstanceOf(PubAck::class, $pubAck);
+        $this->assertSame(124, $pubAck->getPacketIdentifier());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function test_checkForValidPacketIdentifier()
+    {
+        $method = new \ReflectionMethod(Publish::class, 'checkForValidPacketIdentifier');
+        $method->setAccessible(true);
+
+        $this->expectException(InvalidRequest::class);
+        $method->invoke($this->publish);
     }
 }

@@ -14,6 +14,12 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 
 /**
  * A PUBACK Packet is the response to a PUBLISH Packet with QoS level 1.
+ *
+ * QoS lvl1:
+ *   First packet: PUBLISH
+ *   Second packet: PUBACK
+ *
+ * @see https://go.gliffy.com/go/publish/12498076
  */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Mocks;
 
 use Psr\Log\LoggerInterface;
+use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
-use unreal4u\MQTT\Protocol\ConnAck;
 
 class ClientMock implements ClientInterface
 {
@@ -17,6 +17,7 @@ class ClientMock implements ClientInterface
     private $shutdownConnectionWasCalled = false;
     private $readBrokerDataWasCalled = false;
     private $isItPingTimeWasCalled = false;
+    private $processObjectWasCalledWithObjectType = '';
 
     /**
      * This will be set to whatever data must be supposedly returned
@@ -93,7 +94,8 @@ class ClientMock implements ClientInterface
      */
     public function processObject(WritableContentInterface $object): ReadableContentInterface
     {
-        return new ConnAck();
+        $this->processObjectWasCalledWithObjectType = \get_class($object);
+        return new EmptyReadableResponse();
     }
 
     /**
@@ -154,5 +156,10 @@ class ClientMock implements ClientInterface
     public function isItPingTimeWasCalled(): bool
     {
         return $this->isItPingTimeWasCalled;
+    }
+
+    public function processObjectWasCalledWithObjectType(): string
+    {
+        return $this->processObjectWasCalledWithObjectType;
     }
 }
