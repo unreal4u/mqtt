@@ -52,8 +52,7 @@ class ConnectTest extends TestCase
     public function test_userAndPassword()
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
-        $parameters->setUsername('unreal4u');
-        $parameters->setPassword('justT3st1ng');
+        $parameters->setCredentials('unreal4u', 'justT3st1ng');
 
         $this->connect->setConnectionParameters($parameters);
         $connectPayload = $this->connect->createPayload();
@@ -65,7 +64,7 @@ class ConnectTest extends TestCase
     public function test_passwordWithoutUsername()
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
-        $parameters->setPassword('justT3st1ng');
+        $parameters->setCredentials('', 'justT3st1ng');
 
         $this->connect->setConnectionParameters($parameters);
         $this->expectException(MustProvideUsername::class);

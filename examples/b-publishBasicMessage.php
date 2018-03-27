@@ -17,8 +17,7 @@ include __DIR__ . '/00.basics.php';
 
 // For this connection, we'll do something different: we'll connect with a username and password. This is done by doing:
 $connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
-$connectionParameters->setUsername('testuser');
-$connectionParameters->setPassword('userpass');
+$connectionParameters->setCredentials('testuser', 'userpass');
 
 // Now we'll setup a Connect object
 $connect = new Connect();

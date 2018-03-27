@@ -67,10 +67,15 @@ final class Connect extends ProtocolBase implements WritableContentInterface
         $bitString = $this->createUTF8String('MQTT'); // Connect MUST begin with MQTT
         $bitString .= $this->connectionParameters->getProtocolVersionBinaryRepresentation(); // Protocol level
         $bitString .= \chr($this->connectionParameters->getFlags());
-        $bitString .= Utilities::convertNumberToBinaryString($this->connectionParameters->keepAlivePeriod);
+        $bitString .= Utilities::convertNumberToBinaryString($this->connectionParameters->getKeepAlivePeriod());
         return $bitString;
     }
 
+    /**
+     * @return string
+     * @throws \unreal4u\MQTT\Exceptions\MustProvideUsername
+     * @throws \OutOfRangeException
+     */
     public function createPayload(): string
     {
         // The order in a connect string is clientId first

@@ -51,8 +51,8 @@ class PubRelTest extends TestCase
         $clientMock = new ClientMock();
         $pubRec = new PubRec();
         $pubRec->setPacketIdentifier(new PacketIdentifier(999));
-
         $this->pubRel->setPacketIdentifier(new PacketIdentifier(999));
+
         $specialActionsPerformed = $this->pubRel->performSpecialActions($clientMock, $pubRec);
         $this->assertTrue($specialActionsPerformed);
         $this->assertSame(PubComp::class, $clientMock->processObjectWasCalledWithObjectType());
@@ -62,5 +62,22 @@ class PubRelTest extends TestCase
     {
         $specialActionsPerformed = $this->pubRel->performSpecialActions(new ClientMock(), new PingReq());
         $this->assertFalse($specialActionsPerformed);
+    }
+
+    public function provider_fillObject(): array
+    {
+        $mapValues[] = ['asdf', 10];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_fillObject
+     * @param string $rawHeaders
+     * @param int $expectedPacketIdentifier
+     */
+    public function test_fillObject(string $rawHeaders, int $expectedPacketIdentifier)
+    {
+        $this->markTestIncomplete('TODO');
     }
 }

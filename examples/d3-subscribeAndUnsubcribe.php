@@ -23,8 +23,7 @@ $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 $connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
-$connectionParameters->setUsername('testuser');
-$connectionParameters->setPassword('userpass');
+$connectionParameters->setCredentials('testuser', 'userpass');
 
 $connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);

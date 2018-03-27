@@ -6,10 +6,10 @@ namespace unreal4u\MQTT\Protocol\Connect;
 
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
+use unreal4u\MQTT\DataTypes\BrokerPort;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\ProtocolVersion;
-use unreal4u\MQTT\DataTypes\QoSLevel;
 
 /**
  * Special connection parameters will be defined in this class
@@ -31,13 +31,13 @@ final class Parameters
      *
      * @var string
      */
-    public $host = '';
+    private $host;
 
     /**
-     * The port we must connect to
-     * @var int
+     * The port we will connect to
+     * @var BrokerPort
      */
-    public $port = 1883;
+    private $brokerPort;
 
     /**
      * Unique (per broker) client Id. Can be empty if $cleanSession is set to true.
@@ -55,7 +55,7 @@ final class Parameters
      *
      * @var int
      */
-    public $keepAlivePeriod = 60;
+    private $keepAlivePeriod = 60;
 
     /**
      * Whether to create a persistent session (default = false).
@@ -79,28 +79,9 @@ final class Parameters
     private $password = '';
 
     /**
-     * The will message printed out by the server in case of a sudden unexpected disconnect
-     * @var string
+     * @var Message
      */
-    private $willMessage = '';
-
-    /**
-     * If the client disconnects unexpectedly, set the will message in this will topic
-     * @var string
-     */
-    private $willTopic = '';
-
-    /**
-     * QoS Level of the will
-     * @var QoSLevel
-     */
-    private $willQoS;
-
-    /**
-     * Whether the will message should be retained by the server
-     * @var bool
-     */
-    private $willRetain = false;
+    private $will;
 
     /**
      * @var ProtocolVersion
@@ -108,13 +89,14 @@ final class Parameters
     private $protocolVersion;
 
     /**
-     * The 10th byte will contain a series of flags
+     * The 10th byte of the Connect call will contain a series of flags
      *
      * The order of these flags are:
      *
      *   7-6-5-4-3-2-1-0
      * b'0-0-0-0-0-0-0-0'
      *
+     * Where
      * Bit 7: if username is set, this bit is true
      * Bit 6: if password is set, this bit is true
      * Bit 5: This bit specifies if the Will Message is to be Retained when it is published
@@ -135,6 +117,7 @@ final class Parameters
      * @param ClientId $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
      * @param LoggerInterface $logger
+     * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerPort
      * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
     public function __construct(ClientId $clientId = null, string $host = 'localhost', LoggerInterface $logger = null)
@@ -151,8 +134,22 @@ final class Parameters
         }
         $this->setClientId($clientId);
         $this->setProtocolVersion(new ProtocolVersion(self::DEFAULT_PROTOCOL_VERSION));
+        // Set 1883 as the default port
+        $this->setBrokerPort(new BrokerPort(1883));
 
         $this->host = $host;
+    }
+
+    /**
+     * Use this function to change the default broker port
+     *
+     * @param BrokerPort $brokerPort
+     * @return Parameters
+     */
+    public function setBrokerPort(BrokerPort $brokerPort): self
+    {
+        $this->brokerPort = $brokerPort;
+        return $this;
     }
 
     public function setProtocolVersion(ProtocolVersion $protocolVersion): self
@@ -169,7 +166,7 @@ final class Parameters
     /**
      * Handles everything related to setting the ClientId
      *
-     * @param string $clientId
+     * @param ClientId $clientId
      * @return Parameters
      */
     public function setClientId(ClientId $clientId): self
@@ -198,7 +195,7 @@ final class Parameters
      */
     public function getConnectionUrl(): string
     {
-        return 'tcp://' . $this->host . ':' . $this->port;
+        return 'tcp://' . $this->host . ':' . $this->brokerPort->getBrokerPort();
     }
 
     /**
@@ -218,7 +215,7 @@ final class Parameters
      * @return Parameters
      * @throws \InvalidArgumentException
      */
-    public function setKeepAlivePeriod(int $keepAlivePeriod): Parameters
+    public function setKeepAlivePeriod(int $keepAlivePeriod): self
     {
         if ($keepAlivePeriod > 65535 || $keepAlivePeriod < 0) {
             $this->logger->error('Keep alive period must be between 0 and 65535');
@@ -230,62 +227,29 @@ final class Parameters
     }
 
     /**
-     * Sets the 7th bit of the connect flag
+     * Sets the 6th and 7th bit of the connect flag
      *
-     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param string $username
-     * @return Parameters
-     */
-    public function setUsername(string $username): Parameters
-    {
-        $this->bitFlag &= ~128;
-        if ($username !== '') {
-            $this->logger->debug('Username set, setting username flag');
-            $this->bitFlag |= 128;
-        }
-        $this->username = $username;
-        return $this;
-    }
-
-    /**
-     * Sets the 6th bit of the connect flag
-     *
-     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param string $password
      * @return Parameters
      */
-    public function setPassword(string $password): Parameters
+    public function setCredentials(string $username, string $password): self
     {
         $this->bitFlag &= ~64;
+        $this->bitFlag &= ~128;
+
+        if ($username !== '') {
+            $this->logger->debug('Username set, setting username flag');
+            $this->bitFlag |= 128;
+            $this->username = $username;
+        }
+
         if ($password !== '') {
             $this->logger->debug('Password set, setting password flag');
             $this->bitFlag |= 64;
+            $this->password = $password;
         }
-        $this->password = $password;
-        return $this;
-    }
 
-    /**
-     * Is a private method, so can be trusted with just a string name instead of a Topic object
-     *
-     * @param string $willTopic
-     * @return Parameters
-     */
-    private function setWillTopic(string $willTopic): Parameters
-    {
-        $this->willTopic = $willTopic;
-        $this->logger->debug('Setting will topic');
-        return $this;
-    }
-
-    /**
-     * @param string $willMessage
-     * @return Parameters
-     */
-    private function setWillMessage(string $willMessage): Parameters
-    {
-        $this->willMessage = $willMessage;
-        $this->logger->debug('Setting will message');
         return $this;
     }
 
@@ -296,14 +260,13 @@ final class Parameters
      * @param bool $willRetain
      * @return Parameters
      */
-    private function setWillRetain(bool $willRetain): Parameters
+    private function setWillRetainBit(bool $willRetain): self
     {
         $this->bitFlag &= ~32;
         if ($willRetain === true) {
             $this->logger->debug('Setting will retain flag');
             $this->bitFlag |= 32;
         }
-        $this->willRetain = $willRetain;
         return $this;
     }
 
@@ -311,28 +274,22 @@ final class Parameters
      * Determines and sets the 3rd and 4th bits of the connect flag
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
-     * @param QoSLevel $QoSLevel
+     * @param int $QoSLevel
      * @return Parameters
      */
-    private function setWillQoS(QoSLevel $QoSLevel): Parameters
+    private function setWillQoSLevelBit(int $QoSLevel): self
     {
         // Reset first the will QoS bits and proceed to set them
         $this->bitFlag &= ~8; // Third bit: 8
         $this->bitFlag &= ~16; // Fourth bit: 16
 
-        $this->willQoS = $QoSLevel;
-        switch ($this->willQoS->getQoSLevel()) {
-            case 0:
-                // Do nothing as the relevant bits will already have been reset
-                break;
-            case 1:
-                $this->logger->debug('Setting will QoS level 1 flag');
-                $this->bitFlag |= 8;
-                break;
-            case 2:
-                $this->logger->debug('Setting will QoS level 2 flag');
-                $this->bitFlag |= 16;
-                break;
+        if ($QoSLevel !== 0) {
+            $this->logger->debug(sprintf(
+                    'Setting will QoS level %d flag (bit %d)',
+                    $QoSLevel,
+                    $QoSLevel * 8)
+            );
+            $this->bitFlag |= $QoSLevel * 8;
         }
 
         return $this;
@@ -348,7 +305,7 @@ final class Parameters
      * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
      * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      */
-    public function setWill(Message $message): Parameters
+    public function setWill(Message $message): self
     {
         // Proceed only if we have a valid message
         $this->bitFlag &= ~4;
@@ -357,11 +314,10 @@ final class Parameters
             $this->bitFlag |= 4;
         }
 
+        $this->will = $message;
         $this
-            ->setWillMessage($message->getPayload())
-            ->setWillRetain($message->isRetained())
-            ->setWillTopic($message->getTopicName())
-            ->setWillQoS(new QoSLevel($message->getQoSLevel()));
+            ->setWillRetainBit($message->isRetained())
+            ->setWillQoSLevelBit($message->getQoSLevel());
 
         return $this;
     }
@@ -372,7 +328,7 @@ final class Parameters
      * @param bool $cleanSession
      * @return Parameters
      */
-    public function setCleanSession(bool $cleanSession): Parameters
+    public function setCleanSession(bool $cleanSession): self
     {
         $this->bitFlag &= ~2;
         if ($cleanSession === true) {
@@ -420,7 +376,11 @@ final class Parameters
      */
     public function getWillTopic(): string
     {
-        return $this->willTopic;
+        if ($this->will === null) {
+            return '';
+        }
+
+        return $this->will->getTopicName();
     }
 
     /**
@@ -428,7 +388,11 @@ final class Parameters
      */
     public function getWillMessage(): string
     {
-        return $this->willMessage;
+        if ($this->will === null) {
+            return '';
+        }
+
+        return $this->will->getPayload();
     }
 
     /**
@@ -436,6 +400,6 @@ final class Parameters
      */
     public function getWillRetain(): bool
     {
-        return $this->willRetain;
+        return $this->will->isRetained();
     }
 }

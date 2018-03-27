@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Connect;
 
 use PHPUnit\Framework\TestCase;
+use unreal4u\MQTT\DataTypes\BrokerPort;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
@@ -26,38 +27,28 @@ class ParametersTest extends TestCase
         $this->assertSame('tcp://192.168.255.3:1883', $parameters->getConnectionUrl());
     }
 
+    public function test_setHostWithDifferentBrokerPort()
+    {
+        $parameters = new Parameters(new ClientId('uniqueClientId'), '192.168.255.4');
+        $parameters->setBrokerPort(new BrokerPort(5445));
+        $this->assertSame('tcp://192.168.255.4:5445', $parameters->getConnectionUrl());
+    }
+
     public function test_setNonUTF8ClientName()
     {
         $parameters = new Parameters(new ClientId('uniqueClientId𠜎𠜱WithComplexUTF8Chars'));
         $this->assertSame('uniqueClientId𠜎𠜱WithComplexUTF8Chars', (string)$parameters->getClientId());
     }
 
-    public function provider_createObjectWithOptions(): array
-    {
-        $mapValues[] = ['Username', 'asdf', 130];
-        $mapValues[] = ['Password', 'asdf', 66];
-        $mapValues[] = ['CleanSession', true, 2];
-
-        return $mapValues;
-    }
-
-    /**
-     * @dataProvider provider_createObjectWithOptions
-     * @param $key
-     * @param $value
-     * @param $expected
-     */
-    public function test_createObjectWithOptions($key, $value, $expected)
+    public function test_createObjectWithCleanSessionBit()
     {
         $parameters = new Parameters();
-        $setter = 'set' . $key;
-        $getter = 'get' . $key;
-        $parameters->$setter($value);
+        $parameters->setCleanSession(true);
 
         // Basic validation: assert value is the same we have just set it to
-        $this->assertSame($value, $parameters->$getter());
+        $this->assertTrue($parameters->getCleanSession());
         // Assert flags are the same
-        $this->assertSame($expected, $parameters->getFlags());
+        $this->assertSame(2, $parameters->getFlags());
     }
 
     public function test_createObjectWithMultipleOptions()
@@ -65,9 +56,7 @@ class ParametersTest extends TestCase
         $parameters = new Parameters(new ClientId('SpecialClientId'));
         $parameters->setCleanSession(true);
         $this->assertSame(2, $parameters->getFlags());
-        $parameters->setUsername('unreal4u');
-        $this->assertSame(130, $parameters->getFlags());
-        $parameters->setPassword('justT3st1ng');
+        $parameters->setCredentials('unreal4u', 'justT3st1ng');
         $this->assertSame(194, $parameters->getFlags());
 
         $this->assertSame('unreal4u', $parameters->getUsername());
@@ -75,33 +64,22 @@ class ParametersTest extends TestCase
         $this->assertTrue($parameters->getCleanSession());
     }
 
-    public function provider_revertBits()
-    {
-        $mapValues[] = ['Username', 'unreal4u', '', 128];
-        $mapValues[] = ['Password', 'justT3st1ng', '', 64];
-        $mapValues[] = ['CleanSession', true, false, 2];
-
-        return $mapValues;
-    }
-
-    /**
-     * Tests whether reverting of bits works properly
-     *
-     * @param string $key
-     * @param $filledValue
-     * @param $emptyValue
-     * @param int $expectedBit
-     * @dataProvider provider_revertBits
-     */
-    public function test_revertBits(string $key, $filledValue, $emptyValue, int $expectedBit)
+    public function test_revertCleanSessionBit()
     {
         $parameters = new Parameters(new ClientId('unittest'));
+        $parameters->setCleanSession(true);
+        $this->assertSame(2, $parameters->getFlags());
+        $parameters->setCleanSession(false);
+        $this->assertSame(0, $parameters->getFlags());
+    }
 
-        $setter = 'set' . $key;
+    public function test_revertCredentialBits()
+    {
+        $parameters = new Parameters(new ClientId('unittest'));
+        $parameters->setCredentials('unreal4u', 'justT3st1ng');
+        $this->assertSame(192, $parameters->getFlags());
 
-        $parameters->$setter($filledValue);
-        $this->assertSame($expectedBit, $parameters->getFlags());
-        $parameters->$setter($emptyValue);
+        $parameters->setCredentials('', '');
         $this->assertSame(0, $parameters->getFlags());
     }
 

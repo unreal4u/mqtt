@@ -23,8 +23,7 @@ $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 $connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
 // Keep alive period is used for connections that must ping the broker more or less frequently. It defaults to 60 secs.
 $connectionParameters->setKeepAlivePeriod(5);
-$connectionParameters->setUsername('testuser');
-$connectionParameters->setPassword('userpass');
+$connectionParameters->setCredentials('testuser', 'userpass');
 
 $connect = new Connect();
 $connect->setConnectionParameters($connectionParameters);
