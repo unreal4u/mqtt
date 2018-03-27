@@ -10,6 +10,7 @@ use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DebugTools;
+use unreal4u\MQTT\Protocol\PingReq;
 use unreal4u\MQTT\Protocol\PingResp;
 use unreal4u\MQTT\Protocol\Subscribe;
 
@@ -99,5 +100,21 @@ class SubscribeTest extends TestCase
         $output = $this->subscribe->createVariableHeader();
         $humanOutput = DebugTools::convertToBinaryRepresentation($output);
         $this->assertNotSame('0000000000000000', $humanOutput);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function test_itIsPingTime()
+    {
+        $clientMock = new ClientMock();
+        $clientMock->setPingTime(true);
+
+        $method = new \ReflectionMethod(Subscribe::class, 'checkPingTime');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->subscribe, $clientMock);
+        $this->assertSame(PingReq::class, $clientMock->processObjectWasCalledWithObjectType());
+        $this->assertTrue($result);
     }
 }

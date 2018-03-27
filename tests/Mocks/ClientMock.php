@@ -19,6 +19,8 @@ class ClientMock implements ClientInterface
     private $isItPingTimeWasCalled = false;
     private $processObjectWasCalledWithObjectType = '';
 
+    private $itIsPingTimeNow = false;
+
     /**
      * This will be set to whatever data must be supposedly returned
      * @var string
@@ -99,12 +101,24 @@ class ClientMock implements ClientInterface
     }
 
     /**
+     * Set to whatever value isItPingTime should return
+     *
+     * @param bool $status
+     * @return ClientMock
+     */
+    public function setPingTime(bool $status): self
+    {
+        $this->itIsPingTimeNow = $status;
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function isItPingTime(): bool
     {
         $this->isItPingTimeWasCalled = true;
-        return false;
+        return $this->itIsPingTimeNow;
     }
 
     /**

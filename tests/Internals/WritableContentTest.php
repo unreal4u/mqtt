@@ -29,9 +29,20 @@ class WritableContentTest extends TestCase
         $this->assertSame('wAQ=', base64_encode($pingRequest->createFixedHeader(4)));
     }
 
-    public function test_createSendableMessage()
+    public function test_createSendableMessageWithSmallPayload()
     {
         $pingRequest = new PingReq();
         $this->assertSame('wAA=', base64_encode($pingRequest->createSendableMessage()));
     }
+
+    /* This is not enough for a really big message to trigger some exceptions
+    public function test_createSendableMessageWithBigPayload()
+    {
+        $publish = new Publish();
+        $message = new Message(str_repeat('X', 64000), new Topic(str_repeat('Y', 64000)));
+
+        $publish->setMessage($message);
+        var_dump(base64_encode($publish->createSendableMessage()));
+    }
+    */
 }
