@@ -285,11 +285,12 @@ final class Parameters
 
         if ($QoSLevel !== 0) {
             $this->logger->debug(sprintf(
-                    'Setting will QoS level %d flag (bit %d)',
-                    $QoSLevel,
-                    $QoSLevel * 8)
-            );
-            $this->bitFlag |= $QoSLevel * 8;
+                'Setting will QoS level %d flag (bit %d)',
+                $QoSLevel,
+                $QoSLevel * 8
+            ));
+
+            $this->bitFlag |= ($QoSLevel * 8);
         }
 
         return $this;
