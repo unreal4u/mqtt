@@ -7,7 +7,6 @@ namespace tests\unreal4u\MQTT;
 use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
-use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\Publish;
 

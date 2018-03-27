@@ -66,18 +66,28 @@ class PubRelTest extends TestCase
 
     public function provider_fillObject(): array
     {
-        $mapValues[] = ['asdf', 10];
+        $mapValues[] = ['Yg==', 'AgAS', 18];
+        $mapValues[] = ['YgI=', 'ABQ=', 20];
+        $mapValues[] = ['YgIAFg==', '', 22];
 
         return $mapValues;
     }
 
     /**
      * @dataProvider provider_fillObject
-     * @param string $rawHeaders
+     * @param string $firstBytes
+     * @param string $append
      * @param int $expectedPacketIdentifier
      */
-    public function test_fillObject(string $rawHeaders, int $expectedPacketIdentifier)
-    {
-        $this->markTestIncomplete('TODO');
+    public function test_fillObject(
+        string $firstBytes,
+        string $append,
+        int $expectedPacketIdentifier
+    ) {
+        $clientMock = new ClientMock();
+        $clientMock->returnSpecificBrokerData(base64_decode($append));
+
+        $this->pubRel->fillObject(base64_decode($firstBytes), $clientMock);
+        $this->assertSame($expectedPacketIdentifier, $this->pubRel->getPacketIdentifier());
     }
 }
