@@ -261,4 +261,77 @@ class PublishTest extends TestCase
         $this->expectException(InvalidRequest::class);
         $method->invoke($this->publish);
     }
+
+    public function provider_completePossibleIncompleteMessage(): array
+    {
+        // First case: 1 byte and the rest of the message
+        $mapValues[] = ['MA==', 'FAAJZmlyc3RUZXN05rGJQeWtl0JD', 'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw=='];
+        // Second case: 4 bytes already in rawHeaders, the rest still to be provided
+        $mapValues[] = ['MBQACQ==', 'Zmlyc3RUZXN05rGJQeWtl0JD', 'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw=='];
+        // Edge-case: all but 1 byte already in rawHeaders
+        $mapValues[] = ['MBQACWZpcnN0VGVzdOaxiUHlrZdC', 'Qw==', 'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw=='];
+        // Edge-case: no bytes left
+        $mapValues[] = ['MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', '', 'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw=='];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_completePossibleIncompleteMessage
+     * @param string $firstBytes
+     * @param string $append
+     * @param string $expectedOutput
+     * @throws \ReflectionException
+     */
+    public function test_completePossibleIncompleteMessage(string $firstBytes, string $append, string $expectedOutput)
+    {
+        $method = new \ReflectionMethod(Publish::class, 'completePossibleIncompleteMessage');
+        $method->setAccessible(true);
+
+        $clientMock = new ClientMock();
+        $clientMock->returnSpecificBrokerData(base64_decode($append));
+        $output = base64_encode($method->invoke($this->publish, base64_decode($firstBytes), $clientMock));
+
+        $this->assertSame($expectedOutput, $output);
+        $this->assertTrue($clientMock->readBrokerDataWasCalled());
+    }
+
+    public function provider_fillObject(): array
+    {
+        // QoS 0 with UTF-8 characters
+        $mapVal[] = ['MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', 0, 'firstTest', '汉A字BC', 0];
+        // QoS 1 with packetIdentifier 10
+        $mapVal[] = ['MiIACWZpcnN0VGVzdAAKSGVsbG8gd29ybGQhISAoMSAvIDMp', 1, 'firstTest', 'Hello world!! (1 / 3)', 10];
+        // QoS 1 with packetIdentigier 15 and different message
+        $mapVal[] = ['MiIACWZpcnN0VGVzdAAPSGVsbG8gd29ybGQhISAoMyAvIDMp', 1, 'firstTest', 'Hello world!! (3 / 3)', 15];
+        // QoS 2 with packetIdentifier 16
+        $mapVal[] = ['NCIACWZpcnN0VGVzdAAQSGVsbG8gd29ybGQhISAoMSAvIDEp', 2, 'firstTest', 'Hello world!! (1 / 1)', 16];
+
+        return $mapVal;
+    }
+
+    /**
+     * @dataProvider provider_fillObject
+     * @param string $rawData
+     * @param int $expectedQoSLevel
+     * @param string $expectedTopicName
+     * @param string $expectedMessageContent
+     * @param int|null $expectedPacketIdentifier
+     */
+    public function test_fillObject(
+        string $rawData,
+        int $expectedQoSLevel,
+        string $expectedTopicName,
+        string $expectedMessageContent,
+        int $expectedPacketIdentifier
+    ) {
+        $this->publish->fillObject(base64_decode($rawData), new ClientMock());
+        $message = $this->publish->getMessage();
+        $this->assertSame($expectedQoSLevel, $message->getQoSLevel());
+        $this->assertSame($expectedTopicName, $message->getTopicName());
+        $this->assertSame($expectedMessageContent, $message->getPayload());
+        if ($expectedPacketIdentifier !== 0) {
+            $this->assertSame($expectedPacketIdentifier, $this->publish->getPacketIdentifier());
+        }
+    }
 }
