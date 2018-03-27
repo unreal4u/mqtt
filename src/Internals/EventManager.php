@@ -6,9 +6,6 @@ namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Protocol\ConnAck;
-use unreal4u\MQTT\Protocol\Connect;
-use unreal4u\MQTT\Protocol\Disconnect;
-use unreal4u\MQTT\Protocol\PingReq;
 use unreal4u\MQTT\Protocol\PingResp;
 use unreal4u\MQTT\Protocol\PubAck;
 use unreal4u\MQTT\Protocol\PubComp;
@@ -16,9 +13,7 @@ use unreal4u\MQTT\Protocol\Publish;
 use unreal4u\MQTT\Protocol\PubRec;
 use unreal4u\MQTT\Protocol\PubRel;
 use unreal4u\MQTT\Protocol\SubAck;
-use unreal4u\MQTT\Protocol\Subscribe;
 use unreal4u\MQTT\Protocol\UnsubAck;
-use unreal4u\MQTT\Protocol\Unsubscribe;
 
 /**
  * Is able to load in an incoming event and handle it with properly, providing the ability to actively validate
@@ -96,10 +91,7 @@ final class EventManager extends ProtocolBase
             $readableContent = new $this->currentObjectType($this->logger);
             $readableContent->instantiateObject($rawMQTTHeaders, $client);
         } else {
-            $this->logger->error('Invalid control packet type found', [
-                'controlPacketType' => $controlPacketType,
-                #'rawMQTTHeaders' => str2bin($rawMQTTHeaders),
-            ]);
+            $this->logger->error('Invalid control packet type found', ['controlPacketType' => $controlPacketType]);
             throw new \DomainException(sprintf('Invalid control packet found (%d)', $controlPacketType));
         }
 

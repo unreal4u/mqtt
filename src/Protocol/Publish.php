@@ -68,35 +68,46 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             throw new \InvalidArgumentException('You must at least provide a message object with a topic name');
         }
 
-        $bitString = $this->createUTF8String($this->message->getTopicName());
-        // Reset the special flags should the object be reused with another message
+        $variableHeaderContents = $this->createUTF8String($this->message->getTopicName());
+        // Reset the special flags should the same object be reused with another message
         $this->specialFlags = 0;
 
+        $variableHeaderContents .= $this->createVariableHeaderFlags();
+        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
+
+        return $variableHeaderContents;
+    }
+
+    /**
+     * Sets some common flags and returns the variable header string should there be one
+     *
+     * @return string
+     * @throws \OutOfRangeException
+     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     */
+    private function createVariableHeaderFlags(): string
+    {
         if ($this->isRedelivery) {
-            $this->logger->debug('Activating redelivery bit');
             // DUP flag: if the message is a re-delivery, mark it as such
             $this->specialFlags |= 8;
+            $this->logger->debug('Activating redelivery bit');
+        }
+
+        if ($this->message->isRetained()) {
+            // RETAIN flag: should the server retain the message?
+            $this->specialFlags |= 1;
+            $this->logger->debug('Activating retain flag');
         }
 
         // Check QoS level and perform the corresponding actions
         if ($this->message->getQoSLevel() !== 0) {
             // 0 for QoS lvl2 for QoS lvl1 and 4 for QoS lvl2
             $this->specialFlags |= ($this->message->getQoSLevel() * 2);
-            $bitString .= $this->getPacketIdentifierBinaryRepresentation();
-            $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()), [
-                'specialFlags' => $this->specialFlags,
-            ]);
+            $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()));
+            return $this->getPacketIdentifierBinaryRepresentation();
         }
 
-        if ($this->message->isRetained()) {
-            // RETAIN flag: should the server retain the message?
-            $this->specialFlags |= 1;
-            $this->logger->debug('Activating retain flag', ['specialFlags' => $this->specialFlags]);
-        }
-
-        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
-
-        return $bitString;
+        return '';
     }
 
     /**
@@ -279,11 +290,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
                 $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
             )));
-            $this->logger->debug('Determined packet identifier', [
-                'PI' => $this->getPacketIdentifier(),
-                'firstBit' => \ord($rawMQTTHeaders{4 + $topicSize}),
-                'secondBit' => \ord($rawMQTTHeaders{5 + $topicSize})
-            ]);
+            $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
             $messageStartPosition += 2;
         }
 
@@ -293,7 +300,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
             new Topic(substr($rawMQTTHeaders, 4, $topicSize))
         );
-        $this->analyzeFirstByte(\ord($rawMQTTHeaders{0}), $qosLevel);
+        $this->analyzeFirstByte($firstByte, $qosLevel);
 
         $this->logger->debug('Determined headers', [
             'topicSize' => $topicSize,

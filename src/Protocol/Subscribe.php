@@ -142,9 +142,6 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
                 yield $readableContent->getMessage();
             } else {
                 // Only wait for a certain amount of time if there was nothing in the queue
-                #$this->logger->debug('Disregarding', [
-                #    'class' => \get_class($readableContent),
-                #]);
                 usleep($idleMicroseconds);
             }
 

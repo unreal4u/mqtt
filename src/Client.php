@@ -126,8 +126,19 @@ final class Client extends ProtocolBase implements ClientInterface
 
             throw new ServerClosedConnection('The server may have disconnected the current client');
         }
-        $this->logger->debug('Sent data to socket', ['writtenBytes' => $writtenBytes, 'sizeOfString' => $sizeOfString]);
 
+        $this->logger->debug('Sent data to socket', ['writtenBytes' => $writtenBytes, 'sizeOfString' => $sizeOfString]);
+        return $this->checkAndReturnAnswer($object);
+    }
+
+    /**
+     * Checks on the writable object whether we should wait for an answer and either wait or return an empty string
+     *
+     * @param WritableContentInterface $object
+     * @return string
+     */
+    private function checkAndReturnAnswer(WritableContentInterface $object): string
+    {
         $returnValue = '';
         if ($object->shouldExpectAnswer() === true) {
             $this->enableSynchronousTransfer(true);
