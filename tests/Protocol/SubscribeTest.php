@@ -45,7 +45,7 @@ class SubscribeTest extends TestCase
     public function test_pingResponseReturned()
     {
         $clientMock = new ClientMock();
-        $clientMock->returnSpecificBrokerData(base64_decode('0AA='));
+        $clientMock->returnSpecificBrokerData(['0AA=']);
 
         $pingResponse = $this->subscribe->checkForEvent($clientMock);
         $this->assertInstanceOf(PingResp::class, $pingResponse);
@@ -116,5 +116,43 @@ class SubscribeTest extends TestCase
         $result = $method->invoke($this->subscribe, $clientMock);
         $this->assertSame(PingReq::class, $clientMock->processObjectWasCalledWithObjectType());
         $this->assertTrue($result);
+    }
+
+    public function test_emptyLoopAndBreakOutOfLoop()
+    {
+        $clientMock = new ClientMock();
+        // Return a SUBACK and then a PUBLISH object with a message QoS lvl0
+        $clientMock->returnSpecificBrokerData([
+            'kAOcUwA=', // SubAck
+            'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', // QoS lvl0 message
+        ]);
+
+        foreach ($this->subscribe->loop($clientMock, 1) as $message) {
+            $this->subscribe->breakLoop();
+        }
+
+        $this->assertSame(Subscribe::class, $clientMock->processObjectWasCalledWithObjectType());
+        $this->assertSame('汉A字BC', $message->getPayload());
+    }
+
+    public function test_callableFunctionExecutesBeforeLoop()
+    {
+        $clientMock = new ClientMock();
+
+        $callable = function () {
+            $this->assertTrue(true);
+        };
+
+        $clientMock->returnSpecificBrokerData([
+            'kAOcUwA=', // SubAck
+            'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', // QoS lvl0 message
+        ]);
+
+        foreach ($this->subscribe->loop($clientMock, 1, $callable) as $message) {
+            $this->subscribe->breakLoop();
+        }
+
+        $this->assertSame(Subscribe::class, $clientMock->processObjectWasCalledWithObjectType());
+        $this->assertSame('汉A字BC', $message->getPayload());
     }
 }

@@ -14,7 +14,7 @@ final class DebugTools
      */
     public static function convertToBinaryRepresentation(string $rawString): string
     {
-        $out = null;
+        $out = '';
         $strLength = \strlen($rawString);
         for ($a = 0; $a < $strLength; $a++) {
             $dec = \ord($rawString[$a]); //determine symbol ASCII-code

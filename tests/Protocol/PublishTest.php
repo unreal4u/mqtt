@@ -289,7 +289,7 @@ class PublishTest extends TestCase
         $method->setAccessible(true);
 
         $clientMock = new ClientMock();
-        $clientMock->returnSpecificBrokerData(base64_decode($append));
+        $clientMock->returnSpecificBrokerData([$append]);
         $output = base64_encode($method->invoke($this->publish, base64_decode($firstBytes), $clientMock));
 
         $this->assertSame($expectedOutput, $output);

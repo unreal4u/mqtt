@@ -276,7 +276,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     {
         $rawMQTTHeaders = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
         // Handy to maintain for debugging purposes
-        #$this->logger->debug('Headers in binary form', [DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
+        #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
         // Topic size is always the 3rd byte
         $firstByte = \ord($rawMQTTHeaders{0});
@@ -316,6 +316,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * @inheritdoc
+     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
      * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
      * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      * @throws \unreal4u\MQTT\Exceptions\NotConnected

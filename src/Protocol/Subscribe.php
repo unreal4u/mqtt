@@ -110,6 +110,8 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
     /**
      * Loop and yields different type of results back whenever they are available
      *
+     * Be aware that 1 second is 1000000 microseconds
+     *
      * @param ClientInterface $client
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
      * @param callable|null $hookBeforeLoop

@@ -85,7 +85,7 @@ class PubRelTest extends TestCase
         int $expectedPacketIdentifier
     ) {
         $clientMock = new ClientMock();
-        $clientMock->returnSpecificBrokerData(base64_decode($append));
+        $clientMock->returnSpecificBrokerData([$append]);
 
         $this->pubRel->fillObject(base64_decode($firstBytes), $clientMock);
         $this->assertSame($expectedPacketIdentifier, $this->pubRel->getPacketIdentifier());

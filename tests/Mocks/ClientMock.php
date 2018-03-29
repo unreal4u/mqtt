@@ -50,9 +50,17 @@ class ClientMock implements ClientInterface
         return false;
     }
 
-    public function returnSpecificBrokerData(string $streamData): self
+    /**
+     * Sets a specific return value that the actual stream should return
+     *
+     * @param array $streamData base64_encoded string that we must return
+     * @return ClientMock
+     */
+    public function returnSpecificBrokerData(array $streamData): self
     {
-        $this->brokerData = $streamData;
+        foreach ($streamData as $streamDataString) {
+            $this->brokerData .= base64_decode($streamDataString);
+        }
         return $this;
     }
 
@@ -62,6 +70,9 @@ class ClientMock implements ClientInterface
     public function readBrokerData(int $bytes): string
     {
         $this->readBrokerDataWasCalled = true;
+        if ($this->brokerData === '') {
+            return '';
+        }
         $returnedString = substr($this->brokerData, 0, $bytes);
         $this->brokerData = substr($this->brokerData, $bytes);
         return $returnedString;
