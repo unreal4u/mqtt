@@ -50,7 +50,8 @@ After all dependencies are installed, execute the following in project directory
 vagrant up
 vagrant ssh
 cd /vagrant/
-composer.phar update -o
+# Note: minimum supported version is 7.0, so install all dependencies for THAT version
+php70 /usr/bin/composer.phar update -o
 # Enjoy!
 ```
 
@@ -59,7 +60,7 @@ To run all unit tests:
 ```bash
 vagrant ssh
 cd /vagrant/
-php71 vendor/bin/phpunit
+php vendor/bin/phpunit
 # Enjoy!
 ```
 
