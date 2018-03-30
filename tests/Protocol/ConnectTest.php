@@ -14,11 +14,13 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
+use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
+use unreal4u\MQTT\Protocol\ConnAck;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 
@@ -103,5 +105,11 @@ class ConnectTest extends TestCase
 
         $this->connect->setConnectionParameters($parameters);
         $this->assertSame($parameters, $this->connect->getConnectionParameters());
+    }
+
+    public function test_expectAnswer()
+    {
+        $result = $this->connect->expectAnswer(base64_decode('IAIBAA=='), new ClientMock());
+        $this->assertInstanceOf(ConnAck::class, $result);
     }
 }

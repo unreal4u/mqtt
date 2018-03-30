@@ -32,11 +32,12 @@ class WritableBaseMock extends ProtocolBase implements WritableContentInterface
 
     /**
      * @inheritdoc
+     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         $connAck = new ConnAck();
-        $connAck->instantiateObject($data, $client);
+        $connAck->instantiateObject($brokerBitStream, $client);
 
         return $connAck;
     }

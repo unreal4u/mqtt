@@ -116,15 +116,15 @@ trait WritableContent
     /**
      * Creates a UTF8 big-endian representation of the given string
      *
-     * @param string $data
+     * @param string $nonFormattedString
      * @return string
      * @throws \OutOfRangeException
      */
-    final public function createUTF8String(string $data): string
+    final public function createUTF8String(string $nonFormattedString): string
     {
         $returnString = '';
-        if ($data !== '') {
-            $returnString = Utilities::convertNumberToBinaryString(\strlen($data)) . $data;
+        if ($nonFormattedString !== '') {
+            $returnString = Utilities::convertNumberToBinaryString(\strlen($nonFormattedString)) . $nonFormattedString;
         }
 
         return $returnString;
@@ -133,18 +133,18 @@ trait WritableContent
     /**
      * Will return an object of the type the broker has returned to us
      *
-     * @param string $data
+     * @param string $brokerBitStream
      * @param ClientInterface $client
      *
      * @return ReadableContentInterface
      * @throws \DomainException
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
 
         $eventManager = new EventManager($this->logger);
-        return $eventManager->analyzeHeaders($data, $client);
+        return $eventManager->analyzeHeaders($brokerBitStream, $client);
     }
 
     /**

@@ -32,7 +32,7 @@ final class Disconnect extends ProtocolBase implements WritableContentInterface
         return '';
     }
 
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         return new DisconnectCleanup($this->logger);
     }

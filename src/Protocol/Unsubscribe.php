@@ -40,14 +40,13 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
         // Unsubscribe must always send a 2 flag
         $this->specialFlags = 2;
 
-        // Assign a packet identifier automatically if none has been assigned yet
-        if ($this->getPacketIdentifier() === 0) {
-            $this->generateRandomPacketIdentifier();
-        }
-
         return $this->getPacketIdentifierBinaryRepresentation();
     }
 
+    /**
+     * @return string
+     * @throws \OutOfRangeException
+     */
     public function createPayload(): string
     {
         $output = '';

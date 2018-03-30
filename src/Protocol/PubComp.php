@@ -75,7 +75,7 @@ final class PubComp extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * @inheritdoc
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         return new EmptyReadableResponse($this->logger);
     }

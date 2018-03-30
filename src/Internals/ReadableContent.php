@@ -18,9 +18,15 @@ trait ReadableContent
      */
     protected $variableHeaderSize = 0;
 
+    /**
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return bool
+     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     */
     final public function instantiateObject(string $rawMQTTHeaders, ClientInterface $client): bool
     {
-        //var_dump(base64_encode($rawMQTTHeaders)); // For now: make it a bit easier to create unit tests
+        //var_dump(base64_encode($rawMQTTHeaders)); // Make it a bit easier to create unit tests
         $this->checkControlPacketValue(\ord($rawMQTTHeaders[0]) >> 4);
         $this->fillObject($rawMQTTHeaders, $client);
 

@@ -60,7 +60,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * @inheritdoc
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         return $this;
     }

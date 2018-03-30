@@ -39,4 +39,19 @@ class UnsubAckTest extends TestCase
         $this->assertTrue($this->unsuback->performSpecialActions($clientMock, $unsubscribe));
         $this->assertTrue($clientMock->updateLastCommunicationWasCalled());
     }
+
+    public function test_fillObjectWithFullHeaders()
+    {
+        $this->unsuback->fillObject(base64_decode('sAIWvA=='), new ClientMock());
+        $this->assertSame(5820, $this->unsuback->getPacketIdentifier());
+    }
+
+    public function test_fillObjectWithPartialHeaders()
+    {
+        $clientMock = new ClientMock();
+        $clientMock->returnSpecificBrokerData(['Aq6/']);
+
+        $this->unsuback->fillObject(base64_decode('sA=='), $clientMock);
+        $this->assertSame(44735, $this->unsuback->getPacketIdentifier());
+    }
 }

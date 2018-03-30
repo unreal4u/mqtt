@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
+use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DebugTools;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Protocol\Unsubscribe;
 
@@ -73,5 +75,26 @@ class UnsubscribeTest extends TestCase
 
         // Maybe an exception should be thrown?
         $this->markTestIncomplete('Decide whether this should throw an exception');
+    }
+
+    /**
+     * @depends test_addOneTopic
+     */
+    public function test_createVariableHeaderWithStaticPacketIdentifier()
+    {
+        $this->unsubscribe->addTopics(new Topic('test'));
+        $this->unsubscribe->setPacketIdentifier(new PacketIdentifier(8879));
+        $packetIdentifier = base64_encode($this->unsubscribe->createVariableHeader());
+        $this->assertSame('Iq8=', $packetIdentifier);
+    }
+
+    /**
+     * @depends test_addOneTopic
+     */
+    public function test_createVariableHeaderWithRandomPacketIdentifier()
+    {
+        $this->unsubscribe->addTopics(new Topic('test'));
+        $packetIdentifier = DebugTools::convertToBinaryRepresentation($this->unsubscribe->createVariableHeader());
+        $this->assertNotSame('0000000000000000', DebugTools::convertToBinaryRepresentation($packetIdentifier));
     }
 }

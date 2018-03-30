@@ -109,20 +109,20 @@ final class Connect extends ProtocolBase implements WritableContentInterface
     /**
      * Special handling of the ConnAck object: be able to inject more information into the object before throwing it
      *
-     * @param string $data
+     * @param string $brokerBitStream
      * @param ClientInterface $client
      *
      * @return ReadableContentInterface
      * @throws \DomainException
      * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
      */
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
 
         $eventManager = new EventManager($this->logger);
         try {
-            $connAck = $eventManager->analyzeHeaders($data, $client);
+            $connAck = $eventManager->analyzeHeaders($brokerBitStream, $client);
         } catch (IdentifierRejected $e) {
             $possibleReasons = '';
             foreach ($this->connectionParameters->getClientId()->performStrictValidationCheck() as $errorMessage) {

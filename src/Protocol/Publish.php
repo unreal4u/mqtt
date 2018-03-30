@@ -138,16 +138,22 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         return $shouldExpectAnswer;
     }
 
-    public function expectAnswer(string $data, ClientInterface $client): ReadableContentInterface
+    /**
+     * @param string $brokerBitStream
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     */
+    public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
         switch ($this->message->getQoSLevel()) {
             case 1:
                 $pubAck = new PubAck($this->logger);
-                $pubAck->instantiateObject($data, $client);
+                $pubAck->instantiateObject($brokerBitStream, $client);
                 return $pubAck;
             case 2:
                 $pubRec = new PubRec($this->logger);
-                $pubRec->instantiateObject($data, $client);
+                $pubRec->instantiateObject($brokerBitStream, $client);
                 return $pubRec;
             case 0:
             default:
