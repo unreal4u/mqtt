@@ -27,5 +27,17 @@ abstract class ProtocolBase
 
         // Insert name of class within the logger
         $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', \get_class($this)));
+
+        $this->initializeObject();
+    }
+
+    /**
+     * Should any method have any abnormal default behaviour, we can do so here
+     *
+     * @return ProtocolBase
+     */
+    protected function initializeObject(): ProtocolBase
+    {
+        return $this;
     }
 }

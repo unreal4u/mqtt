@@ -51,38 +51,6 @@ class SubscribeTest extends TestCase
         $this->assertInstanceOf(PingResp::class, $pingResponse);
     }
 
-    public function test_addOneTopic()
-    {
-        $this->subscribe->addTopics(new Topic('test'));
-        $this->assertSame(1, $this->subscribe->getNumberOfTopics());
-    }
-
-    public function test_addMultipleTopicsInOneGo()
-    {
-        $this->subscribe->addTopics(new Topic('test_a'), new Topic('test_b'));
-        $this->assertSame(2, $this->subscribe->getNumberOfTopics());
-    }
-
-    public function test_addMultipleTopicsInMultipleStages()
-    {
-        $this->subscribe->addTopics(new Topic('test_a'));
-        $this->assertSame(1, $this->subscribe->getNumberOfTopics());
-
-        $this->subscribe->addTopics(new Topic('test_b'));
-        $this->assertSame(2, $this->subscribe->getNumberOfTopics());
-    }
-
-    public function test_addSameTopicMoreThanOnce()
-    {
-        $this->subscribe->addTopics(new Topic('test_a'));
-        $this->assertSame(1, $this->subscribe->getNumberOfTopics());
-
-        $this->subscribe->addTopics(new Topic('test_a'));
-        $this->markTestIncomplete('Not implemented yet');
-        $this->assertSame(1, $this->subscribe->getNumberOfTopics());
-
-    }
-
     public function test_createPayload()
     {
         $this->subscribe->addTopics(new Topic('test'));

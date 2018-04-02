@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
-use unreal4u\MQTT\DataTypes\Topic;
-use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
+use unreal4u\MQTT\Internals\TopicFunctionality;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
@@ -16,15 +15,15 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent, PacketIdentifierFunctionality;
+    use WritableContent, PacketIdentifierFunctionality, TopicFunctionality;
 
     const CONTROL_PACKET_VALUE = 10;
 
-    /**
-     * An array of topics on which unsubscribe to
-     * @var Topic[]
-     */
-    private $topics = [];
+    protected function initializeObject(): ProtocolBase
+    {
+        $this->topics = new \SplQueue();
+        return parent::initializeObject();
+    }
 
     /**
      * @return string
@@ -33,10 +32,6 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
      */
     public function createVariableHeader(): string
     {
-        if (count($this->topics) === 0) {
-            throw new MustContainTopic('An unsubscribe command must contain at least one topic');
-        }
-
         // Unsubscribe must always send a 2 flag
         $this->specialFlags = 2;
 
@@ -45,12 +40,13 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 
     /**
      * @return string
+     * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
      * @throws \OutOfRangeException
      */
     public function createPayload(): string
     {
         $output = '';
-        foreach ($this->topics as $topic) {
+        foreach ($this->getTopics() as $topic) {
             // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
             $output .= $this->createUTF8String($topic->getTopicName());
         }
@@ -69,19 +65,5 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
     public function shouldExpectAnswer(): bool
     {
         return true;
-    }
-
-    /**
-     * A subscription is based on filters, this function allows us to pass on filters
-     *
-     * @param Topic[] $topics
-     * @return Unsubscribe
-     */
-    public function addTopics(Topic ...$topics): self
-    {
-        $this->topics = array_merge($this->topics, $topics);
-        $this->logger->debug('Topics added', ['totalTopics', count($this->topics)]);
-
-        return $this;
     }
 }

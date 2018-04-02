@@ -24,12 +24,6 @@ class UnsubscribeTest extends TestCase
         parent::setUp();
     }
 
-    public function test_missingTopic()
-    {
-        $this->expectException(MustContainTopic::class);
-        $this->unsubscribe->createVariableHeader();
-    }
-
     public function test_shouldExpectAnswer()
     {
         $this->assertTrue($this->unsubscribe->shouldExpectAnswer());
@@ -65,16 +59,6 @@ class UnsubscribeTest extends TestCase
         $this->unsubscribe->addTopics(new Topic('test3'));
         $result = $this->unsubscribe->createPayload();
         $this->assertSame('AAV0ZXN0MgAEdGVzdAAFdGVzdDM=', base64_encode($result));
-    }
-
-    public function test_addSameTopicMultipleTimes()
-    {
-        $this->unsubscribe->addTopics(new Topic('test'));
-        $result = $this->unsubscribe->createPayload();
-        $this->assertSame('AAR0ZXN0', base64_encode($result));
-
-        // Maybe an exception should be thrown?
-        $this->markTestIncomplete('Decide whether this should throw an exception');
     }
 
     /**
