@@ -9,11 +9,6 @@ entire rewrite of [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 [![Code Coverage](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Build Status](https://travis-ci.org/unreal4u/mqtt.svg)](https://travis-ci.org/unreal4u/mqtt)
 
-## Stability notes
-
-Please note that for the time being, this is still work in progress! A version will be launched when I believe it to be
-ready for production environments.
-
 ## What is MQTT?
 
 Please read the [following wiki page](https://github.com/unreal4u/mqtt/wiki/What-is-MQTT) for that :)
@@ -33,36 +28,6 @@ incorrectly parsing such filters.
 
 This package uses sockets to communicate (a)synchronously with the broker. If you don't want this, you are free to
 create your own client, for which you'll just have to implement an interface.
-
-# Development environment
-
-* Ensure virtualbox is installed: [https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
-* Ensure vagrant is installed: [https://www.vagrantup.com](https://www.vagrantup.com)
-* Ensure plugin vagrant-vbguest is installed: [https://github.com/dotless-de/vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest)
-
-```bash
-vagrant plugin install vagrant-vbguest
-```
-
-After all dependencies are installed, execute the following in project directory:
-
-```bash
-vagrant up
-vagrant ssh
-cd /vagrant/
-# Note: minimum supported version is 7.0, so install all dependencies for THAT version
-php70 /usr/bin/composer.phar update -o
-# Enjoy!
-```
-
-To run all unit tests:
-
-```bash
-vagrant ssh
-cd /vagrant/
-php vendor/bin/phpunit
-# Enjoy!
-```
 
 # References
 **[mqtt-v3.1.1-plus-errata01]**

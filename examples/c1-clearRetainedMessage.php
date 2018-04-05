@@ -12,11 +12,8 @@ use unreal4u\MQTT\Protocol\Publish;
 
 include __DIR__ . '/00.basics.php';
 
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
-$connectionParameters->setCredentials('testuser', 'userpass');
-
 $connect = new Connect();
-$connect->setConnectionParameters($connectionParameters);
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
 
 $client = new Client();
 $client->processObject($connect);
@@ -36,6 +33,6 @@ if ($client->isConnected()) {
     $publish->setMessage($message);
     // And publish the object to the broker
     $client->processObject($publish);
-    echo 'Cleared retained message';
+    printf('Cleared retained message on topic "%s"', COMMON_TOPICNAME);
 }
 echo PHP_EOL;

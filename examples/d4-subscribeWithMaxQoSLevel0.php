@@ -10,6 +10,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
+use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -41,7 +42,16 @@ if ($client->isConnected() === false) {
 }
 
 $subscribe = new Subscribe($logger);
-$subscribe->addTopics(new TopicFilter(COMMON_TOPICNAME));
+/*
+ * Time for a little explanation: This option means that all traffic originating from the broker will have a maximum QoS
+ * level of 0. This will not have any impact on how the original message has been delivered to the broker, the only part
+ * that is affected is the traffic between the broker and this client.
+ *
+ * That being said, I must very sincerely admit that I can not find a use-case for this, but the protocol supports it
+ * and it was kind of trivial to implement. If you know about an actual use for this, please let me know or submit an
+ * PR!
+ */
+$subscribe->addTopics(new TopicFilter(COMMON_TOPICNAME), new QoSLevel(0));
 
 /** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
