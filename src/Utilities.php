@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
+/**
+ * Functionality that is shared across the entire package
+ * @package unreal4u\MQTT
+ */
 final class Utilities
 {
     /**

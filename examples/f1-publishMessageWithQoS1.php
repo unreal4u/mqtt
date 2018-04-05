@@ -14,9 +14,9 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Publish;
@@ -42,7 +42,7 @@ $client->processObject($connect);
 define('MAXIMUM', 3);
 if ($client->isConnected()) {
     // Set main topic (equal for all messages)
-    $topic = new Topic(COMMON_TOPICNAME);
+    $topic = new TopicName(COMMON_TOPICNAME);
     // Create a new Publish object
     $publish = new Publish($logger);
 

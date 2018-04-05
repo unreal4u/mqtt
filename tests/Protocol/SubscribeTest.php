@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\DebugTools;
 use unreal4u\MQTT\Protocol\PingReq;
 use unreal4u\MQTT\Protocol\PingResp;
@@ -53,7 +53,7 @@ class SubscribeTest extends TestCase
 
     public function test_createPayload()
     {
-        $this->subscribe->addTopics(new Topic('test'));
+        $this->subscribe->addTopics(new TopicFilter('test'));
         $this->assertSame('AAR0ZXN0Ag==', base64_encode($this->subscribe->createPayload()));
     }
 

@@ -15,7 +15,7 @@ use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Disconnect;
 
 /**
- * Class Client
+ * Example working client that implements all methods from the mandatory ClientInterface
  * @package unreal4u\MQTT
  */
 final class Client extends ProtocolBase implements ClientInterface

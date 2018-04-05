@@ -33,18 +33,18 @@ final class Message
     private $isRetained = false;
 
     /**
-     * The Topic Name identifies the information channel to which payload data is published
-     * @var Topic
+     * The TopicName identifies the information channel to which payload data is published
+     * @var TopicName
      */
     private $topic;
 
     /**
      * Message constructor.
      * @param string $payload
-     * @param Topic $topic
+     * @param TopicFilter $topic
      * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
      */
-    public function __construct(string $payload, Topic $topic)
+    public function __construct(string $payload, TopicName $topic)
     {
         $this->topic = $topic;
         if (mb_strlen($payload) > 65535) {

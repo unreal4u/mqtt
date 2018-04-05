@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT\Internals;
 
 use PHPUnit\Framework\TestCase;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
-use unreal4u\MQTT\Internals\TopicFunctionality;
+use unreal4u\MQTT\Internals\TopicFilterFunctionality;
 
 class TopicFunctionalityTest extends TestCase
 {
-    use TopicFunctionality;
+    use TopicFilterFunctionality;
 
     protected function setUp()
     {
@@ -34,31 +34,31 @@ class TopicFunctionalityTest extends TestCase
 
     public function test_addOneTopic()
     {
-        $this->addTopics(new Topic('test'));
+        $this->addTopics(new TopicFilter('test'));
         $this->assertSame(1, $this->getNumberOfTopics());
     }
 
     public function test_addMultipleTopicsInOneGo()
     {
-        $this->addTopics(new Topic('test_a'), new Topic('test_b'));
+        $this->addTopics(new TopicFilter('test_a'), new TopicFilter('test_b'));
         $this->assertSame(2, $this->getNumberOfTopics());
     }
 
     public function test_addMultipleTopicsInMultipleStages()
     {
-        $this->addTopics(new Topic('test_a'));
+        $this->addTopics(new TopicFilter('test_a'));
         $this->assertSame(1, $this->getNumberOfTopics());
 
-        $this->addTopics(new Topic('test_b'));
+        $this->addTopics(new TopicFilter('test_b'));
         $this->assertSame(2, $this->getNumberOfTopics());
     }
 
     public function test_addSameTopicMoreThanOnce()
     {
-        $this->addTopics(new Topic('test_a'));
+        $this->addTopics(new TopicFilter('test_a'));
         $this->assertSame(1, $this->getNumberOfTopics());
 
-        $this->addTopics(new Topic('test_a'));
+        $this->addTopics(new TopicFilter('test_a'));
         $this->assertSame(1, $this->getNumberOfTopics());
     }
 }

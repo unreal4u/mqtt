@@ -39,7 +39,7 @@ class WritableContentTest extends TestCase
     public function test_createSendableMessageWithBigPayload()
     {
         $publish = new Publish();
-        $message = new Message(str_repeat('X', 64000), new Topic(str_repeat('Y', 64000)));
+        $message = new Message(str_repeat('X', 64000), new TopicFilter(str_repeat('Y', 64000)));
 
         $publish->setMessage($message);
         var_dump(base64_encode($publish->createSendableMessage()));

@@ -6,7 +6,7 @@ namespace unreal4u\MQTT\Protocol;
 
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
-use unreal4u\MQTT\Internals\TopicFunctionality;
+use unreal4u\MQTT\Internals\TopicFilterFunctionality;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
@@ -15,7 +15,7 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent, PacketIdentifierFunctionality, TopicFunctionality;
+    use WritableContent, PacketIdentifierFunctionality, TopicFilterFunctionality;
 
     const CONTROL_PACKET_VALUE = 10;
 
@@ -48,7 +48,7 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
         $output = '';
         foreach ($this->getTopics() as $topic) {
             // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
-            $output .= $this->createUTF8String($topic->getTopicName());
+            $output .= $this->createUTF8String($topic->getTopicFilter());
         }
 
         return $output;

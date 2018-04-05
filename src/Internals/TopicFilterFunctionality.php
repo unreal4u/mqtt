@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
 
 /**
  * Trait ReadableContent
  * @package unreal4u\MQTT\Internals
  */
-trait TopicFunctionality
+trait TopicFilterFunctionality
 {
     /**
      * The list of topics, being a SplQueue ensures the order is correct
@@ -28,14 +28,14 @@ trait TopicFunctionality
     /**
      * A subscription is based on filters, this function allows us to pass on filters
      *
-     * @param Topic[] $topics
+     * @param TopicFilter[] $topics
      * @return self
      */
-    final public function addTopics(Topic ...$topics): self
+    final public function addTopics(TopicFilter ...$topics): self
     {
         foreach ($topics as $topic) {
             // Frequently used: topicName, make it an apart variable for easy access
-            $topicName = $topic->getTopicName();
+            $topicName = $topic->getTopicFilter();
             if (\in_array($topicName, $this->topicHashTable, true) === false) {
                 // Personally, I find this hacky as hell. However, using the SPL library there seems to be no other way
                 $this->topicHashTable[] = $topicName;
@@ -62,7 +62,7 @@ trait TopicFunctionality
      * The order is important because SUBACK will return the status code for each topic in this order, without
      * explicitly identifying which topic is which
      *
-     * @return \Generator|Topic[]
+     * @return \Generator|TopicFilter[]
      * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
      */
     private function getTopics(): \Generator

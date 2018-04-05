@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\Exceptions\InvalidRequest;
@@ -33,7 +33,7 @@ class PublishTest extends TestCase
     {
         parent::setUp();
         $this->publish = new Publish();
-        $this->message = new Message('Hello test world!', new Topic('t'));
+        $this->message = new Message('Hello test world!', new TopicName('t'));
     }
 
     protected function tearDown()

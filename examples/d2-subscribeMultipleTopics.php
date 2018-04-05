@@ -11,7 +11,7 @@ use Monolog\Logger;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\QoSLevel;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Subscribe;
@@ -45,9 +45,9 @@ if ($client->isConnected() === false) {
 }
 
 // We are subscribing in this example to 2 topics, so initialize the objects:
-$mainTopic = new Topic(COMMON_TOPICNAME);
+$mainTopic = new TopicFilter(COMMON_TOPICNAME);
 // Tell the broker that it should restrict the secondary topic to send only QoS lvl 0 messages towards us
-$secondaryTopic = new Topic(SECONDARY_TOPICNAME, new QoSLevel(0));
+$secondaryTopic = new TopicFilter(SECONDARY_TOPICNAME, new QoSLevel(0));
 
 $subscribe = new Subscribe($logger);
 // And provide multiple arguments to the subscription's addTopics() method

@@ -7,7 +7,7 @@ namespace unreal4u\MQTT\Internals;
 use Psr\Log\LoggerInterface;
 
 /**
- * Interface ClientInterface
+ * All clients that interact with this library should implement all of the below methods
  * @package unreal4u\MQTT\Internals
  */
 interface ClientInterface

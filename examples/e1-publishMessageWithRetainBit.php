@@ -9,7 +9,7 @@ declare(strict_types=1);
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Publish;
@@ -33,7 +33,7 @@ if ($client->isConnected()) {
     // So basically, everything is pretty standard
     $message = new Message(
         'Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained',
-        new Topic(COMMON_TOPICNAME)
+        new TopicName(COMMON_TOPICNAME)
     );
     // Except that we set the retain flag
     $message->setRetainFlag(true);
@@ -43,7 +43,7 @@ if ($client->isConnected()) {
     // Exactly the same, but for the SECONDARY_TOPICNAME
     $message = new Message(
         'Message from ' . $now->format('d-m-Y H:i:s') . ' will be retained',
-        new Topic(SECONDARY_TOPICNAME)
+        new TopicName(SECONDARY_TOPICNAME)
     );
     // Except that we set the retain flag
     $message->setRetainFlag(true);

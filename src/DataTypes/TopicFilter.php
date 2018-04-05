@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\DataTypes;
 
+use unreal4u\MQTT\Internals\GeneralTopicRules;
+
 /**
- * When the client wants to subscribe to a topic, this is done by adding a topic filter.
+ * When the client wants to subscribe to a topic, this is done by adding a topic FILTER.
  */
-final class Topic
+final class TopicFilter extends GeneralTopicRules
 {
     /**
-     * The Topic Name identifies the information channel to which payload data is published.
+     * The TopicFilter Name identifies the information channel to which payload data is being retrieved from.
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718106
      * @var string
      */
-    private $topicName;
+    private $topicFilter;
 
     /**
      * The QoS lvl of this topic
      *
-     * NOTE: Setting a QoS level where it is not needed will have no effect at all, as the QoS level is set not on a
-     *       Topic level, but on a Message level instead.
      * NOTE: The SUBSCRIBE Packet also specifies (for each Subscription) the maximum QoS with which the Server can send
      *       Application Messages to the Client. So even if the server has QoS lvl 2 messages in the queue, it will send
      *       them as QoS lvl 0 if we provide lvl 0 as the input for this function. Defaults to QoS lvl 2.
@@ -31,7 +31,7 @@ final class Topic
     private $qosLevel = 0;
 
     /**
-     * Topic constructor.
+     * TopicFilter constructor.
      * @param string $topicName
      * @param QoSLevel $qosLevel
      * @throws \OutOfBoundsException
@@ -51,24 +51,18 @@ final class Topic
     }
 
     /**
-     * Contains the name of the Topic Filter
+     * Will validate and set the topic filter
      *
-     * @param string $topicName
-     * @return Topic
+     * @param string $topicFilter
+     * @return TopicFilter
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
-    private function setTopicName(string $topicName): self
+    private function setTopicName(string $topicFilter): self
     {
-        if ($topicName === '') {
-            throw new \InvalidArgumentException('Topic name must be at least 1 character long');
-        }
+        $this->generalRulesCheck($topicFilter);
 
-        if (\strlen($topicName) > 65535) {
-            throw new \OutOfBoundsException('Topic name can not exceed 65535 bytes');
-        }
-
-        $this->topicName = $topicName;
+        $this->topicFilter = $topicFilter;
         return $this;
     }
 
@@ -76,7 +70,7 @@ final class Topic
      * Requested QoS level is the maximum QoS level at which the Server can send Application Messages to the Client
      *
      * @param QoSLevel $qosLevel
-     * @return Topic
+     * @return TopicFilter
      */
     private function setQoSLevel(QoSLevel $qosLevel): self
     {
@@ -88,15 +82,15 @@ final class Topic
     /**
      * @return string
      */
-    public function getTopicName(): string
+    public function getTopicFilter(): string
     {
-        return $this->topicName;
+        return $this->topicFilter;
     }
 
     /**
      * @return int
      */
-    public function getTopicQoSLevel(): int
+    public function getTopicFilterQoSLevel(): int
     {
         return $this->qosLevel->getQoSLevel();
     }

@@ -50,6 +50,7 @@ class ConnAckTest extends TestCase
         $this->connAck->performSpecialActions($clientMock, new Connect());
         $this->assertTrue($clientMock->setConnectedWasCalled());
         $this->assertTrue($clientMock->updateLastCommunicationWasCalled());
+        $this->assertSame(0, $this->connAck->getConnectReturnCode());
     }
 
     public function provider_TestExceptions(): array

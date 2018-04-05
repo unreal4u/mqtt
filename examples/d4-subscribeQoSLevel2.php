@@ -10,7 +10,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicFilter;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Subscribe;
@@ -41,7 +41,7 @@ if ($client->isConnected() === false) {
 }
 
 $subscribe = new Subscribe($logger);
-$subscribe->addTopics(new Topic(COMMON_TOPICNAME));
+$subscribe->addTopics(new TopicFilter(COMMON_TOPICNAME));
 
 /** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {

@@ -7,8 +7,8 @@ namespace unreal4u\MQTT\Protocol;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
-use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Exceptions\InvalidRequest;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
@@ -283,7 +283,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // Handy to maintain for debugging purposes
         #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
-        // Topic size is always the 3rd byte
+        // TopicFilter size is always the 3rd byte
         $firstByte = \ord($rawMQTTHeaders{0});
         $topicSize = \ord($rawMQTTHeaders{3});
         $qosLevel = $this->determineIncomingQoSLevel($firstByte);
@@ -303,7 +303,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->message = new Message(
             // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
             substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
-            new Topic(substr($rawMQTTHeaders, 4, $topicSize))
+            new TopicName(substr($rawMQTTHeaders, 4, $topicSize))
         );
         $this->analyzeFirstByte($firstByte, $qosLevel);
 

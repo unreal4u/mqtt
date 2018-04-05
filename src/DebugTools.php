@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
+/**
+ * Collection of function that have proven useful while debugging issues and creating unit tests
+ * @package unreal4u\MQTT
+ */
 final class DebugTools
 {
     /**

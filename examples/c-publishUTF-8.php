@@ -9,8 +9,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\Client;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Protocol\Publish;
@@ -33,7 +33,7 @@ $client->processObject($connect);
 // Below kanjis are 3 bytes long, combined with "normal" 1 byte characters
 // Example of a veeeeery long message with multibyte (4) UTF-8 characters
 #str_repeat('𠜎', 65534)
-$message = new Message('汉A字BC', new Topic(COMMON_TOPICNAME));
+$message = new Message('汉A字BC', new TopicName(COMMON_TOPICNAME));
 $publish = new Publish($logger);
 
 // Setting the message and publishing to broker

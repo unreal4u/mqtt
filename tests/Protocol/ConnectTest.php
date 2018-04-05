@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use tests\unreal4u\MQTT\Mocks\ClientMock;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
 use unreal4u\MQTT\Protocol\ConnAck;
@@ -76,7 +76,7 @@ class ConnectTest extends TestCase
     public function test_completeWill()
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
-        $parameters->setWill(new Message('Testing', new Topic('topic')));
+        $parameters->setWill(new Message('Testing', new TopicName('topic')));
         $this->connect->setConnectionParameters($parameters);
         $connectPayload = $this->connect->createPayload();
 

@@ -7,7 +7,7 @@ declare(strict_types = 1);
 
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
@@ -19,7 +19,7 @@ $clientId = new ClientId(basename(__FILE__));
 // Create a new Message object
 $willMessage = new Message(
     sprintf('If I die unexpectedly, please print this message. Used ClientId: %s', $clientId->getClientId()),
-    new Topic('client/errors')
+    new TopicName('client/errors')
 );
 
 // Now we will setup a new Connect Parameters object

@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\DataTypes\BrokerPort;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DataTypes\QoSLevel;
+use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 
 class ParametersTest extends TestCase
@@ -91,7 +91,7 @@ class ParametersTest extends TestCase
         $parameters = new Parameters();
         $parameters->setWill(new Message(
                 'You will see this if I disconnect without notice',
-                new Topic('client/errors'))
+                new TopicName('client/errors'))
         );
 
         $this->assertSame(6, $parameters->getFlags());
@@ -100,7 +100,7 @@ class ParametersTest extends TestCase
 
     public function test_validRetainedWillMessage()
     {
-        $willMessage = new Message('You will see this if I disconnect without notice', new Topic('client/errors'));
+        $willMessage = new Message('You will see this if I disconnect without notice', new TopicName('client/errors'));
         $willMessage->setRetainFlag(true);
 
         $parameters = new Parameters();
@@ -126,7 +126,7 @@ class ParametersTest extends TestCase
      */
     public function test_validQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult)
     {
-        $willMessage = new Message('You will see this if I disconnect without notice', new Topic('client/errors'));
+        $willMessage = new Message('You will see this if I disconnect without notice', new TopicName('client/errors'));
         $willMessage->setQoSLevel(new QoSLevel($QoSLevel));
 
         $parameters = new Parameters(new ClientId('unittest'));
