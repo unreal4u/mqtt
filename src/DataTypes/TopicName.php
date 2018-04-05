@@ -35,7 +35,7 @@ final class TopicName extends GeneralTopicRules
      * Contains the name of the TopicFilter Filter
      *
      * @param string $topicName
-     * @return TopicFilter
+     * @return TopicName
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */

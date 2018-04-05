@@ -37,10 +37,10 @@ class TopicFilterTest extends TestCase
         new TopicFilter('');
     }
 
-    public function test_terminationCharacterPresent()
+    public function test_terminationCharacterPresentInTopicFilter()
     {
         $this->expectException(\InvalidArgumentException::class);
-        new TopicFilter('hello/world' . \chr("\n"));
+        new TopicFilter('hello/world' . \chr(0) . '/Yep');
     }
 
     public function test_tooBigTopicName()

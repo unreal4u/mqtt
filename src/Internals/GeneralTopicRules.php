@@ -23,7 +23,7 @@ abstract class GeneralTopicRules
             throw new \OutOfBoundsException('Topics can not exceed 65535 bytes in size');
         }
 
-        if (strpos($topic, \chr("\n")) !== false) {
+        if (strpos($topic, \chr(0)) !== false) {
             throw new \InvalidArgumentException('Topics can not contain the termination character');
         }
 
