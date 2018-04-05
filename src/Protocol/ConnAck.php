@@ -40,7 +40,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      * 6-255 = Reserved for future use
      * @var int
      */
-    public $connectReturnCode;
+    private $connectReturnCode = -1;
 
     /**
      * @inheritdoc
@@ -64,6 +64,15 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Don't know why you should ever need this, but don't allow to overwrite it
+     * @return int
+     */
+    public function getConnectReturnCode(): int
+    {
+        return $this->connectReturnCode;
     }
 
     /**

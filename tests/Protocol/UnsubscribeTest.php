@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\Topic;
 use unreal4u\MQTT\DebugTools;
-use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Protocol\Unsubscribe;
 
 class UnsubscribeTest extends TestCase

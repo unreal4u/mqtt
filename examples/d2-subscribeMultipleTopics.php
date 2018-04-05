@@ -18,7 +18,9 @@ use unreal4u\MQTT\Protocol\Subscribe;
 
 include __DIR__ . '/00.basics.php';
 
+// This example uses full logger capabilities, watch out! Lots of debug information coming out!
 $logger = new Logger('main');
+// To adjust the level of logging, adjust last parameter of StreamHandler to something like Logger::INFO
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 $connectionParameters = new Parameters(new ClientId(basename(__FILE__)));

@@ -14,11 +14,16 @@ use unreal4u\MQTT\Protocol\Connect\Parameters;
 
 include __DIR__ . '/00.basics.php';
 
+$clientId = new ClientId(basename(__FILE__));
+
 // Create a new Message object
-$willMessage = new Message('If I die unexpectedly, please print this message', new Topic('client/errors'));
+$willMessage = new Message(
+    sprintf('If I die unexpectedly, please print this message. Used ClientId: %s', $clientId->getClientId()),
+    new Topic('client/errors')
+);
 
 // Now we will setup a new Connect Parameters object
-$parameters = new Parameters(new ClientId(basename(__FILE__)));
+$parameters = new Parameters($clientId);
 // Set the will message to the above created message
 $parameters->setWill($willMessage);
 
@@ -53,7 +58,7 @@ try {
  */
 for ($i = 0; $i < 3; $i++) {
     sleep(1);
-    if ($i === 2) {
+    if ($i === 1) {
         throw new \LogicException('Throwing an exception unexpectedly will not trigger the destructor');
     }
 }

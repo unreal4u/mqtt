@@ -50,6 +50,7 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
             // chr on QoS level is safe because it will create an 8-bit flag where the first 6 are only 0's
             $output .= $this->createUTF8String($topic->getTopicName());
         }
+
         return $output;
     }
 

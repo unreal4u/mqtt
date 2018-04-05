@@ -73,7 +73,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $this->specialFlags = 0;
 
         $variableHeaderContents .= $this->createVariableHeaderFlags();
-        $this->logger->info('Variable header created', ['specialFlags' => $this->specialFlags]);
 
         return $variableHeaderContents;
     }

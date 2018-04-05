@@ -25,7 +25,8 @@ $connect->setConnectionParameters(new Parameters(new ClientId('uniqueClientId123
 /** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */
 $connAck = $client->processObject($connect);
 
-var_dump(
-    'connect return code:', $connAck->connectReturnCode,
-    'client is connected?:', $client->isConnected()
+printf('Connection return code: %d.%sClient is connected: %s',
+    $connAck->getConnectReturnCode(),
+    PHP_EOL,
+    $client->isConnected() ? 'true' : 'false'
 );
