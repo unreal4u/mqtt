@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\DataTypes;
 
 use unreal4u\MQTT\Exceptions\InvalidBrokerPort;
+use unreal4u\MQTT\Exceptions\InvalidBrokerProtocol;
 
 /**
  * This Value Object will always contain a valid broker port.
@@ -23,12 +24,32 @@ final class BrokerPort
     private $brokerPort;
 
     /**
+     * If we should connect through SSL or TLS, this parameter should be set to true
+     * @var string
+     */
+    private $transmissionProtocol;
+
+    /**
+     * List of valid protocols that this package implements (or the broker can implement)
+     * @var array
+     */
+    private static $validProtocols = [
+        'tcp',
+        'ssl',
+        'tlsv1.0',
+        'tlsv1.1',
+        'tlsv1.2',
+    ];
+
+    /**
      * BrokerPort constructor.
      *
      * @param int $brokerPort
+     * @param string $transmissionProtocol
+     * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerProtocol
      * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerPort
      */
-    public function __construct(int $brokerPort = 1883)
+    public function __construct(int $brokerPort = 1883, string $transmissionProtocol = 'tcp')
     {
         if ($brokerPort > 65535 || $brokerPort < 1) {
             throw new InvalidBrokerPort(sprintf(
@@ -37,7 +58,15 @@ final class BrokerPort
             ));
         }
 
+        if (\in_array($transmissionProtocol, self::$validProtocols, true) === false) {
+            throw new InvalidBrokerProtocol(sprintf(
+                'You must provide a valid protocol (Provided: %s)',
+                $transmissionProtocol
+            ));
+        }
+
         $this->brokerPort = $brokerPort;
+        $this->transmissionProtocol = $transmissionProtocol;
     }
 
     /**
@@ -48,5 +77,13 @@ final class BrokerPort
     public function getBrokerPort(): int
     {
         return $this->brokerPort;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransmissionProtocol(): string
+    {
+        return $this->transmissionProtocol;
     }
 }

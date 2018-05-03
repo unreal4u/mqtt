@@ -1,0 +1,16 @@
+# To test this: git archive --format zip -v -o mqtt.zip HEAD
+tests/** export-ignore
+vendor/** export-ignore
+.vagrant/** export-ignore
+VagrantProvisionScripts/** export-ignore
+documentation-assets/** export-ignore
+docs/** export-ignore
+report/** export-ignore
+bin/** export-ignore
+
+.git* export-ignore
+.*.yml export-ignore
+phpunit.xml* export-ignore
+Vagrantfile export-ignore
+
+*.php diff=php

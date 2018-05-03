@@ -117,6 +117,7 @@ final class Parameters
      * @param ClientId $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
      * @param LoggerInterface $logger
+     * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerProtocol
      * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerPort
      * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
      */
@@ -134,8 +135,8 @@ final class Parameters
         }
         $this->setClientId($clientId);
         $this->setProtocolVersion(new ProtocolVersion(self::DEFAULT_PROTOCOL_VERSION));
-        // Set 1883 as the default port
-        $this->setBrokerPort(new BrokerPort(1883));
+        // Set 1883 as the default port on a non-secured channel
+        $this->setBrokerPort(new BrokerPort(1883, 'tcp'));
 
         $this->host = $host;
     }
@@ -195,7 +196,12 @@ final class Parameters
      */
     public function getConnectionUrl(): string
     {
-        return 'tcp://' . $this->host . ':' . $this->brokerPort->getBrokerPort();
+        return sprintf(
+            '%s://%s:%d',
+            $this->brokerPort->getTransmissionProtocol(),
+            $this->host,
+            $this->brokerPort->getBrokerPort()
+        );
     }
 
     /**

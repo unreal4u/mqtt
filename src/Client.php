@@ -159,7 +159,7 @@ final class Client extends ProtocolBase implements ClientInterface
      */
     private function checkForConnectionErrors(int $errorCode, string $errorDescription): self
     {
-        if ($errorCode !== 0) {
+        if ($errorCode !== 0 || $this->socket === false) {
             $this->logger->critical('Could not connect to broker', [
                 'errorCode' => $errorCode,
                 'errorDescription' => $errorDescription,
@@ -191,12 +191,30 @@ final class Client extends ProtocolBase implements ClientInterface
             STREAM_CLIENT_CONNECT
         );
 
-        $this->checkForConnectionErrors($errorCode, $errorDescription);
-
-        stream_set_timeout($this->socket, (int)floor($this->connectionParameters->getKeepAlivePeriod() * 1.5));
+        $this
+            ->checkForConnectionErrors($errorCode, $errorDescription)
+            ->setSocketTimeout();
 
         $this->logger->debug('Created socket connection successfully, continuing', stream_get_meta_data($this->socket));
         return true;
+    }
+
+    /**
+     * Calculates and sets the timeout on the socket connection according to the MQTT standard
+     *
+     * 1.5 times the keep alive period is the maximum amount of time the connection may remain idle before the
+     * broker decides to close it.
+     * Odd numbers will also produce a 0.5 second extra time, take this into account as well
+     *
+     * @return Client
+     */
+    private function setSocketTimeout(): self
+    {
+        $timeCalculation = $this->connectionParameters->getKeepAlivePeriod() * 1.5;
+        $seconds = (int)floor($timeCalculation);
+        stream_set_timeout($this->socket, $seconds, (int)($timeCalculation - $seconds) * 1000);
+
+        return $this;
     }
 
     /**
