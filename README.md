@@ -5,9 +5,12 @@ Complete PHP7+ MQTT client with full support for
 entire rewrite of [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
 ## This project in badges
+[![Latest Stable Version](https://poser.pugx.org/unreal4u/mqtt/v/stable)](https://packagist.org/packages/unreal4u/mqtt)
+[![Total Downloads](https://poser.pugx.org/unreal4u/mqtt/downloads)](https://packagist.org/packages/unreal4u/mqtt)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/unreal4u/mqtt/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/unreal4u/mqtt/?branch=master)
 [![Build Status](https://travis-ci.org/unreal4u/mqtt.svg)](https://travis-ci.org/unreal4u/mqtt)
+[![License](https://poser.pugx.org/unreal4u/mqtt/license)](https://packagist.org/packages/unreal4u/mqtt)
 
 ## What is MQTT?
 
