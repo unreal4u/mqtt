@@ -32,6 +32,10 @@ incorrectly parsing such filters.
 This package uses sockets to communicate (a)synchronously with the broker. If you don't want this, you are free to
 create your own client, for which you'll just have to implement an interface.
 
+## Examples
+
+This package has many examples detailing the many things you can do with it. Please check the [examples directory](https://github.com/unreal4u/mqtt/tree/master/examples) for more information. In case of questions or doubt, [open up an Issue](https://github.com/unreal4u/mqtt/issues/new) or submit a [Pull Request](https://github.com/unreal4u/mqtt/pulls) if you feel the need to clarify, correct or add more examples.
+
 # References
 **[mqtt-v3.1.1-plus-errata01]**
 
