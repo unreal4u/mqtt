@@ -19,7 +19,7 @@ Please read the [following wiki page](https://github.com/unreal4u/mqtt/wiki/What
 ## Capabilities of this package: 
 
 This package is able to:
-- Connect to the broker (SSL not tested yet). You can connect with virtually all optional parameters the protocol
+- Connect to the broker. You can connect with virtually all optional parameters the protocol
 supports, including Will Message. The only exception to the rule is the clean session flag. This is not tested and may
 or may not work as intended.
 - Publish QoS level 0, 1 and 2 messages. All protocol supported parameters are also supported, such as retained messages
