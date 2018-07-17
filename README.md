@@ -16,9 +16,9 @@ entire rewrite of [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
 Please read the [following wiki page](https://github.com/unreal4u/mqtt/wiki/What-is-MQTT%3F) for that :)
 Don't forget to read the other articles which may contain more useful information: 
-[What is QoS?](https://github.com/unreal4u/mqtt/wiki/What-is-QoS%3F)
-[Difference between QoS and Retainability](https://github.com/unreal4u/mqtt/wiki/Difference-between-retain-and-QoS)
-[What is ClientId?](https://github.com/unreal4u/mqtt/wiki/Why-is-the-ClientId-important%3F)
+[What is QoS?](https://github.com/unreal4u/mqtt/wiki/What-is-QoS%3F)  
+[Difference between QoS and Retainability](https://github.com/unreal4u/mqtt/wiki/Difference-between-retain-and-QoS)  
+[What is ClientId?](https://github.com/unreal4u/mqtt/wiki/Why-is-the-ClientId-important%3F)  
 
 ## Capabilities of this package: 
 
