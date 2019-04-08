@@ -22,7 +22,7 @@ final class Client extends ProtocolBase implements ClientInterface
 {
     /**
      * Where all the magic happens
-     * @var Resource
+     * @var Resource|null
      */
     private $socket;
 
@@ -159,7 +159,7 @@ final class Client extends ProtocolBase implements ClientInterface
      */
     private function checkForConnectionErrors(int $errorCode, string $errorDescription): self
     {
-        if ($errorCode !== 0 || $this->socket === false) {
+        if ($errorCode !== 0 || $this->socket === null) {
             $this->logger->critical('Could not connect to broker', [
                 'errorCode' => $errorCode,
                 'errorDescription' => $errorDescription,

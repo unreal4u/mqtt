@@ -16,7 +16,8 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class EmptyWritableResponse extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
 
     const CONTROL_PACKET_VALUE = 0;
 

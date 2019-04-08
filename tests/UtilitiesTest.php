@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace tests\unreal4u\MQTT;
 
 use PHPUnit\Framework\TestCase;
+use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
 
 class UtilitiesTest extends TestCase
@@ -80,5 +81,61 @@ class UtilitiesTest extends TestCase
     public function test_convertBinaryStringToNumber(int $expectedOutput, string $binaryString)
     {
         $this->assertSame($expectedOutput, Utilities::convertBinaryStringToNumber(base64_decode($binaryString)));
+    }
+
+    /**
+     * Tests whether a message that is too big will throw an exception
+     */
+    public function test_formatRemainingLengthOutputIsTooLarge()
+    {
+        $this->expectException(MessageTooBig::class);
+        Utilities::formatRemainingLengthOutput(268435456);
+    }
+
+    /**
+     * @return array
+     */
+    public function provider_remainingLength(): array
+    {
+        // Min. possible values, 1 byte long
+        $mapValues[] = [0, 'AA=='];
+        $mapValues[] = [1, 'AQ=='];
+        $mapValues[] = [2, 'Ag=='];
+        // Most probable cases, 1 to 2 bytes long
+        $mapValues[] = [24, 'GA=='];
+        $mapValues[] = [127, 'fw=='];
+        $mapValues[] = [128, 'gAE='];
+        $mapValues[] = [129, 'gQE='];
+        $mapValues[] = [200, 'yAE='];
+        $mapValues[] = [364, '7AI='];
+        $mapValues[] = [1023, '/wc='];
+        // One extra byte
+        $mapValues[] = [16385, 'gYAB'];
+        $mapValues[] = [25897, 'qcoB'];
+        // Maximum number of bytes used in remaining length: 4
+        $mapValues[] = [2097153, 'gYCAAQ=='];
+        $mapValues[] = [268435455, '////fw=='];
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_remainingLength
+     * @param int $lengthInBytes
+     * @param string $expectedOutput
+     */
+    public function test_formatRemainingLengthOutput(int $lengthInBytes, string $expectedOutput)
+    {
+        $this->assertSame($expectedOutput, base64_encode(Utilities::formatRemainingLengthOutput($lengthInBytes)));
+    }
+
+    /**
+     * @dataProvider provider_remainingLength
+     * @param string $encodedLength
+     * @param int $expectedOutput
+     */
+    public function test_convertRemainingLengthStringToInt(int $expectedOutput, string $encodedLength)
+    {
+        $this->assertSame($expectedOutput, Utilities::convertRemainingLengthStringToInt(base64_decode($encodedLength)));
     }
 }

@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
+use DomainException;
+use OutOfRangeException;
 use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
+use function chr;
+use function get_class;
+use function strlen;
 
 /**
  * Trait WritableContent
@@ -37,55 +42,27 @@ trait WritableContent
      *
      * @param int $variableHeaderLength
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @throws MessageTooBig
      */
     final public function createFixedHeader(int $variableHeaderLength): string
     {
         $this->logger->debug('Creating fixed header with values', [
-            'controlPacketValue' => static::CONTROL_PACKET_VALUE,
+            'controlPacketValue' => self::getControlPacketValue(),
             'specialFlags' => $this->specialFlags,
             'variableHeaderLength' => $variableHeaderLength,
-            'composed' => decbin(\chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags)),
+            'composed' => decbin(chr((self::getControlPacketValue() << 4) | $this->specialFlags)),
         ]);
 
         // Binary OR is safe to do because the first 4 bits are always 0 after shifting
         return
-            \chr((static::CONTROL_PACKET_VALUE << 4) | $this->specialFlags) .
-            $this->getRemainingLength($variableHeaderLength);
-    }
-
-    /**
-     * Returns the correct format for the length in bytes of the remaining bytes
-     *
-     * @param int $lengthInBytes
-     * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
-     */
-    final public function getRemainingLength(int $lengthInBytes): string
-    {
-        if ($lengthInBytes > 268435455) {
-            throw new MessageTooBig('The message cannot exceed 268435455 bytes in length');
-        }
-
-        $x = $lengthInBytes;
-        $outputString = '';
-        do {
-            $encodedByte = $x % 128;
-            $x >>= 7; // Shift 7 bytes
-            // if there are more data to encode, set the top bit of this byte
-            if ($x > 0) {
-                $encodedByte |= 128;
-            }
-            $outputString .= \chr($encodedByte);
-        } while ($x > 0);
-
-        return $outputString;
+            chr((self::getControlPacketValue() << 4) | $this->specialFlags) .
+            Utilities::formatRemainingLengthOutput($variableHeaderLength);
     }
 
     /**
      * Creates the entire message
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @throws MessageTooBig
      */
     final public function createSendableMessage(): string
     {
@@ -93,7 +70,7 @@ trait WritableContent
         $this->logger->debug('Created variable header', ['variableHeader' => base64_encode($variableHeader)]);
         $payload = $this->createPayload();
         $this->logger->debug('Created payload', ['payload' => base64_encode($payload)]);
-        $fixedHeader = $this->createFixedHeader(\strlen($variableHeader . $payload));
+        $fixedHeader = $this->createFixedHeader(strlen($variableHeader . $payload));
         $this->logger->debug('Created fixed header', ['fixedHeader' => base64_encode($fixedHeader)]);
 
         return $fixedHeader . $variableHeader . $payload;
@@ -118,13 +95,13 @@ trait WritableContent
      *
      * @param string $nonFormattedString
      * @return string
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     final public function createUTF8String(string $nonFormattedString): string
     {
         $returnString = '';
         if ($nonFormattedString !== '') {
-            $returnString = Utilities::convertNumberToBinaryString(\strlen($nonFormattedString)) . $nonFormattedString;
+            $returnString = Utilities::convertNumberToBinaryString(strlen($nonFormattedString)) . $nonFormattedString;
         }
 
         return $returnString;
@@ -137,11 +114,11 @@ trait WritableContent
      * @param ClientInterface $client
      *
      * @return ReadableContentInterface
-     * @throws \DomainException
+     * @throws DomainException
      */
     public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
+        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => get_class($this)]);
 
         $eventManager = new EventManager($this->logger);
         return $eventManager->analyzeHeaders($brokerBitStream, $client);

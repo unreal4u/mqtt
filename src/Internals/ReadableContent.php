@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
+use unreal4u\MQTT\Utilities;
+use function ord;
 
 /**
  * Trait ReadableContent
@@ -19,15 +21,21 @@ trait ReadableContent
     protected $variableHeaderSize = 0;
 
     /**
+     * The remaining length field may be from 1 to 4 bytes long, this field will represent that offset
+     * @var int
+     */
+    private $sizeOfRemainingLengthField = 1;
+
+    /**
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     * @throws InvalidResponseType
      */
     final public function instantiateObject(string $rawMQTTHeaders, ClientInterface $client): bool
     {
         //var_dump(base64_encode($rawMQTTHeaders)); // Make it a bit easier to create unit tests
-        $this->checkControlPacketValue(\ord($rawMQTTHeaders[0]) >> 4);
+        $this->checkControlPacketValue(ord($rawMQTTHeaders[0]) >> 4);
         $this->fillObject($rawMQTTHeaders, $client);
 
         return true;
@@ -38,7 +46,7 @@ trait ReadableContent
      *
      * @param int $controlPacketValue
      * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     * @throws InvalidResponseType
      */
     private function checkControlPacketValue(int $controlPacketValue): bool
     {
@@ -52,6 +60,36 @@ trait ReadableContent
         }
 
         return true;
+    }
+
+    /**
+     * Returns the correct format for the length in bytes of the remaining bytes
+     *
+     * @param string $firstRemainingLengthByte
+     * @param ClientInterface $client
+     * @param string $rawMQTTHeaders
+     * @return int
+     */
+    private function calculateSizeOfRemainingLengthField(
+        string $firstRemainingLengthByte,
+        ClientInterface $client,
+        string $rawMQTTHeaders = ''
+    ): int {
+        // Early return: assume defaults if first digit has a value under 128, no further need for complex checks
+        if (ord($firstRemainingLengthByte{0}) < 128) {
+            return ord($firstRemainingLengthByte{0});
+        }
+
+        if (strlen($rawMQTTHeaders) < 4) {
+            // If we enter this condition, it is safe to assume that we can at least read 3 more bytes of the stream
+            $rawMQTTHeaders .= $client->readBrokerData(3);
+        }
+
+        // Estimate how much longer is the remaining length field
+        // This will also set $this->sizeOfRemainingLengthField in order to calculate the offset
+
+        // Pass it to our utilities function and return that
+        return Utilities::convertRemainingLengthStringToInt($firstRemainingLengthByte);
     }
 
     /**
