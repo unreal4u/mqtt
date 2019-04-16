@@ -17,6 +17,8 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
  */
 final class EmptyReadableResponse extends ProtocolBase implements ReadableContentInterface
 {
+    const CONTROL_PACKET_VALUE = 0;
+
     use ReadableContent;
 
     /**

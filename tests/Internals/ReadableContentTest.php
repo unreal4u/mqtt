@@ -26,24 +26,53 @@ class ReadableContentTest extends TestCase
         $pingResp->instantiateObject($success, new ClientMock());
     }
 
+    public function provider_performRemainingLengthFieldOperations(): array
+    {
+        $mapValues[] = ['Ag==', 1]; // remaining length: 2, which is 1 byte long
+        $mapValues[] = ['yAE=', 2]; // remaining length: 200, which is 2 bytes long
+        $mapValues[] = ['qcoB', 3]; // remaining length: 25897, which is 3 bytes long
+        $mapValues[] = ['////fw==', 4]; // remaining length: 268435455, which is 4 bytes long
+
+        return $mapValues;
+    }
+
+    /**
+     * @dataProvider provider_performRemainingLengthFieldOperations
+     * @param string $binaryText
+     * @param int $numericRepresentation
+     */
+    public function test_performRemainingLengthFieldOperations(string $binaryText, int $numericRepresentation)
+    {
+        $clientMock = new ClientMock();
+        $clientMock->returnSpecificBrokerData(['']);
+        $returnValue = $this->performRemainingLengthFieldOperations($binaryText, $clientMock);
+        $this->assertSame($numericRepresentation, $returnValue);
+    }
+
     public function provider_calculateSizeOfRemainingLengthField(): array
     {
-        $mapValues[] = [chr(50), chr(50)];
-        $mapValues[] = [chr(240), chr(240)];
-        $mapValues[] = [chr(1024), chr(1024)];
+        $mapValues[] = [1, 1];
+        $mapValues[] = [2, 1];
+        $mapValues[] = [50, 1];
+        $mapValues[] = [128, 2];
+        $mapValues[] = [1280, 2];
+        $mapValues[] = [16400, 3];
+        $mapValues[] = [2097150, 3];
+        $mapValues[] = [2097152, 4];
+        $mapValues[] = [268435455, 4];
 
         return $mapValues;
     }
 
     /**
      * @dataProvider provider_calculateSizeOfRemainingLengthField
-     * @param string $binaryText
-     * @param string $numericRepresentation
+     * @param int $size
+     * @param int $expectedByteSize
      */
-    public function test_calculateSizeOfRemainingLengthField(string $binaryText, string $numericRepresentation)
+    public function test_calculateSizeOfRemainingLengthField(int $size, int $expectedByteSize)
     {
-        $returnValue = $this->calculateSizeOfRemainingLengthField($binaryText, new ClientMock());
-        $this->assertSame($numericRepresentation, $returnValue);
+        $returnValue = $this->calculateSizeOfRemainingLengthField($size);
+        $this->assertSame($expectedByteSize, $returnValue);
     }
 
     /**

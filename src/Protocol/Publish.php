@@ -263,23 +263,18 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private function completePossibleIncompleteMessage(string $rawMQTTHeaders, ClientInterface $client): string
     {
-        if (strlen($rawMQTTHeaders) === 1) {
-            $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
-            $restOfBytes = $this->calculateSizeOfRemainingLengthField(
-                $client->readBrokerData(1),
-                $client,
-                $rawMQTTHeaders
-            );
-            $payload = $client->readBrokerData($restOfBytes);
-        } else {
-            $this->logger->debug('More than 1 byte detected, calculating and retrieving the rest');
-            $restOfBytes = $this->calculateSizeOfRemainingLengthField($rawMQTTHeaders{1}, $client, $rawMQTTHeaders);
+        $restOfBytes = $this->performRemainingLengthFieldOperations($rawMQTTHeaders, $client);
+        #if (strlen($rawMQTTHeaders) === 1) {
+        #    $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
+        #    $payload = $client->readBrokerData($restOfBytes);
+        #} else {
+        #    $this->logger->debug('More than 1 byte detected, calculating and retrieving the rest');
 
             $payload = substr($rawMQTTHeaders, 2);
             $exactRest = $restOfBytes - strlen($payload);
             $payload .= $client->readBrokerData($exactRest);
             $rawMQTTHeaders = $rawMQTTHeaders{0};
-        }
+        #}
 
         // $rawMQTTHeaders may be redefined
         return $rawMQTTHeaders . chr($restOfBytes) . $payload;

@@ -65,19 +65,17 @@ trait ReadableContent
     /**
      * Returns the correct format for the length in bytes of the remaining bytes
      *
-     * @param string $firstRemainingLengthByte
      * @param ClientInterface $client
      * @param string $rawMQTTHeaders
      * @return int
      */
-    private function calculateSizeOfRemainingLengthField(
-        string $firstRemainingLengthByte,
-        ClientInterface $client,
-        string $rawMQTTHeaders = ''
+    private function performRemainingLengthFieldOperations(
+        string &$rawMQTTHeaders,
+        ClientInterface $client
     ): int {
         // Early return: assume defaults if first digit has a value under 128, no further need for complex checks
-        if (ord($firstRemainingLengthByte{0}) < 128) {
-            return ord($firstRemainingLengthByte{0});
+        if (ord($rawMQTTHeaders{0}) < 128) {
+            return ord($rawMQTTHeaders{0});
         }
 
         if (strlen($rawMQTTHeaders) < 4) {
@@ -85,11 +83,29 @@ trait ReadableContent
             $rawMQTTHeaders .= $client->readBrokerData(3);
         }
 
-        // Estimate how much longer is the remaining length field
-        // This will also set $this->sizeOfRemainingLengthField in order to calculate the offset
+        $remainingBytes = Utilities::convertRemainingLengthStringToInt($rawMQTTHeaders);
 
-        // Pass it to our utilities function and return that
-        return Utilities::convertRemainingLengthStringToInt($firstRemainingLengthByte);
+        // Estimate how much longer is the remaining length field, this will also set $this->sizeOfRemainingLengthField
+        $this->calculateSizeOfRemainingLengthField($remainingBytes);
+        return $remainingBytes;
+    }
+
+    /**
+     * Sets the offset of the remaining length field
+     *
+     * @param int $size
+     * @return int
+     */
+    private function calculateSizeOfRemainingLengthField(int $size): int
+    {
+        $blockSize = $iterations = 0;
+        while ($size >= $blockSize) {
+            $iterations++;
+            $blockSize = 128 ** $iterations;
+        }
+
+        $this->sizeOfRemainingLengthField = $iterations;
+        return $iterations;
     }
 
     /**
