@@ -7,6 +7,7 @@ namespace unreal4u\MQTT\Internals;
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
 use unreal4u\MQTT\Utilities;
 use function ord;
+use function strlen;
 
 /**
  * Trait ReadableContent
@@ -78,9 +79,10 @@ trait ReadableContent
             return ord($rawMQTTHeaders{0});
         }
 
+        // If we have less than 4 bytes now, we should really try to recover the rest of the remaining field data
         if (strlen($rawMQTTHeaders) < 4) {
-            // If we enter this condition, it is safe to assume that we can at least read 3 more bytes of the stream
-            $rawMQTTHeaders .= $client->readBrokerData(3);
+            // At this point we could actually read at least 128 as a minimum, but restrict it to what we need right now
+            $rawMQTTHeaders .= $client->readBrokerData(4 - strlen($rawMQTTHeaders));
         }
 
         $remainingBytes = Utilities::convertRemainingLengthStringToInt($rawMQTTHeaders);
