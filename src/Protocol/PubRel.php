@@ -27,7 +27,9 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
+    use ReadableContent, /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent,
+        PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 6;
 

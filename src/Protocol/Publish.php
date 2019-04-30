@@ -4,12 +4,21 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use InvalidArgumentException;
+use OutOfBoundsException;
+use OutOfRangeException;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\DataTypes\TopicName;
+use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Exceptions\InvalidRequest;
+use unreal4u\MQTT\Exceptions\InvalidResponseType;
+use unreal4u\MQTT\Exceptions\MessageTooBig;
+use unreal4u\MQTT\Exceptions\MissingTopicName;
+use unreal4u\MQTT\Exceptions\NotConnected;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -18,6 +27,8 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
+use function ord;
+use function strlen;
 
 /**
  * A PUBLISH Control Packet is sent from a Client to a Server or vice-versa to transport an Application Message.
@@ -38,7 +49,9 @@ use unreal4u\MQTT\Utilities;
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
+    use ReadableContent, /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent,
+        PacketIdentifierFunctionality;
 
     const CONTROL_PACKET_VALUE = 3;
 
@@ -57,15 +70,15 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
-     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
-     * @throws \OutOfRangeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidQoSLevel
+     * @throws MissingTopicName
+     * @throws OutOfRangeException
+     * @throws InvalidArgumentException
      */
     public function createVariableHeader(): string
     {
         if ($this->message === null) {
-            throw new \InvalidArgumentException('You must at least provide a message object with a topic name');
+            throw new InvalidArgumentException('You must at least provide a message object with a topic name');
         }
 
         $variableHeaderContents = $this->createUTF8String($this->message->getTopicName());
@@ -81,8 +94,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Sets some common flags and returns the variable header string should there be one
      *
      * @return string
-     * @throws \OutOfRangeException
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws OutOfRangeException
+     * @throws InvalidQoSLevel
      */
     private function createVariableHeaderFlags(): string
     {
@@ -111,14 +124,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
 
     /**
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
-     * @throws \InvalidArgumentException
+     * @throws MissingTopicName
+     * @throws MessageTooBig
+     * @throws InvalidArgumentException
      */
     public function createPayload(): string
     {
         if ($this->message === null) {
-            throw new \InvalidArgumentException('A message must be set before publishing');
+            throw new InvalidArgumentException('A message must be set before publishing');
         }
         return $this->message->getPayload();
     }
@@ -126,7 +139,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     /**
      * QoS level 0 does not have to wait for a answer, so return false. Any other QoS level returns true
      * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws InvalidQoSLevel
      */
     public function shouldExpectAnswer(): bool
     {
@@ -141,7 +154,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $brokerBitStream
      * @param ClientInterface $client
      * @return ReadableContentInterface
-     * @throws \unreal4u\MQTT\Exceptions\InvalidResponseType
+     * @throws InvalidResponseType
      */
     public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
@@ -188,7 +201,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param int $firstByte
      * @param QoSLevel $qoSLevel
      * @return Publish
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws InvalidQoSLevel
      */
     private function analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel): Publish
     {
@@ -218,7 +231,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      *
      * @param int $bitString
      * @return QoSLevel
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws InvalidQoSLevel
      */
     private function determineIncomingQoSLevel(int $bitString): QoSLevel
     {
@@ -242,28 +255,38 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return string
-     * @throws \OutOfBoundsException
-     * @throws \InvalidArgumentException
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws OutOfBoundsException
+     * @throws InvalidArgumentException
+     * @throws MessageTooBig
+     * @throws InvalidQoSLevel
      */
     private function completePossibleIncompleteMessage(string $rawMQTTHeaders, ClientInterface $client): string
     {
-        if (\strlen($rawMQTTHeaders) === 1) {
-            $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
-            $restOfBytes = $client->readBrokerData(1);
-            $payload = $client->readBrokerData(\ord($restOfBytes));
-        } else {
-            $this->logger->debug('More than 1 byte detected, calculating and retrieving the rest');
-            $restOfBytes = $rawMQTTHeaders{1};
-            $payload = substr($rawMQTTHeaders, 2);
-            $exactRest = \ord($restOfBytes) - \strlen($payload);
-            $payload .= $client->readBrokerData($exactRest);
-            $rawMQTTHeaders = $rawMQTTHeaders{0};
+        // Read at least one extra byte from the stream if we know that the message is too short
+        if (strlen($rawMQTTHeaders) < 2) {
+            $rawMQTTHeaders .= $client->readBrokerData(1);
         }
 
-        // $rawMQTTHeaders may be redefined
-        return $rawMQTTHeaders . $restOfBytes . $payload;
+        $restOfBytes = $this->performRemainingLengthFieldOperations($rawMQTTHeaders, $client);
+
+        /*
+         * A complete message consists of:
+         *  - The very first byte
+         *  - The size of the remaining length field (from 1 to 4 bytes)
+         *  - The $restOfBytes
+         *
+         * So we have to compare what we already have vs the above calculation
+         *
+         * More information:
+         * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180832
+         */
+        if (strlen($rawMQTTHeaders) < ($restOfBytes + $this->sizeOfRemainingLengthField + 1)) {
+            // Read only the portion of data we have left from the socket
+            $readableDataLeft = ($restOfBytes + $this->sizeOfRemainingLengthField + 1) - strlen($rawMQTTHeaders);
+            $rawMQTTHeaders .= $client->readBrokerData($readableDataLeft);
+        }
+
+        return $rawMQTTHeaders;
     }
 
     /**
@@ -271,29 +294,34 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
-     * @throws \OutOfBoundsException
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
+     * @throws MessageTooBig
+     * @throws OutOfBoundsException
+     * @throws InvalidQoSLevel
+     * @throws InvalidArgumentException
+     * @throws OutOfRangeException
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $rawMQTTHeaders = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
+        // Retrieve full message first
+        $fullMessage = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
         // Handy to maintain for debugging purposes
         #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
-        // TopicFilter size is always the 3rd byte
-        $firstByte = \ord($rawMQTTHeaders{0});
-        $topicSize = \ord($rawMQTTHeaders{3});
+        // Handy to have: the first byte
+        $firstByte = ord($fullMessage{0});
+        // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
+        $topicSize = ord($fullMessage{$this->sizeOfRemainingLengthField + 2});
+        // With the first byte, we can determine the QoS level of the incoming message
         $qosLevel = $this->determineIncomingQoSLevel($firstByte);
 
-        $messageStartPosition = 4;
+        $messageStartPosition = $this->sizeOfRemainingLengthField + 3;
+        // If we have a QoS level present, we must retrieve the packet identifier as well
         if ($qosLevel->getQoSLevel() > 0) {
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
             $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
-                $rawMQTTHeaders{4 + $topicSize} . $rawMQTTHeaders{5 + $topicSize}
+                $fullMessage{$this->sizeOfRemainingLengthField + 3 + $topicSize} .
+                $fullMessage{$this->sizeOfRemainingLengthField + 4 + $topicSize}
             )));
             $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
             $messageStartPosition += 2;
@@ -302,8 +330,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
         $this->message = new Message(
             // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
-            substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
-            new TopicName(substr($rawMQTTHeaders, 4, $topicSize))
+            substr($fullMessage, $messageStartPosition + $topicSize),
+            new TopicName(substr($fullMessage, $this->sizeOfRemainingLengthField + 3, $topicSize))
         );
         $this->analyzeFirstByte($firstByte, $qosLevel);
 
@@ -315,17 +343,15 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             #'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(), // This is not always set!
         ]);
 
-
         return $this;
     }
 
     /**
      * @inheritdoc
-     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws InvalidRequest
+     * @throws InvalidQoSLevel
+     * @throws NotConnected
+     * @throws NoConnectionParametersDefined
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {
@@ -349,7 +375,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Composes a PubRec answer with the same packetIdentifier as what we received
      *
      * @return PubRec
-     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
+     * @throws InvalidRequest
      */
     private function composePubRecAnswer(): PubRec
     {
@@ -363,7 +389,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Composes a PubAck answer with the same packetIdentifier as what we received
      *
      * @return PubAck
-     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
+     * @throws InvalidRequest
      */
     private function composePubAckAnswer(): PubAck
     {
@@ -377,7 +403,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      * Will check whether the current object has a packet identifier set. If not, we are in serious problems!
      *
      * @return Publish
-     * @throws \unreal4u\MQTT\Exceptions\InvalidRequest
+     * @throws InvalidRequest
      */
     private function checkForValidPacketIdentifier(): self
     {

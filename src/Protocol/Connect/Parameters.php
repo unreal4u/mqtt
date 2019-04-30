@@ -44,7 +44,7 @@ final class Parameters
      *
      * @var ClientId
      */
-    private $clientId = '';
+    private $clientId;
 
     /**
      * The keep alive is a time interval in seconds (defaults to 60), the clients commits to by sending regular PING

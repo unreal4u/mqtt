@@ -28,7 +28,7 @@ final class TopicFilter extends GeneralTopicRules
      *
      * @var QoSLevel
      */
-    private $qosLevel = 0;
+    private $qosLevel;
 
     /**
      * TopicFilter constructor.
