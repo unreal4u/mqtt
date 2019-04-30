@@ -27,7 +27,6 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
-use function chr;
 use function ord;
 use function strlen;
 
@@ -263,21 +262,31 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
      */
     private function completePossibleIncompleteMessage(string $rawMQTTHeaders, ClientInterface $client): string
     {
+        // Read at least one extra byte from the stream if we know that the message is too short
+        if (strlen($rawMQTTHeaders) < 2) {
+            $rawMQTTHeaders .= $client->readBrokerData(1);
+        }
+
         $restOfBytes = $this->performRemainingLengthFieldOperations($rawMQTTHeaders, $client);
-        #if (strlen($rawMQTTHeaders) === 1) {
-        #    $this->logger->debug('Only one incoming byte, retrieving rest of size and the full payload');
-        #    $payload = $client->readBrokerData($restOfBytes);
-        #} else {
-        #    $this->logger->debug('More than 1 byte detected, calculating and retrieving the rest');
 
-            $payload = substr($rawMQTTHeaders, 2);
-            $exactRest = $restOfBytes - strlen($payload);
-            $payload .= $client->readBrokerData($exactRest);
-            $rawMQTTHeaders = $rawMQTTHeaders{0};
-        #}
+        /*
+         * A complete message consists of:
+         *  - The very first byte
+         *  - The size of the remaining length field (from 1 to 4 bytes)
+         *  - The $restOfBytes
+         *
+         * So we have to compare what we already have vs the above calculation
+         *
+         * More information:
+         * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180832
+         */
+        if (strlen($rawMQTTHeaders) < ($restOfBytes + $this->sizeOfRemainingLengthField + 1)) {
+            // Read only the portion of data we have left from the socket
+            $readableDataLeft = ($restOfBytes + $this->sizeOfRemainingLengthField + 1) - strlen($rawMQTTHeaders);
+            $rawMQTTHeaders .= $client->readBrokerData($readableDataLeft);
+        }
 
-        // $rawMQTTHeaders may be redefined
-        return $rawMQTTHeaders . chr($restOfBytes) . $payload;
+        return $rawMQTTHeaders;
     }
 
     /**
@@ -294,14 +303,14 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
         // Retrieve full message first
-        $rawMQTTHeaders = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
+        $fullMessage = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
         // Handy to maintain for debugging purposes
         #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
         // Handy to have: the first byte
-        $firstByte = ord($rawMQTTHeaders{0});
+        $firstByte = ord($fullMessage{0});
         // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
-        $topicSize = ord($rawMQTTHeaders{$this->sizeOfRemainingLengthField + 2});
+        $topicSize = ord($fullMessage{$this->sizeOfRemainingLengthField + 2});
         // With the first byte, we can determine the QoS level of the incoming message
         $qosLevel = $this->determineIncomingQoSLevel($firstByte);
 
@@ -311,8 +320,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
             $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
-                $rawMQTTHeaders{$this->sizeOfRemainingLengthField + 3 + $topicSize} .
-                $rawMQTTHeaders{$this->sizeOfRemainingLengthField + 4 + $topicSize}
+                $fullMessage{$this->sizeOfRemainingLengthField + 3 + $topicSize} .
+                $fullMessage{$this->sizeOfRemainingLengthField + 4 + $topicSize}
             )));
             $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
             $messageStartPosition += 2;
@@ -321,8 +330,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
         $this->message = new Message(
             // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
-            substr($rawMQTTHeaders, $messageStartPosition + $topicSize),
-            new TopicName(substr($rawMQTTHeaders, $this->sizeOfRemainingLengthField + 3, $topicSize))
+            substr($fullMessage, $messageStartPosition + $topicSize),
+            new TopicName(substr($fullMessage, $this->sizeOfRemainingLengthField + 3, $topicSize))
         );
         $this->analyzeFirstByte($firstByte, $qosLevel);
 

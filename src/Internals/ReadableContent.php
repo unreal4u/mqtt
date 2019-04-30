@@ -75,8 +75,8 @@ trait ReadableContent
         ClientInterface $client
     ): int {
         // Early return: assume defaults if first digit has a value under 128, no further need for complex checks
-        if (ord($rawMQTTHeaders{0}) < 128) {
-            return ord($rawMQTTHeaders{0});
+        if (ord($rawMQTTHeaders{1}) < 128) {
+            return ord($rawMQTTHeaders{1});
         }
 
         // If we have less than 4 bytes now, we should really try to recover the rest of the remaining field data
@@ -85,7 +85,7 @@ trait ReadableContent
             $rawMQTTHeaders .= $client->readBrokerData(4 - strlen($rawMQTTHeaders));
         }
 
-        $remainingBytes = Utilities::convertRemainingLengthStringToInt($rawMQTTHeaders);
+        $remainingBytes = Utilities::convertRemainingLengthStringToInt(substr($rawMQTTHeaders, 1, 4));
 
         // Estimate how much longer is the remaining length field, this will also set $this->sizeOfRemainingLengthField
         $this->calculateSizeOfRemainingLengthField($remainingBytes);

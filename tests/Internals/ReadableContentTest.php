@@ -29,10 +29,10 @@ class ReadableContentTest extends TestCase
 
     public function provider_performRemainingLengthFieldOperations(): array
     {
-        $mapValues[] = [base64_decode('Ag=='), 1]; // remaining length: 2, which is 1 byte long
-        $mapValues[] = [base64_decode('yAE='), 2]; // remaining length: 200, which is 2 bytes long
-        $mapValues[] = [base64_decode('qcoB'), 3]; // remaining length: 25897, which is 3 bytes long
-        $mapValues[] = [base64_decode('////fw=='), 4]; // remaining length: 268435455, which is 4 bytes long
+        $mapValues[] = [base64_decode('IAI='), 2]; // remaining length: 2, which is 1 byte long
+        $mapValues[] = [base64_decode('IMgB'), 200]; // remaining length: 200, which is 2 bytes long
+        $mapValues[] = [base64_decode('IKnKAQ=='), 25897]; // remaining length: 25897, which is 3 bytes long
+        $mapValues[] = [base64_decode('IP///38='), 268435455]; // remaining length: 268435455, which is 4 bytes long
 
         return $mapValues;
     }

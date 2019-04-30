@@ -205,7 +205,6 @@ class PublishTest extends TestCase
      * @param int $QoSLevel
      * @param int $packetIdentifier
      * @param string $expectedClassType
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
      */
     public function test_performSpecialActions(int $QoSLevel, int $packetIdentifier, string $expectedClassType)
     {
@@ -293,7 +292,8 @@ class PublishTest extends TestCase
         $output = base64_encode($method->invoke($this->publish, base64_decode($firstBytes), $clientMock));
 
         $this->assertSame($expectedOutput, $output);
-        $this->assertTrue($clientMock->readBrokerDataWasCalled());
+        // If there is no more data to read, readBrokerData should never even be called
+        $this->assertSame($append !== '', $clientMock->readBrokerDataWasCalled());
     }
 
     public function provider_fillObject(): array
@@ -302,10 +302,23 @@ class PublishTest extends TestCase
         $mapVal[] = ['MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', 0, 'firstTest', '汉A字BC', 0];
         // QoS 1 with packetIdentifier 10
         $mapVal[] = ['MiIACWZpcnN0VGVzdAAKSGVsbG8gd29ybGQhISAoMSAvIDMp', 1, 'firstTest', 'Hello world!! (1 / 3)', 10];
-        // QoS 1 with packetIdentigier 15 and different message
+        // QoS 1 with packetIdentifier 15 and different message
         $mapVal[] = ['MiIACWZpcnN0VGVzdAAPSGVsbG8gd29ybGQhISAoMyAvIDMp', 1, 'firstTest', 'Hello world!! (3 / 3)', 15];
         // QoS 2 with packetIdentifier 16
         $mapVal[] = ['NCIACWZpcnN0VGVzdAAQSGVsbG8gd29ybGQhISAoMSAvIDEp', 2, 'firstTest', 'Hello world!! (1 / 1)', 16];
+
+        // Real-life example of message that did go wrong, ensure it never happens again
+        $mapVal[] = [
+            'Me0BABpzaW5nbGVsYW1wL3RlbGVtZXRyeS9TVEFURXsiVGltZSI6IjIwMTktMDMtMjZUMjI6MzM6MzciLCJVcHRpbWUiOiI0NVQwNzow' .
+            'OTowMiIsIlZjYyI6My40MjMsIlNsZWVwTW9kZSI6IkR5bmFtaWMiLCJTbGVlcCI6NTAsIkxvYWRBdmciOjE5LCJQT1dFUiI6Ik9GRiIs' .
+            'IldpZmkiOnsiQVAiOjEsIlNTSWQiOiJYWFhYWFhYWCIsIkJTU0lkIjoiQUE6QUE6QUE6QUE6QUE6QUEiLCJDaGFubmVsIjozLCJSU1NJ' .
+            'Ijo2MH0=',
+            0,
+            'singlelamp/telemetry/STATE',
+            '{"Time":"2019-03-26T22:33:37","Uptime":"45T07:09:02","Vcc":3.423,"SleepMode":"Dynamic","Sleep":50,"LoadA' .
+            'vg":19,"POWER":"OFF","Wifi":{"AP":1,"SSId":"XXXXXXXX","BSSId":"AA:AA:AA:AA:AA:AA","Channel":3,"RSSI":60}',
+            0
+        ];
 
         return $mapVal;
     }
