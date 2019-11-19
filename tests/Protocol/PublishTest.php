@@ -42,25 +42,25 @@ class PublishTest extends TestCase
         $this->publish = null;
     }
 
-    public function test_getOriginControlPacket()
+    public function testGetOriginControlPacket(): void
     {
         $this->assertSame(0, $this->publish->getOriginControlPacket());
     }
 
-    public function test_throwExceptionNoMessageProvided()
+    public function testThrowExceptionNoMessageProvided(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->publish->createVariableHeader();
     }
 
-    public function test_publishBasicMessage()
+    public function testPublishBasicMessage(): void
     {
         $this->publish->setMessage($this->message);
         $variableHeader = $this->publish->createVariableHeader();
         $this->assertSame('AAF0', base64_encode($variableHeader));
     }
 
-    public function test_PublishComplexMessage()
+    public function testPublishComplexMessage(): void
     {
         $this->message->setQoSLevel(new QoSLevel(1));
         $this->message->setRetainFlag(true);
@@ -71,27 +71,27 @@ class PublishTest extends TestCase
         $this->assertSame('AAF0AAE=', base64_encode($variableHeader));
     }
 
-    public function test_NoAnswerRequired()
+    public function testNoAnswerRequired(): void
     {
         $this->publish->setMessage($this->message);
         $this->assertFalse($this->publish->shouldExpectAnswer());
     }
 
-    public function test_AnswerRequired()
+    public function testAnswerRequired(): void
     {
         $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
         $this->assertTrue($this->publish->shouldExpectAnswer());
     }
 
-    public function test_emptyExpectedAnswer()
+    public function testEmptyExpectedAnswer(): void
     {
         $this->publish->setMessage($this->message);
         $answer = $this->publish->expectAnswer('000', new ClientMock());
         $this->assertInstanceOf(EmptyReadableResponse::class, $answer);
     }
 
-    public function test_QoSLevel1ExpectedAnswer()
+    public function testQoSLevel1ExpectedAnswer(): void
     {
         $this->message->setQoSLevel(new QoSLevel(1));
         $this->publish->setMessage($this->message);
@@ -103,7 +103,7 @@ class PublishTest extends TestCase
         $this->assertSame($answer->getPacketIdentifier(), $this->publish->getPacketIdentifier());
     }
 
-    public function test_QoSLevel2ExpectedAnswer()
+    public function testQoSLevel2ExpectedAnswer(): void
     {
         $this->message->setQoSLevel(new QoSLevel(2));
         $this->publish->setMessage($this->message);
@@ -115,26 +115,26 @@ class PublishTest extends TestCase
         $this->assertSame($answer->getPacketIdentifier(), $this->publish->getPacketIdentifier());
     }
 
-    public function test_noPayloadException()
+    public function testNoPayloadException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->publish->createPayload();
     }
 
-    public function test_goodPayload()
+    public function testGoodPayload(): void
     {
         $this->publish->setMessage($this->message);
         $this->assertSame('Hello test world!', $this->publish->createPayload());
     }
 
-    public function test_getMessage()
+    public function testGetMessage(): void
     {
         $this->publish->setMessage($this->message);
         $objectMessage = $this->publish->getMessage();
         $this->assertSame($this->message, $objectMessage);
     }
 
-    public function provider_calculateIncomingQoSLevel(): array
+    public function providerCalculateIncomingQoSLevel(): array
     {
         $mapValues[] = [48, 0];
         $mapValues[] = [50, 1];
@@ -145,12 +145,12 @@ class PublishTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_calculateIncomingQoSLevel
+     * @dataProvider providerCalculateIncomingQoSLevel
      * @param int $bitString
      * @param int $expectedQoS
      * @throws \ReflectionException
      */
-    public function test_calculateIncomingQoSLevel(int $bitString, int $expectedQoS)
+    public function testCalculateIncomingQoSLevel(int $bitString, int $expectedQoS): void
     {
         $method = new \ReflectionMethod(Publish::class, 'determineIncomingQoSLevel');
         $method->setAccessible(true);
@@ -159,7 +159,7 @@ class PublishTest extends TestCase
         $this->assertSame($expectedQoS, $qosLevel->getQoSLevel());
     }
 
-    public function provider_analyzeFirstByte(): array
+    public function providerAnalyzeFirstByte(): array
     {
         $mapValues[] = [48, new QoSLevel(0), false, false];
         $mapValues[] = [50, new QoSLevel(1), false, false];
@@ -173,14 +173,14 @@ class PublishTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_analyzeFirstByte
+     * @dataProvider providerAnalyzeFirstByte
      * @param int $firstByte
      * @param QoSLevel $qoSLevel
      * @param bool $isRetained
      * @param bool $isRedelivery
      * @throws \ReflectionException
      */
-    public function test_analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel, bool $isRetained, bool $isRedelivery)
+    public function testAnalyzeFirstByte(int $firstByte, QoSLevel $qoSLevel, bool $isRetained, bool $isRedelivery): void
     {
         $method = new \ReflectionMethod(Publish::class, 'analyzeFirstByte');
         $method->setAccessible(true);
@@ -191,7 +191,7 @@ class PublishTest extends TestCase
         $this->assertSame($isRedelivery, $publishObject->isRedelivery);
     }
 
-    public function provider_performSpecialActions(): array
+    public function providerPerformSpecialActions(): array
     {
         $mapValues[] = [0, 126, ''];
         $mapValues[] = [1, 127, PubAck::class];
@@ -201,12 +201,12 @@ class PublishTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_performSpecialActions
+     * @dataProvider providerPerformSpecialActions
      * @param int $QoSLevel
      * @param int $packetIdentifier
      * @param string $expectedClassType
      */
-    public function test_performSpecialActions(int $QoSLevel, int $packetIdentifier, string $expectedClassType)
+    public function testPerformSpecialActions(int $QoSLevel, int $packetIdentifier, string $expectedClassType): void
     {
         $clientMock = new ClientMock();
         $this->message->setQoSLevel(new QoSLevel($QoSLevel));
@@ -222,7 +222,7 @@ class PublishTest extends TestCase
     /**
      * @throws \ReflectionException
      */
-    public function test_composePubRecAnswer()
+    public function testComposePubRecAnswer(): void
     {
         $this->publish->setPacketIdentifier(new PacketIdentifier(123));
         $method = new \ReflectionMethod(Publish::class, 'composePubRecAnswer');
@@ -237,7 +237,7 @@ class PublishTest extends TestCase
     /**
      * @throws \ReflectionException
      */
-    public function test_composePubAckAnswer()
+    public function testComposePubAckAnswer(): void
     {
         $this->publish->setPacketIdentifier(new PacketIdentifier(124));
         $method = new \ReflectionMethod(Publish::class, 'composePubAckAnswer');
@@ -252,7 +252,7 @@ class PublishTest extends TestCase
     /**
      * @throws \ReflectionException
      */
-    public function test_checkForValidPacketIdentifier()
+    public function testCheckForValidPacketIdentifier(): void
     {
         $method = new \ReflectionMethod(Publish::class, 'checkForValidPacketIdentifier');
         $method->setAccessible(true);
@@ -261,7 +261,7 @@ class PublishTest extends TestCase
         $method->invoke($this->publish);
     }
 
-    public function provider_completePossibleIncompleteMessage(): array
+    public function providerCompletePossibleIncompleteMessage(): array
     {
         // First case: 1 byte and the rest of the message
         $mapValues[] = ['MA==', 'FAAJZmlyc3RUZXN05rGJQeWtl0JD', 'MBQACWZpcnN0VGVzdOaxiUHlrZdCQw=='];
@@ -276,14 +276,17 @@ class PublishTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_completePossibleIncompleteMessage
+     * @dataProvider providerCompletePossibleIncompleteMessage
      * @param string $firstBytes
      * @param string $append
      * @param string $expectedOutput
      * @throws \ReflectionException
      */
-    public function test_completePossibleIncompleteMessage(string $firstBytes, string $append, string $expectedOutput)
-    {
+    public function testCompletePossibleIncompleteMessage(
+        string $firstBytes,
+        string $append,
+        string $expectedOutput
+    ): void {
         $method = new \ReflectionMethod(Publish::class, 'completePossibleIncompleteMessage');
         $method->setAccessible(true);
 
@@ -296,7 +299,7 @@ class PublishTest extends TestCase
         $this->assertSame($append !== '', $clientMock->readBrokerDataWasCalled());
     }
 
-    public function provider_fillObject(): array
+    public function providerFillObject(): array
     {
         // QoS 0 with UTF-8 characters
         $mapVal[] = ['MBQACWZpcnN0VGVzdOaxiUHlrZdCQw==', 0, 'firstTest', '汉A字BC', 0];
@@ -324,20 +327,20 @@ class PublishTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_fillObject
+     * @dataProvider providerFillObject
      * @param string $rawData
      * @param int $expectedQoSLevel
      * @param string $expectedTopicName
      * @param string $expectedMessageContent
      * @param int|null $expectedPacketIdentifier
      */
-    public function test_fillObject(
+    public function testFillObject(
         string $rawData,
         int $expectedQoSLevel,
         string $expectedTopicName,
         string $expectedMessageContent,
         int $expectedPacketIdentifier
-    ) {
+    ): void {
         $this->publish->fillObject(base64_decode($rawData), new ClientMock());
         $message = $this->publish->getMessage();
         $this->assertSame($expectedQoSLevel, $message->getQoSLevel());

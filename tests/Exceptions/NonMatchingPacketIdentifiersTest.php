@@ -21,13 +21,13 @@ class NonMatchingPacketIdentifiersTest extends TestCase
         parent::setUp();
     }
 
-    public function test_originPacketIdentifierIsSetAndReturnedCorrectly()
+    public function testOriginPacketIdentifierIsSetAndReturnedCorrectly(): void
     {
         $this->exception->setOriginPacketIdentifier(new PacketIdentifier(908));
         $this->assertSame(908, $this->exception->getOriginPacketIdentifierValue());
     }
 
-    public function test_returnedPacketIdentifierIsSetAndReturnedCorrectly()
+    public function testReturnedPacketIdentifierIsSetAndReturnedCorrectly(): void
     {
         $this->exception->setReturnedPacketIdentifier(new PacketIdentifier(909));
         $this->assertSame(909, $this->exception->getReturnedPacketIdentifierValue());

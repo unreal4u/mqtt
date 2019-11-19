@@ -23,7 +23,7 @@ class PubAckTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacketValue()
+    public function testGetOriginControlPacketValue(): void
     {
         $this->assertSame(Publish::getControlPacketValue(), $this->pubAck->getOriginControlPacket());
     }
@@ -33,7 +33,7 @@ class PubAckTest extends TestCase
      *
      * This test will assert that no exception is actually being thrown.
      */
-    public function test_emulateSuccessfulConnection()
+    public function testEmulateSuccessfulConnection(): void
     {
         $clientMock = new ClientMock();
 
@@ -48,22 +48,22 @@ class PubAckTest extends TestCase
         $this->assertFalse($this->pubAck->performSpecialActions($clientMock, $publish));
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertFalse($this->pubAck->shouldExpectAnswer());
     }
 
-    public function test_expectAnswer()
+    public function testExpectAnswer(): void
     {
         $this->assertInstanceOf(PubAck::class, $this->pubAck->expectAnswer('', new ClientMock()));
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->pubAck->createPayload());
     }
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->pubAck->setPacketIdentifier(new PacketIdentifier(46));
         $this->assertSame('AC4=', base64_encode($this->pubAck->createVariableHeader()));

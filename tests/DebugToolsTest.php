@@ -15,7 +15,7 @@ use unreal4u\MQTT\DebugTools;
  */
 class DebugToolsTest extends TestCase
 {
-    public function test_convertToBinaryRepresentation()
+    public function testConvertToBinaryRepresentation(): void
     {
         $binaryString = base64_decode('cAIAJg==');
         $result = DebugTools::convertToBinaryRepresentation($binaryString);
@@ -23,7 +23,7 @@ class DebugToolsTest extends TestCase
         $this->assertSame('01110000000000100000000000100110', $result);
     }
 
-    public function test_convertBinaryToBase64String()
+    public function testConvertBinaryToBase64String(): void
     {
         $binaryString = '01110000000000100000000000100110';
         $result = DebugTools::convertBinaryToString($binaryString, true);
@@ -31,7 +31,7 @@ class DebugToolsTest extends TestCase
         $this->assertSame('cAIAJg==', $result);
     }
 
-    public function test_convertBinaryToString()
+    public function testConvertBinaryToString(): void
     {
         $binaryString = '0111010101101110011100100110010101100001011011000011010001110101';
         $result = DebugTools::convertBinaryToString($binaryString);

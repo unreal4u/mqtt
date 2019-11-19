@@ -10,13 +10,13 @@ use unreal4u\MQTT\Application\EmptyReadableResponse;
 
 class EmptyReadableResponseTest extends TestCase
 {
-    public function test_originPacketIdentifier()
+    public function testOriginPacketIdentifier(): void
     {
         $emptyReadableResponse = new EmptyReadableResponse();
         $this->assertSame(0, $emptyReadableResponse->getOriginControlPacket());
     }
 
-    public function test_correctPacket()
+    public function testCorrectPacket(): void
     {
         $emptyReadableResponse = new EmptyReadableResponse();
         $this->assertInstanceOf(EmptyReadableResponse::class, $emptyReadableResponse->fillObject('', new ClientMock()));

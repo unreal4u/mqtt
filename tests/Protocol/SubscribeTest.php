@@ -27,12 +27,12 @@ class SubscribeTest extends TestCase
         parent::setUp();
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->subscribe->shouldExpectAnswer());
     }
 
-    public function test_emptyEvent()
+    public function testEmptyEvent(): void
     {
         $clientMock = new ClientMock();
 
@@ -42,7 +42,7 @@ class SubscribeTest extends TestCase
         $this->assertInstanceOf(EmptyReadableResponse::class, $result);
     }
 
-    public function test_pingResponseReturned()
+    public function testPingResponseReturned(): void
     {
         $clientMock = new ClientMock();
         $clientMock->returnSpecificBrokerData(['0AA=']);
@@ -51,19 +51,19 @@ class SubscribeTest extends TestCase
         $this->assertInstanceOf(PingResp::class, $pingResponse);
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->subscribe->addTopics(new TopicFilter('test'));
         $this->assertSame('AAR0ZXN0Ag==', base64_encode($this->subscribe->createPayload()));
     }
 
-    public function test_createVariableHeaderWithFixedPacketIdentifier()
+    public function testCreateVariableHeaderWithFixedPacketIdentifier(): void
     {
         $this->subscribe->setPacketIdentifier(new PacketIdentifier(155));
         $this->assertSame('AJs=', base64_encode($this->subscribe->createVariableHeader()));
     }
 
-    public function test_createVariableHeaderWithRandomPacketIdentifier()
+    public function testCreateVariableHeaderWithRandomPacketIdentifier(): void
     {
         $output = $this->subscribe->createVariableHeader();
         $humanOutput = DebugTools::convertToBinaryRepresentation($output);
@@ -73,7 +73,7 @@ class SubscribeTest extends TestCase
     /**
      * @throws \ReflectionException
      */
-    public function test_itIsPingTime()
+    public function testItIsPingTime(): void
     {
         $clientMock = new ClientMock();
         $clientMock->setPingTime(true);
@@ -86,7 +86,7 @@ class SubscribeTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function test_emptyLoopAndBreakOutOfLoop()
+    public function testEmptyLoopAndBreakOutOfLoop(): void
     {
         $clientMock = new ClientMock();
         // Return a SUBACK and then a PUBLISH object with a message QoS lvl0
@@ -103,7 +103,7 @@ class SubscribeTest extends TestCase
         $this->assertSame('汉A字BC', $message->getPayload());
     }
 
-    public function test_callableFunctionExecutesBeforeLoop()
+    public function testCallableFunctionExecutesBeforeLoop(): void
     {
         $clientMock = new ClientMock();
 

@@ -28,22 +28,22 @@ class DisconnectTest extends TestCase
         $this->disconnect = null;
     }
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->assertSame('', $this->disconnect->createVariableHeader());
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->disconnect->createPayload());
     }
 
-    public function test_expectAnswer()
+    public function testExpectAnswer(): void
     {
         $this->assertInstanceOf(DisconnectCleanup::class, $this->disconnect->expectAnswer('0', new ClientMock()));
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertFalse($this->disconnect->shouldExpectAnswer());
     }

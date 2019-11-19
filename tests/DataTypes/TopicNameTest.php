@@ -9,14 +9,14 @@ use unreal4u\MQTT\DataTypes\TopicName;
 
 class TopicNameTest extends TestCase
 {
-    public function test_validTopicName()
+    public function testValidTopicName(): void
     {
         $topicName = new TopicName('a valid topic name');
         $this->assertSame('a valid topic name', $topicName->getTopicName());
         $this->assertSame('a valid topic name', (string)$topicName);
     }
 
-    public function test_wildcardInTopicName()
+    public function testWildcardInTopicName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new TopicName('invalidTopic/#/Name');

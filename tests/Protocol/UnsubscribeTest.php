@@ -23,26 +23,26 @@ class UnsubscribeTest extends TestCase
         parent::setUp();
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->unsubscribe->shouldExpectAnswer());
     }
 
-    public function test_addOneTopic()
+    public function testAddOneTopic(): void
     {
         $this->unsubscribe->addTopics(new TopicFilter('test'));
         $result = $this->unsubscribe->createPayload();
         $this->assertSame('AAR0ZXN0', base64_encode($result));
     }
 
-    public function test_addMultipleTopicsInOneGo()
+    public function testAddMultipleTopicsInOneGo(): void
     {
         $this->unsubscribe->addTopics(new TopicFilter('test'), new TopicFilter('test2'));
         $result = $this->unsubscribe->createPayload();
         $this->assertSame('AAR0ZXN0AAV0ZXN0Mg==', base64_encode($result));
     }
 
-    public function test_addMultipleTopicsInSteps()
+    public function testAddMultipleTopicsInSteps(): void
     {
         // Add one topic first
         $this->unsubscribe->addTopics(new TopicFilter('test2'));
@@ -61,9 +61,9 @@ class UnsubscribeTest extends TestCase
     }
 
     /**
-     * @depends test_addOneTopic
+     * @depends testAddOneTopic
      */
-    public function test_createVariableHeaderWithStaticPacketIdentifier()
+    public function testCreateVariableHeaderWithStaticPacketIdentifier(): void
     {
         $this->unsubscribe->addTopics(new TopicFilter('test'));
         $this->unsubscribe->setPacketIdentifier(new PacketIdentifier(8879));
@@ -72,9 +72,9 @@ class UnsubscribeTest extends TestCase
     }
 
     /**
-     * @depends test_addOneTopic
+     * @depends testAddOneTopic
      */
-    public function test_createVariableHeaderWithRandomPacketIdentifier()
+    public function testCreateVariableHeaderWithRandomPacketIdentifier(): void
     {
         $this->unsubscribe->addTopics(new TopicFilter('test'));
         $packetIdentifier = DebugTools::convertToBinaryRepresentation($this->unsubscribe->createVariableHeader());

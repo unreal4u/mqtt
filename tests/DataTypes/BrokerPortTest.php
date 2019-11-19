@@ -11,19 +11,19 @@ use unreal4u\MQTT\Exceptions\InvalidBrokerProtocol;
 
 class BrokerPortTest extends TestCase
 {
-    public function test_negativeBrokerPort()
+    public function testNegativeBrokerPort(): void
     {
         $this->expectException(InvalidBrokerPort::class);
         new BrokerPort(-1);
     }
 
-    public function test_outOfRangePort()
+    public function testOutOfRangePort(): void
     {
         $this->expectException(InvalidBrokerPort::class);
         new BrokerPort(76543);
     }
 
-    public function provider_validBrokerPorts(): array
+    public function providerValidBrokerPorts(): array
     {
         $mapValues[] = [1];
         $mapValues[] = [1182];
@@ -33,16 +33,16 @@ class BrokerPortTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validBrokerPorts
+     * @dataProvider providerValidBrokerPorts
      * @param int $port
      */
-    public function test_validBrokerPorts(int $port)
+    public function testValidBrokerPorts(int $port): void
     {
         $brokerPort = new BrokerPort($port);
         $this->assertSame($port, $brokerPort->getBrokerPort());
     }
 
-    public function provider_validProtocols(): array
+    public function providerValidProtocols(): array
     {
         $mapValues[] = ['tcp'];
         $mapValues[] = ['ssl'];
@@ -54,16 +54,16 @@ class BrokerPortTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validProtocols
+     * @dataProvider providerValidProtocols
      * @param string $protocol
      */
-    public function test_validProtocols(string $protocol)
+    public function testValidProtocols(string $protocol): void
     {
         $brokerPort = new BrokerPort(112, $protocol);
         $this->assertSame($protocol, $brokerPort->getTransmissionProtocol());
     }
 
-    public function test_invalidProtocol()
+    public function testInvalidProtocol(): void
     {
         $this->expectException(InvalidBrokerProtocol::class);
         new BrokerPort(112, 'this-wont-ever-be-an-approved-protocol-name');

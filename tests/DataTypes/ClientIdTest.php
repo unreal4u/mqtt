@@ -9,7 +9,7 @@ use unreal4u\MQTT\DataTypes\ClientId;
 
 class ClientIdTest extends TestCase
 {
-    public function test_perfectClientId()
+    public function testPerfectClientId(): void
     {
         $clientId = new ClientId('test');
         $this->assertSame('test', $clientId->getClientId());
@@ -17,7 +17,7 @@ class ClientIdTest extends TestCase
         $this->assertSame('test', (string)$clientId);
     }
 
-    public function provider_warnedClientIds(): array
+    public function providerWarnedClientIds(): array
     {
         $mapValues[] = ['', 'ClientId size is 0 bytes. This has several implications, check comments'];
         $mapValues[] = [
@@ -30,11 +30,11 @@ class ClientIdTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_warnedClientIds
+     * @dataProvider providerWarnedClientIds
      * @param string $clientIdString
      * @param string $errorMessage
      */
-    public function test_warnedClientIds(string $clientIdString, string $errorMessage)
+    public function testWarnedClientIds(string $clientIdString, string $errorMessage): void
     {
         $clientId = new ClientId($clientIdString);
 

@@ -27,17 +27,17 @@ class PingReqTest extends TestCase
     }
 
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->assertSame('', $this->pingReq->createVariableHeader());
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->pingReq->createPayload());
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->pingReq->shouldExpectAnswer());
     }

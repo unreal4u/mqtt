@@ -25,7 +25,7 @@ class PubCompTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacketValue()
+    public function testGetOriginControlPacketValue(): void
     {
         $this->assertSame(PubRel::getControlPacketValue(), $this->pubComp->getOriginControlPacket());
     }
@@ -35,7 +35,7 @@ class PubCompTest extends TestCase
      *
      * This test will assert that no exception is actually being thrown.
      */
-    public function test_emulateSuccessfulRequest()
+    public function testEmulateSuccessfulRequest(): void
     {
         $clientMock = new ClientMock();
 
@@ -50,7 +50,7 @@ class PubCompTest extends TestCase
         $this->assertTrue($this->pubComp->performSpecialActions($clientMock, $pubrel));
     }
 
-    public function test_badPacketIdentifier()
+    public function testBadPacketIdentifier(): void
     {
         $clientMock = new ClientMock();
 
@@ -67,22 +67,22 @@ class PubCompTest extends TestCase
         $this->pubComp->performSpecialActions($clientMock, $pubrel);
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertFalse($this->pubComp->shouldExpectAnswer());
     }
 
-    public function test_expectAnswer()
+    public function testExpectAnswer(): void
     {
         $this->assertInstanceOf(EmptyReadableResponse::class, $this->pubComp->expectAnswer('', new ClientMock()));
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->pubComp->createPayload());
     }
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->pubComp->setPacketIdentifier(new PacketIdentifier(46));
         $this->assertSame('AC4=', base64_encode($this->pubComp->createVariableHeader()));

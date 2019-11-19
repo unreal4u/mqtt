@@ -11,7 +11,7 @@ use unreal4u\MQTT\Exceptions\MessageTooBig;
 
 class MessageTest extends TestCase
 {
-    public function test_messageTooBig()
+    public function testMessageTooBig(): void
     {
         $this->expectException(MessageTooBig::class);
         new Message(str_repeat('ö', 65536), new TopicName('Set up a topic'));

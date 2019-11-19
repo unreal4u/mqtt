@@ -23,12 +23,12 @@ class UnsubAckTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacket()
+    public function testGetOriginControlPacket(): void
     {
         $this->assertSame(Unsubscribe::getControlPacketValue(), $this->unsuback->getOriginControlPacket());
     }
 
-    public function test_performSpecialActions()
+    public function testPerformSpecialActions(): void
     {
         $clientMock = new ClientMock();
 
@@ -40,13 +40,13 @@ class UnsubAckTest extends TestCase
         $this->assertTrue($clientMock->updateLastCommunicationWasCalled());
     }
 
-    public function test_fillObjectWithFullHeaders()
+    public function testFillObjectWithFullHeaders(): void
     {
         $this->unsuback->fillObject(base64_decode('sAIWvA=='), new ClientMock());
         $this->assertSame(5820, $this->unsuback->getPacketIdentifier());
     }
 
-    public function test_fillObjectWithPartialHeaders()
+    public function testFillObjectWithPartialHeaders(): void
     {
         $clientMock = new ClientMock();
         $clientMock->returnSpecificBrokerData(['Aq6/']);

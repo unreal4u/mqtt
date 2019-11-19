@@ -10,46 +10,46 @@ use unreal4u\MQTT\DataTypes\QoSLevel;
 
 class TopicFilterTest extends TestCase
 {
-    public function test_createDefault()
+    public function testCreateDefault(): void
     {
         $topic = new TopicFilter('a topic', new QoSLevel(0));
         $this->assertSame('a topic', $topic->getTopicFilter());
         $this->assertSame(0, $topic->getTopicFilterQoSLevel());
     }
 
-    public function test_QoSLevel1()
+    public function testQoSLevel1(): void
     {
         $topic = new TopicFilter('a topic', new QoSLevel(1));
         $this->assertSame('a topic', $topic->getTopicFilter());
         $this->assertSame(1, $topic->getTopicFilterQoSLevel());
     }
 
-    public function test_QoSLevel2()
+    public function testQoSLevel2(): void
     {
         $topic = new TopicFilter('a topic');
         $this->assertSame('a topic', $topic->getTopicFilter());
         $this->assertSame(2, $topic->getTopicFilterQoSLevel());
     }
 
-    public function test_emptyTopicName()
+    public function testEmptyTopicName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new TopicFilter('');
     }
 
-    public function test_terminationCharacterPresentInTopicFilter()
+    public function testTerminationCharacterPresentInTopicFilter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new TopicFilter('hello/world' . \chr(0) . '/Yep');
     }
 
-    public function test_tooBigTopicName()
+    public function testTooBigTopicName(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         new TopicFilter(str_repeat('-', 65537));
     }
 
-    public function provider_validTopicNames(): array
+    public function providerValidTopicNames(): array
     {
         $mapValues[] = ['First-topic-name'];
         $mapValues[] = ['𠜎𠜱𠝹𠱓'];
@@ -60,10 +60,10 @@ class TopicFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validTopicNames
+     * @dataProvider providerValidTopicNames
      * @param string $topicName
      */
-    public function test_validTopicNames(string $topicName)
+    public function testValidTopicNames(string $topicName): void
     {
         $topic = new TopicFilter($topicName);
         $this->assertSame($topicName, $topic->getTopicFilter());

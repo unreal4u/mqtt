@@ -24,28 +24,28 @@ class PubRecTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacketValue()
+    public function testGetOriginControlPacketValue(): void
     {
         $this->assertSame(Publish::getControlPacketValue(), $this->pubRec->getOriginControlPacket());
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->pubRec->shouldExpectAnswer());
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->pubRec->createPayload());
     }
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->pubRec->setPacketIdentifier(new PacketIdentifier(446));
         $this->assertSame('Ab4=', base64_encode($this->pubRec->createVariableHeader()));
     }
 
-    public function test_performSpecialActions()
+    public function testPerformSpecialActions(): void
     {
         $clientMock = new ClientMock();
         $publish = new Publish();

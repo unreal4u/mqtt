@@ -9,19 +9,19 @@ use unreal4u\MQTT\Protocol\PingReq;
 
 class WritableContentTest extends TestCase
 {
-    public function test_createUTF8String()
+    public function testCreateUTF8String(): void
     {
         $pingRequest = new PingReq();
         $this->assertSame('AA5UaGlzIGlzIGEgdGVzdA==', base64_encode($pingRequest->createUTF8String('This is a test')));
     }
 
-    public function test_emptyString()
+    public function testEmptyString(): void
     {
         $pingRequest = new PingReq();
         $this->assertSame('', base64_encode($pingRequest->createUTF8String('')));
     }
 
-    public function test_createFixedHeader()
+    public function testCreateFixedHeader(): void
     {
         $pingRequest = new PingReq();
 
@@ -29,7 +29,7 @@ class WritableContentTest extends TestCase
         $this->assertSame('wAQ=', base64_encode($pingRequest->createFixedHeader(4)));
     }
 
-    public function test_createSendableMessageWithSmallPayload()
+    public function testCreateSendableMessageWithSmallPayload(): void
     {
         $pingRequest = new PingReq();
         $this->assertSame('wAA=', base64_encode($pingRequest->createSendableMessage()));

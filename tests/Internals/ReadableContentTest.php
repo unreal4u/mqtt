@@ -18,7 +18,7 @@ class ReadableContentTest extends TestCase
 {
     use ReadableContent;
 
-    public function test_incorrectControlPacketValue()
+    public function testIncorrectControlPacketValue(): void
     {
         $success = chr(100) . chr(0);
         $pingResp = new PingResp();
@@ -27,7 +27,7 @@ class ReadableContentTest extends TestCase
         $pingResp->instantiateObject($success, new ClientMock());
     }
 
-    public function provider_performRemainingLengthFieldOperations(): array
+    public function providerPerformRemainingLengthFieldOperations(): array
     {
         $mapValues[] = [base64_decode('IAI='), 2]; // remaining length: 2, which is 1 byte long
         $mapValues[] = [base64_decode('IMgB'), 200]; // remaining length: 200, which is 2 bytes long
@@ -38,18 +38,18 @@ class ReadableContentTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_performRemainingLengthFieldOperations
+     * @dataProvider providerPerformRemainingLengthFieldOperations
      * @param string $binaryText
      * @param int $numericRepresentation
      */
-    public function test_performRemainingLengthFieldOperations(string $binaryText, int $numericRepresentation)
+    public function testPerformRemainingLengthFieldOperations(string $binaryText, int $numericRepresentation): void
     {
         $clientMock = new ClientMock();
         $returnValue = $this->performRemainingLengthFieldOperations($binaryText, $clientMock);
         $this->assertSame($numericRepresentation, $returnValue);
     }
 
-    public function provider_calculateSizeOfRemainingLengthField(): array
+    public function providerCalculateSizeOfRemainingLengthField(): array
     {
         $mapValues[] = [1, 1];
         $mapValues[] = [2, 1];
@@ -65,11 +65,11 @@ class ReadableContentTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_calculateSizeOfRemainingLengthField
+     * @dataProvider providerCalculateSizeOfRemainingLengthField
      * @param int $size
      * @param int $expectedByteSize
      */
-    public function test_calculateSizeOfRemainingLengthField(int $size, int $expectedByteSize)
+    public function testCalculateSizeOfRemainingLengthField(int $size, int $expectedByteSize): void
     {
         $returnValue = $this->calculateSizeOfRemainingLengthField($size);
         $this->assertSame($expectedByteSize, $returnValue);

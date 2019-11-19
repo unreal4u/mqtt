@@ -10,13 +10,13 @@ use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 
 class QoSLevelTest extends TestCase
 {
-    public function test_invalidQoSLevel()
+    public function testInvalidQoSLevel(): void
     {
         $this->expectException(InvalidQoSLevel::class);
         new QoSLevel(-1);
     }
 
-    public function provider_validQoSLevels(): array
+    public function providerValidQoSLevels(): array
     {
         $mapValues[] = [0];
         $mapValues[] = [1];
@@ -26,20 +26,20 @@ class QoSLevelTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validQoSLevels
+     * @dataProvider providerValidQoSLevels
      * @param int $level
      */
-    public function test_validQoSLevels(int $level)
+    public function testValidQoSLevels(int $level): void
     {
         $QoSLevel = new QoSLevel($level);
         $this->assertSame($level, $QoSLevel->getQoSLevel());
     }
 
     /**
-     * @dataProvider provider_validQoSLevels
+     * @dataProvider providerValidQoSLevels
      * @param int $level
      */
-    public function test_toString(int $level)
+    public function testToString(int $level): void
     {
         $QoSLevel = new QoSLevel($level);
         $this->assertSame((string)$level, (string)$QoSLevel);

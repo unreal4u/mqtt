@@ -20,7 +20,7 @@ class IdentifierRejectedTest extends TestCase
         parent::setUp();
     }
 
-    public function test_fillPossibleReasonIsSetAndReturnedCorrectly()
+    public function testFillPossibleReasonIsSetAndReturnedCorrectly(): void
     {
         $this->exception->fillPossibleReason('test reason');
         $this->assertSame('test reason', $this->exception->getPossibleReason());

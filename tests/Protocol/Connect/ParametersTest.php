@@ -14,33 +14,33 @@ use unreal4u\MQTT\Protocol\Connect\Parameters;
 
 class ParametersTest extends TestCase
 {
-    public function test_defaultSettings()
+    public function testDefaultSettings(): void
     {
         $parameters = new Parameters();
         $this->assertSame('tcp://localhost:1883', $parameters->getConnectionUrl());
         $this->assertSame(2, $parameters->getFlags());
     }
 
-    public function test_setHost()
+    public function testSetHost(): void
     {
         $parameters = new Parameters(new ClientId('uniqueClientId'), '192.168.255.3');
         $this->assertSame('tcp://192.168.255.3:1883', $parameters->getConnectionUrl());
     }
 
-    public function test_setHostWithDifferentBrokerPort()
+    public function testSetHostWithDifferentBrokerPort(): void
     {
         $parameters = new Parameters(new ClientId('uniqueClientId'), '192.168.255.4');
         $parameters->setBrokerPort(new BrokerPort(5445));
         $this->assertSame('tcp://192.168.255.4:5445', $parameters->getConnectionUrl());
     }
 
-    public function test_setNonUTF8ClientName()
+    public function testSetNonUTF8ClientName(): void
     {
         $parameters = new Parameters(new ClientId('uniqueClientId𠜎𠜱WithComplexUTF8Chars'));
         $this->assertSame('uniqueClientId𠜎𠜱WithComplexUTF8Chars', (string)$parameters->getClientId());
     }
 
-    public function test_createObjectWithCleanSessionBit()
+    public function testCreateObjectWithCleanSessionBit(): void
     {
         $parameters = new Parameters();
         $parameters->setCleanSession(true);
@@ -51,7 +51,7 @@ class ParametersTest extends TestCase
         $this->assertSame(2, $parameters->getFlags());
     }
 
-    public function test_createObjectWithMultipleOptions()
+    public function testCreateObjectWithMultipleOptions(): void
     {
         $parameters = new Parameters(new ClientId('SpecialClientId'));
         $parameters->setCleanSession(true);
@@ -64,7 +64,7 @@ class ParametersTest extends TestCase
         $this->assertTrue($parameters->getCleanSession());
     }
 
-    public function test_revertCleanSessionBit()
+    public function testRevertCleanSessionBit(): void
     {
         $parameters = new Parameters(new ClientId('unittest'));
         $parameters->setCleanSession(true);
@@ -73,7 +73,7 @@ class ParametersTest extends TestCase
         $this->assertSame(0, $parameters->getFlags());
     }
 
-    public function test_revertCredentialBits()
+    public function testRevertCredentialBits(): void
     {
         $parameters = new Parameters(new ClientId('unittest'));
         $parameters->setCredentials('unreal4u', 'justT3st1ng');
@@ -86,7 +86,7 @@ class ParametersTest extends TestCase
     /**
      * Tests whether setting up a will message goes correctly or not
      */
-    public function test_validBasicWillMessage()
+    public function testValidBasicWillMessage(): void
     {
         $parameters = new Parameters();
         $parameters->setWill(new Message(
@@ -98,7 +98,7 @@ class ParametersTest extends TestCase
         $this->assertFalse($parameters->getWillRetain());
     }
 
-    public function test_validRetainedWillMessage()
+    public function testValidRetainedWillMessage(): void
     {
         $willMessage = new Message('You will see this if I disconnect without notice', new TopicName('client/errors'));
         $willMessage->setRetainFlag(true);
@@ -110,7 +110,7 @@ class ParametersTest extends TestCase
         $this->assertTrue($parameters->getWillRetain());
     }
 
-    public function provider_validQosLevelWillMessage(): array
+    public function providerValidQosLevelWillMessage(): array
     {
         $mapValues[] = [0, 4];
         $mapValues[] = [1, 12];
@@ -120,11 +120,11 @@ class ParametersTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validQoSLevelWillMessage
+     * @dataProvider providerValidQosLevelWillMessage
      * @param int $QoSLevel
      * @param int $parameterFlagResult
      */
-    public function test_validQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult)
+    public function testValidQoSLevelWillMessage(int $QoSLevel, int $parameterFlagResult): void
     {
         $willMessage = new Message('You will see this if I disconnect without notice', new TopicName('client/errors'));
         $willMessage->setQoSLevel(new QoSLevel($QoSLevel));
@@ -135,14 +135,14 @@ class ParametersTest extends TestCase
         $this->assertSame($parameterFlagResult, $parameters->getFlags());
     }
 
-    public function test_invalidTimeoutSetting()
+    public function testInvalidTimeoutSetting(): void
     {
         $parameters = new Parameters();
         $this->expectException(\InvalidArgumentException::class);
         $parameters->setKeepAlivePeriod(-10);
     }
 
-    public function test_validTimeoutSetting()
+    public function testValidTimeoutSetting(): void
     {
         $parameters = new Parameters();
         $parameters->setKeepAlivePeriod(65530);

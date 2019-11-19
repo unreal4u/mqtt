@@ -25,28 +25,28 @@ class PubRelTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacketValue()
+    public function testGetOriginControlPacketValue(): void
     {
         $this->assertSame(PubRec::getControlPacketValue(), $this->pubRel->getOriginControlPacket());
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->pubRel->shouldExpectAnswer());
     }
 
-    public function test_createPayload()
+    public function testCreatePayload(): void
     {
         $this->assertSame('', $this->pubRel->createPayload());
     }
 
-    public function test_createVariableHeader()
+    public function testCreateVariableHeader(): void
     {
         $this->pubRel->setPacketIdentifier(new PacketIdentifier(88));
         $this->assertSame('AFg=', base64_encode($this->pubRel->createVariableHeader()));
     }
 
-    public function test_performSpecialActionsWithValidObject()
+    public function testPerformSpecialActionsWithValidObject(): void
     {
         $clientMock = new ClientMock();
         $pubRec = new PubRec();
@@ -58,13 +58,13 @@ class PubRelTest extends TestCase
         $this->assertSame(PubComp::class, $clientMock->processObjectWasCalledWithObjectType());
     }
 
-    public function test_performSpecialActionsWithInvalidObject()
+    public function testPerformSpecialActionsWithInvalidObject(): void
     {
         $specialActionsPerformed = $this->pubRel->performSpecialActions(new ClientMock(), new PingReq());
         $this->assertFalse($specialActionsPerformed);
     }
 
-    public function provider_fillObject(): array
+    public function providerFillObject(): array
     {
         $mapValues[] = ['Yg==', 'AgAS', 18];
         $mapValues[] = ['YgI=', 'ABQ=', 20];
@@ -74,16 +74,16 @@ class PubRelTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_fillObject
+     * @dataProvider providerFillObject
      * @param string $firstBytes
      * @param string $append
      * @param int $expectedPacketIdentifier
      */
-    public function test_fillObject(
+    public function testFillObject(
         string $firstBytes,
         string $append,
         int $expectedPacketIdentifier
-    ) {
+    ): void {
         $clientMock = new ClientMock();
         $clientMock->returnSpecificBrokerData([$append]);
 

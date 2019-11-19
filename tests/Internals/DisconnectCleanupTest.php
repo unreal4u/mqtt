@@ -22,17 +22,17 @@ class DisconnectCleanupTest extends TestCase
         $this->disconnectCleanup = new DisconnectCleanup();
     }
 
-    public function test_getOriginPacketControl()
+    public function testGetOriginPacketControl(): void
     {
         $this->assertSame(0, $this->disconnectCleanup->getOriginControlPacket());
     }
 
-    public function test_objectIsCreatedSuccessfully()
+    public function testObjectIsCreatedSuccessfully(): void
     {
         $this->assertInstanceOf(DisconnectCleanup::class, $this->disconnectCleanup->fillObject('', new ClientMock()));
     }
 
-    public function test_performSpecialActions()
+    public function testPerformSpecialActions(): void
     {
         $clientMock = new ClientMock();
 

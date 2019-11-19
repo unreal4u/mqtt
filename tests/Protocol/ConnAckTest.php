@@ -28,7 +28,7 @@ class ConnAckTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacketValue()
+    public function testGetOriginControlPacketValue(): void
     {
         $this->assertSame(Connect::getControlPacketValue(), $this->connAck->getOriginControlPacket());
     }
@@ -38,7 +38,7 @@ class ConnAckTest extends TestCase
      *
      * This test will assert that no exception is actually being thrown.
      */
-    public function test_emulateSuccessfulConnection()
+    public function testEmulateSuccessfulConnection(): void
     {
         $clientMock = new ClientMock();
 
@@ -53,7 +53,7 @@ class ConnAckTest extends TestCase
         $this->assertSame(0, $this->connAck->getConnectReturnCode());
     }
 
-    public function provider_TestExceptions(): array
+    public function providerTestExceptions(): array
     {
         $mapValues[] = [UnacceptableProtocolVersion::class, 'IAIAAQ=='];
         $mapValues[] = [IdentifierRejected::class, 'IAIAAg=='];
@@ -67,12 +67,12 @@ class ConnAckTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_TestExceptions
+     * @dataProvider providerTestExceptions
      *
      * @param string $expectedException
      * @param string $encodedResponse
      */
-    public function test_exception(string $expectedException, string $encodedResponse)
+    public function testException(string $expectedException, string $encodedResponse): void
     {
         $this->expectException($expectedException);
         $this->connAck->fillObject(base64_decode($encodedResponse), new ClientMock());

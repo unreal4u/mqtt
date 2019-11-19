@@ -43,7 +43,7 @@ class ConnectTest extends TestCase
         $this->connect = null;
     }
 
-    public function test_createVariableHeaderDefaultValues()
+    public function testCreateVariableHeaderDefaultValues(): void
     {
         $this->connect->setConnectionParameters(new Parameters(new ClientId('UnitTestClientId')));
         $connectVariableHeader = $this->connect->createVariableHeader();
@@ -51,7 +51,7 @@ class ConnectTest extends TestCase
         $this->assertSame('AARNUVRUBAAAPA==', base64_encode($connectVariableHeader));
     }
 
-    public function test_userAndPassword()
+    public function testUserAndPassword(): void
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setCredentials('unreal4u', 'justT3st1ng');
@@ -63,7 +63,7 @@ class ConnectTest extends TestCase
         $this->assertSame('ABBVbml0VGVzdENsaWVudElkAAh1bnJlYWw0dQALanVzdFQzc3Qxbmc=', base64_encode($connectPayload));
     }
 
-    public function test_passwordWithoutUsername()
+    public function testPasswordWithoutUsername(): void
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setCredentials('', 'justT3st1ng');
@@ -73,7 +73,7 @@ class ConnectTest extends TestCase
         $this->connect->createPayload();
     }
 
-    public function test_completeWill()
+    public function testCompleteWill(): void
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
         $parameters->setWill(new Message('Testing', new TopicName('topic')));
@@ -88,18 +88,18 @@ class ConnectTest extends TestCase
         );
     }
 
-    public function test_shouldExpectAnswer()
+    public function testShouldExpectAnswer(): void
     {
         $this->assertTrue($this->connect->shouldExpectAnswer());
     }
 
-    public function test_noConnectionParametersDefinedException()
+    public function testNoConnectionParametersDefinedException(): void
     {
         $this->expectException(NoConnectionParametersDefined::class);
         $this->connect->getConnectionParameters();
     }
 
-    public function test_getConnectionParameters()
+    public function testGetConnectionParameters(): void
     {
         $parameters = new Parameters(new ClientId('UnitTestClientId'));
 
@@ -107,7 +107,7 @@ class ConnectTest extends TestCase
         $this->assertSame($parameters, $this->connect->getConnectionParameters());
     }
 
-    public function test_expectAnswer()
+    public function testExpectAnswer(): void
     {
         $result = $this->connect->expectAnswer(base64_decode('IAIBAA=='), new ClientMock());
         $this->assertInstanceOf(ConnAck::class, $result);

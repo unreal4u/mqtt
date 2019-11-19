@@ -28,7 +28,7 @@ class EventManagerTest extends TestCase
         $this->eventManager = null;
     }
 
-    public function test_emptyRawHeaders()
+    public function testEmptyRawHeaders(): void
     {
         $this->assertInstanceOf(
             EmptyReadableResponse::class,
@@ -36,7 +36,7 @@ class EventManagerTest extends TestCase
         );
     }
 
-    public function test_invalidControlPacketValue()
+    public function testInvalidControlPacketValue(): void
     {
         $this->expectException(\DomainException::class);
         $this->eventManager->analyzeHeaders(

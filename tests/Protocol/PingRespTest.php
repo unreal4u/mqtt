@@ -22,7 +22,7 @@ class PingRespTest extends TestCase
         parent::setUp();
     }
 
-    public function testCheckControlPacketValue()
+    public function testCheckControlPacketValue(): void
     {
         $success = \chr(208) . \chr(0);
         $this->pingResp->instantiateObject($success, new ClientMock());
@@ -31,12 +31,12 @@ class PingRespTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_getOriginControlPacket()
+    public function testGetOriginControlPacket(): void
     {
         $this->assertSame(PingReq::getControlPacketValue(), $this->pingResp->getOriginControlPacket());
     }
 
-    public function test_performSpecialActions()
+    public function testPerformSpecialActions(): void
     {
         $clientMock = new ClientMock();
 

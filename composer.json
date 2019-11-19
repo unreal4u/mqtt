@@ -1,6 +1,6 @@
 {
   "name": "unreal4u/mqtt",
-  "description": "Complete MQTT v3.1.1 implementation for PHP 7.x",
+  "description": "Complete MQTT v3.1.1 implementation for PHP >=7.1.x",
   "keywords": [
     "mqtt",
     "php",
@@ -35,6 +35,6 @@
     "phpmd/phpmd": "@stable",
     "phpdocumentor/phpdocumentor": "2.*",
     "squizlabs/php_codesniffer": "^3.0",
-    "phpstan/phpstan": "^0.8"
+    "phpstan/phpstan": "~0.11"
   }
 }

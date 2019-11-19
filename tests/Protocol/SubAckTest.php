@@ -23,12 +23,12 @@ class SubAckTest extends TestCase
         parent::setUp();
     }
 
-    public function test_getOriginControlPacket()
+    public function testGetOriginControlPacket(): void
     {
         $this->assertSame(Subscribe::getControlPacketValue(), $this->suback->getOriginControlPacket());
     }
 
-    public function test_performSpecialActions()
+    public function testPerformSpecialActions(): void
     {
         $clientMock = new ClientMock();
 

@@ -19,12 +19,12 @@ class TopicFunctionalityTest extends TestCase
         parent::setUp();
     }
 
-    public function test_zeroTopics()
+    public function testZeroTopics(): void
     {
         $this->assertSame(0, $this->getNumberOfTopics());
     }
 
-    public function test_missingTopic()
+    public function testMissingTopic(): void
     {
         $this->expectException(MustContainTopic::class);
         foreach ($this->getTopics() as $topic) {
@@ -32,19 +32,19 @@ class TopicFunctionalityTest extends TestCase
         }
     }
 
-    public function test_addOneTopic()
+    public function testAddOneTopic(): void
     {
         $this->addTopics(new TopicFilter('test'));
         $this->assertSame(1, $this->getNumberOfTopics());
     }
 
-    public function test_addMultipleTopicsInOneGo()
+    public function testAddMultipleTopicsInOneGo(): void
     {
         $this->addTopics(new TopicFilter('test_a'), new TopicFilter('test_b'));
         $this->assertSame(2, $this->getNumberOfTopics());
     }
 
-    public function test_addMultipleTopicsInMultipleStages()
+    public function testAddMultipleTopicsInMultipleStages(): void
     {
         $this->addTopics(new TopicFilter('test_a'));
         $this->assertSame(1, $this->getNumberOfTopics());
@@ -53,7 +53,7 @@ class TopicFunctionalityTest extends TestCase
         $this->assertSame(2, $this->getNumberOfTopics());
     }
 
-    public function test_addSameTopicMoreThanOnce()
+    public function testAddSameTopicMoreThanOnce(): void
     {
         $this->addTopics(new TopicFilter('test_a'));
         $this->assertSame(1, $this->getNumberOfTopics());

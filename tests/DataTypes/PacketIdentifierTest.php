@@ -9,7 +9,7 @@ use unreal4u\MQTT\DataTypes\PacketIdentifier;
 
 class PacketIdentifierTest extends TestCase
 {
-    public function provider_test_outOfRange(): array
+    public function providerOutOfRange(): array
     {
         $mapValues[] = [-322];
         $mapValues[] = [0];
@@ -20,16 +20,16 @@ class PacketIdentifierTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_test_outOfRange
+     * @dataProvider providerOutOfRange
      * @param int $number
      */
-    public function test_outOfRange(int $number)
+    public function testOutOfRange(int $number): void
     {
         $this->expectException(\OutOfRangeException::class);
         new PacketIdentifier($number);
     }
 
-    public function provider_validPacketIdentifier(): array
+    public function providerValidPacketIdentifier(): array
     {
         $mapValues[] = [1];
         $mapValues[] = [35];
@@ -40,16 +40,16 @@ class PacketIdentifierTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validPacketIdentifier
+     * @dataProvider providerValidPacketIdentifier
      * @param int $number
      */
-    public function test_validPacketIdentifier(int $number)
+    public function testValidPacketIdentifier(int $number): void
     {
         $packetIdentifier = new PacketIdentifier($number);
         $this->assertSame($number, $packetIdentifier->getPacketIdentifierValue());
     }
 
-    public function test_toString()
+    public function testToString(): void
     {
         $packetIdentifier = new PacketIdentifier(35);
         $this->assertSame('ACM=', base64_encode((string)$packetIdentifier));
