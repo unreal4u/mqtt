@@ -30,8 +30,10 @@ class EventManagerTest extends TestCase
 
     public function test_emptyRawHeaders()
     {
-        $this->assertInstanceOf(EmptyReadableResponse::class,
-            $this->eventManager->analyzeHeaders('', new ClientMock()));
+        $this->assertInstanceOf(
+            EmptyReadableResponse::class,
+            $this->eventManager->analyzeHeaders('', new ClientMock())
+        );
     }
 
     public function test_invalidControlPacketValue()

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+## Executes PHPStan
+
+fin exec vendor/bin/phpstan analyse "$@"
+

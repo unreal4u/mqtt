@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="phpcs-mqtt">
+    <!-- Files and directories to start scanning -->
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- include all rules in PSR-2 ruleset -->
+    <rule ref="PSR2"/>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+</ruleset>
+

@@ -1,0 +1,11 @@
+version: "2.1"
+
+services:
+  mosquitto:
+    hostname: mosquitto
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+  cli:
+    environment:
+      - PHP_IDE_CONFIG=serverName=${VIRTUAL_HOST}

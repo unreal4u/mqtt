@@ -90,9 +90,9 @@ class ParametersTest extends TestCase
     {
         $parameters = new Parameters();
         $parameters->setWill(new Message(
-                'You will see this if I disconnect without notice',
-                new TopicName('client/errors'))
-        );
+            'You will see this if I disconnect without notice',
+            new TopicName('client/errors')
+        ));
 
         $this->assertSame(6, $parameters->getFlags());
         $this->assertFalse($parameters->getWillRetain());

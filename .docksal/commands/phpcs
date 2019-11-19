@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## Executes Codesniffer
+
+CACHE_FILE=var/cache/phpcs.cache
+mkdir -p $(dirname ${CACHE_FILE})
+fin exec vendor/bin/phpcs --cache=${CACHE_FILE} "$@"
+
