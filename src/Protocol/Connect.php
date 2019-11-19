@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use DomainException;
+use OutOfRangeException;
 use unreal4u\MQTT\Exceptions\Connect\IdentifierRejected;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustProvideUsername;
@@ -16,15 +18,19 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 use unreal4u\MQTT\Utilities;
 
+use function chr;
+use function get_class;
+
 /**
  * After a Network Connection is established by a Client to a Server, the first Packet sent from the Client to the
  * Server MUST be a CONNECT Packet
  */
 final class Connect extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
 
-    const CONTROL_PACKET_VALUE = 1;
+    private const CONTROL_PACKET_VALUE = 1;
 
     /**
      * @var Parameters
@@ -47,7 +53,7 @@ final class Connect extends ProtocolBase implements WritableContentInterface
      * Get the connection parameters from the private object
      *
      * @return Parameters
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws NoConnectionParametersDefined
      */
     public function getConnectionParameters(): Parameters
     {
@@ -60,21 +66,21 @@ final class Connect extends ProtocolBase implements WritableContentInterface
 
     /**
      * @return string
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     public function createVariableHeader(): string
     {
         $bitString = $this->createUTF8String('MQTT'); // Connect MUST begin with MQTT
         $bitString .= $this->connectionParameters->getProtocolVersionBinaryRepresentation(); // Protocol level
-        $bitString .= \chr($this->connectionParameters->getFlags());
+        $bitString .= chr($this->connectionParameters->getFlags());
         $bitString .= Utilities::convertNumberToBinaryString($this->connectionParameters->getKeepAlivePeriod());
         return $bitString;
     }
 
     /**
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MustProvideUsername
-     * @throws \OutOfRangeException
+     * @throws MustProvideUsername
+     * @throws OutOfRangeException
      */
     public function createPayload(): string
     {
@@ -113,12 +119,12 @@ final class Connect extends ProtocolBase implements WritableContentInterface
      * @param ClientInterface $client
      *
      * @return ReadableContentInterface
-     * @throws \DomainException
-     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
+     * @throws DomainException
+     * @throws IdentifierRejected
      */
     public function expectAnswer(string $brokerBitStream, ClientInterface $client): ReadableContentInterface
     {
-        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => \get_class($this)]);
+        $this->logger->info('String of incoming data confirmed, returning new object', ['callee' => get_class($this)]);
 
         $eventManager = new EventManager($this->logger);
         try {

@@ -27,8 +27,12 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Utilities;
+
+use function decbin;
 use function ord;
+use function sprintf;
 use function strlen;
+use function substr;
 
 /**
  * A PUBLISH Control Packet is sent from a Client to a Server or vice-versa to transport an Application Message.
@@ -49,11 +53,12 @@ use function strlen;
  */
 final class Publish extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, /** @noinspection TraitsPropertiesConflictsInspection */
-        WritableContent,
-        PacketIdentifierFunctionality;
+    use ReadableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
+    use PacketIdentifierFunctionality;
 
-    const CONTROL_PACKET_VALUE = 3;
+    private const CONTROL_PACKET_VALUE = 3;
 
     /**
      * Contains the message to be sent

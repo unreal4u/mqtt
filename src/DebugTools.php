@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
+use function base64_encode;
+use function base_convert;
 use function chr;
 use function ord;
+use function sprintf;
 use function strlen;
+use function substr;
 
 /**
  * Collection of function that have proven useful while debugging issues and creating unit tests

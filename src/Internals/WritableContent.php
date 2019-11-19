@@ -9,7 +9,10 @@ use OutOfRangeException;
 use Psr\Log\LoggerInterface;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 use unreal4u\MQTT\Utilities;
+
+use function base64_encode;
 use function chr;
+use function decbin;
 use function get_class;
 use function strlen;
 

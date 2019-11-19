@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use OutOfRangeException;
+use SplQueue;
+use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
 use unreal4u\MQTT\Internals\TopicFilterFunctionality;
@@ -15,20 +18,23 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent, PacketIdentifierFunctionality, TopicFilterFunctionality;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
+    use PacketIdentifierFunctionality;
+    use TopicFilterFunctionality;
 
-    const CONTROL_PACKET_VALUE = 10;
+    private const CONTROL_PACKET_VALUE = 10;
 
     protected function initializeObject(): ProtocolBase
     {
-        $this->topics = new \SplQueue();
+        $this->topics = new SplQueue();
         return parent::initializeObject();
     }
 
     /**
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
-     * @throws \OutOfRangeException
+     * @throws MustContainTopic
+     * @throws OutOfRangeException
      */
     public function createVariableHeader(): string
     {
@@ -40,8 +46,8 @@ final class Unsubscribe extends ProtocolBase implements WritableContentInterface
 
     /**
      * @return string
-     * @throws \unreal4u\MQTT\Exceptions\MustContainTopic
-     * @throws \OutOfRangeException
+     * @throws MustContainTopic
+     * @throws OutOfRangeException
      */
     public function createPayload(): string
     {

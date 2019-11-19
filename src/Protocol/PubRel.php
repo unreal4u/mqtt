@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use LogicException;
+use OutOfRangeException;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -11,6 +13,8 @@ use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContent;
 use unreal4u\MQTT\Internals\WritableContentInterface;
+
+use function strlen;
 
 /**
  * A PUBREL Packet is the response to a PUBREC Packet.
@@ -27,21 +31,22 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class PubRel extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, /** @noinspection TraitsPropertiesConflictsInspection */
-        WritableContent,
-        PacketIdentifierFunctionality;
+    use ReadableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
+    use PacketIdentifierFunctionality;
 
-    const CONTROL_PACKET_VALUE = 6;
+    private const CONTROL_PACKET_VALUE = 6;
 
     /**
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $rawHeadersSize = \strlen($rawMQTTHeaders);
+        $rawHeadersSize = strlen($rawMQTTHeaders);
         // A PubRel message is always 4 bytes in size
         if ($rawHeadersSize !== 4) {
             $this->logger->debug('Headers are smaller than 4 bytes, retrieving the rest', [
@@ -50,7 +55,9 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
             $rawMQTTHeaders .= $client->readBrokerData(4 - $rawHeadersSize);
         }
         $this->setPacketIdentifierFromRawHeaders($rawMQTTHeaders);
-        $this->logger->debug('Determined packet identifier', ['PI' => $this->packetIdentifier]);
+        $this->logger->debug('Determined packet identifier', [
+            'PI' => $this->packetIdentifier->getPacketIdentifierValue()
+        ]);
 
         return $this;
     }
@@ -58,7 +65,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
     /**
      * Creates the variable header that each method has
      * @return string
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     public function createVariableHeader(): string
     {
@@ -88,7 +95,7 @@ final class PubRel extends ProtocolBase implements ReadableContentInterface, Wri
      * @param ClientInterface $client
      * @param WritableContentInterface $originalRequest
      * @return bool
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
     {

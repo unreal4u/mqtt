@@ -19,7 +19,7 @@ final class EmptyWritableResponse extends ProtocolBase implements WritableConten
     use /** @noinspection TraitsPropertiesConflictsInspection */
         WritableContent;
 
-    const CONTROL_PACKET_VALUE = 0;
+    private const CONTROL_PACKET_VALUE = 0;
 
     /**
      * Creates the variable header that each method has

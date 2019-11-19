@@ -18,9 +18,10 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class Disconnect extends ProtocolBase implements WritableContentInterface
 {
-    use WritableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
 
-    const CONTROL_PACKET_VALUE = 14;
+    private const CONTROL_PACKET_VALUE = 14;
 
     public function createVariableHeader(): string
     {

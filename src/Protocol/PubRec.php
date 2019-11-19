@@ -28,11 +28,12 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class PubRec extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, /** @noinspection TraitsPropertiesConflictsInspection */
-        WritableContent,
-        PacketIdentifierFunctionality;
+    use ReadableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
+    use PacketIdentifierFunctionality;
 
-    const CONTROL_PACKET_VALUE = 5;
+    private const CONTROL_PACKET_VALUE = 5;
 
     /**
      * @param string $rawMQTTHeaders

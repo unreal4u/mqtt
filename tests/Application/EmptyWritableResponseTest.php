@@ -26,11 +26,6 @@ class EmptyWritableResponseTest extends TestCase
         $this->emptyWritableResponse = null;
     }
 
-    public function testEmptyControlPacketValue(): void
-    {
-        $this->assertSame(0, EmptyWritableResponse::CONTROL_PACKET_VALUE);
-    }
-
     public function testEmptyVariableHeader(): void
     {
         $this->assertSame('', $this->emptyWritableResponse->createVariableHeader());

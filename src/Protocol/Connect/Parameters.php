@@ -4,12 +4,23 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol\Connect;
 
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use unreal4u\Dummy\Logger;
 use unreal4u\MQTT\DataTypes\BrokerPort;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\ProtocolVersion;
+use unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion;
+use unreal4u\MQTT\Exceptions\InvalidBrokerPort;
+use unreal4u\MQTT\Exceptions\InvalidBrokerProtocol;
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
+use unreal4u\MQTT\Exceptions\MessageTooBig;
+use unreal4u\MQTT\Exceptions\MissingTopicName;
+
+use function get_class;
+use function sprintf;
+use function str_replace;
 
 /**
  * Special connection parameters will be defined in this class
@@ -19,7 +30,7 @@ final class Parameters
     /**
      * The default protocol version this library will be talking with
      */
-    const DEFAULT_PROTOCOL_VERSION = '3.1.1';
+    private const DEFAULT_PROTOCOL_VERSION = '3.1.1';
 
     /**
      * @var LoggerInterface
@@ -117,9 +128,9 @@ final class Parameters
      * @param ClientId $clientId Will default to a clientId set by the broker
      * @param string $host Will default to localhost
      * @param LoggerInterface $logger
-     * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerProtocol
-     * @throws \unreal4u\MQTT\Exceptions\InvalidBrokerPort
-     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
+     * @throws InvalidBrokerProtocol
+     * @throws InvalidBrokerPort
+     * @throws UnacceptableProtocolVersion
      */
     public function __construct(ClientId $clientId = null, string $host = 'localhost', LoggerInterface $logger = null)
     {
@@ -127,7 +138,7 @@ final class Parameters
             $logger = new Logger();
         }
         // Insert name of class within the logger
-        $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', \get_class($this)));
+        $this->logger = $logger->withName(str_replace('unreal4u\\MQTT\\', '', get_class($this)));
 
         // Once we have a logger, set the clientId
         if ($clientId === null) {
@@ -219,13 +230,13 @@ final class Parameters
      *
      * @param int $keepAlivePeriod
      * @return Parameters
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setKeepAlivePeriod(int $keepAlivePeriod): self
     {
         if ($keepAlivePeriod > 65535 || $keepAlivePeriod < 0) {
             $this->logger->error('Keep alive period must be between 0 and 65535');
-            throw new \InvalidArgumentException('Keep alive period must be between 0 and 65535');
+            throw new InvalidArgumentException('Keep alive period must be between 0 and 65535');
         }
 
         $this->keepAlivePeriod = $keepAlivePeriod;
@@ -308,9 +319,9 @@ final class Parameters
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349230
      * @param Message $message
      * @return Parameters
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
-     * @throws \unreal4u\MQTT\Exceptions\MissingTopicName
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @throws InvalidQoSLevel
+     * @throws MissingTopicName
+     * @throws MessageTooBig
      */
     public function setWill(Message $message): self
     {

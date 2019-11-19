@@ -7,10 +7,12 @@ namespace unreal4u\MQTT;
 use LogicException;
 use OutOfRangeException;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
+
 use function chr;
 use function dechex;
 use function hexdec;
 use function ord;
+use function str_pad;
 
 /**
  * Functionality that is shared across the entire package

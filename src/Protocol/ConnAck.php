@@ -16,6 +16,9 @@ use unreal4u\MQTT\Internals\ReadableContent;
 use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 
+use function ord;
+use function sprintf;
+
 /**
  * The CONNACK Packet is the packet sent by the Server in response to a CONNECT Packet received from a Client.
  */
@@ -23,7 +26,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
 
-    const CONTROL_PACKET_VALUE = 2;
+    private const CONTROL_PACKET_VALUE = 2;
 
     /**
      * The connect return code. If a server sends a CONNACK packet containing a non-zero return code it MUST then close
@@ -48,16 +51,16 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
-     * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
-     * @throws \unreal4u\MQTT\Exceptions\Connect\BadUsernameOrPassword
-     * @throws \unreal4u\MQTT\Exceptions\Connect\ServerUnavailable
-     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
+     * @throws GenericError
+     * @throws NotAuthorized
+     * @throws BadUsernameOrPassword
+     * @throws ServerUnavailable
+     * @throws IdentifierRejected
+     * @throws UnacceptableProtocolVersion
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->connectReturnCode = \ord($rawMQTTHeaders{3});
+        $this->connectReturnCode = ord($rawMQTTHeaders{3});
         if ($this->connectReturnCode !== 0) {
             // We have detected a problem while connecting to the broker, send out the correct exception
             $this->throwConnectException();
@@ -81,12 +84,12 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc385349257
      *
      * @return ConnAck
-     * @throws \unreal4u\MQTT\Exceptions\Connect\GenericError
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NotAuthorized
-     * @throws \unreal4u\MQTT\Exceptions\Connect\BadUsernameOrPassword
-     * @throws \unreal4u\MQTT\Exceptions\Connect\ServerUnavailable
-     * @throws \unreal4u\MQTT\Exceptions\Connect\IdentifierRejected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\UnacceptableProtocolVersion
+     * @throws GenericError
+     * @throws NotAuthorized
+     * @throws BadUsernameOrPassword
+     * @throws ServerUnavailable
+     * @throws IdentifierRejected
+     * @throws UnacceptableProtocolVersion
      */
     private function throwConnectException(): self
     {

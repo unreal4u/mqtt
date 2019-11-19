@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Protocol;
 
+use OutOfRangeException;
 use unreal4u\MQTT\Internals\ClientInterface;
 use unreal4u\MQTT\Internals\PacketIdentifierFunctionality;
 use unreal4u\MQTT\Internals\ProtocolBase;
@@ -23,15 +24,18 @@ use unreal4u\MQTT\Internals\WritableContentInterface;
  */
 final class PubAck extends ProtocolBase implements ReadableContentInterface, WritableContentInterface
 {
-    use ReadableContent, WritableContent, PacketIdentifierFunctionality;
+    use ReadableContent;
+    use /** @noinspection TraitsPropertiesConflictsInspection */
+        WritableContent;
+    use PacketIdentifierFunctionality;
 
-    const CONTROL_PACKET_VALUE = 4;
+    private const CONTROL_PACKET_VALUE = 4;
 
     /**
      * @param string $rawMQTTHeaders
      * @param ClientInterface $client
      * @return ReadableContentInterface
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
@@ -41,7 +45,7 @@ final class PubAck extends ProtocolBase implements ReadableContentInterface, Wri
 
     /**
      * @return string
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     public function createVariableHeader(): string
     {

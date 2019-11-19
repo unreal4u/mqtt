@@ -9,9 +9,9 @@ namespace unreal4u\MQTT\Internals;
  */
 final class DisconnectCleanup extends ProtocolBase implements ReadableContentInterface
 {
-    const CONTROL_PACKET_VALUE = 0;
-
     use ReadableContent;
+
+    private const CONTROL_PACKET_VALUE = 0;
 
     /**
      * @inheritdoc

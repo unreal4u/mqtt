@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
+use Exception;
+use OutOfRangeException;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Utilities;
+
+use function mt_rand;
 
 /**
  * Trait ReadableContent
@@ -39,7 +43,7 @@ trait PacketIdentifierFunctionality
      * Returns the binary representation of the packet identifier
      *
      * @return string
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     final public function getPacketIdentifierBinaryRepresentation(): string
     {
@@ -51,7 +55,7 @@ trait PacketIdentifierFunctionality
      *
      * @param string $rawMQTTHeaders
      * @return self
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     final public function setPacketIdentifierFromRawHeaders(string $rawMQTTHeaders): self
     {
@@ -66,7 +70,7 @@ trait PacketIdentifierFunctionality
     {
         try {
             $this->packetIdentifier = new PacketIdentifier(random_int(1, 65535));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             /*
              * Default to an older method, there should be no security issues here I believe.
              *
@@ -90,7 +94,16 @@ trait PacketIdentifierFunctionality
     {
         /** @var PacketIdentifierFunctionality $originalRequest */
         if ($this->getPacketIdentifier() !== $originalRequest->getPacketIdentifier()) {
-            $e = new NonMatchingPacketIdentifiers('Packet identifiers do not match');
+            $this->logger->critical('Non matching packet identifiers found, throwing exception', [
+                'original' => $originalRequest->getPacketIdentifier(),
+                'response' => $this->getPacketIdentifier(),
+            ]);
+
+            $e = new NonMatchingPacketIdentifiers(sprintf(
+                'Packet identifiers do not match: %d (original) vs %d (response)',
+                $originalRequest->getPacketIdentifier(),
+                $this->getPacketIdentifier()
+            ));
             $e->setOriginPacketIdentifier(new PacketIdentifier($originalRequest->getPacketIdentifier()));
             $e->setReturnedPacketIdentifier($this->packetIdentifier);
             throw $e;

@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT;
 
+use DateTime;
+use DateTimeImmutable;
+use LogicException;
 use unreal4u\MQTT\Application\EmptyWritableResponse;
+use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
+use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Exceptions\NotConnected;
 use unreal4u\MQTT\Exceptions\ServerClosedConnection;
 use unreal4u\MQTT\Internals\ClientInterface;
@@ -13,6 +18,21 @@ use unreal4u\MQTT\Internals\ReadableContentInterface;
 use unreal4u\MQTT\Internals\WritableContentInterface;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Disconnect;
+
+use function array_key_exists;
+use function array_keys;
+use function floor;
+use function fread;
+use function fwrite;
+use function get_class;
+use function microtime;
+use function sprintf;
+use function stream_get_meta_data;
+use function stream_set_blocking;
+use function stream_set_timeout;
+use function stream_socket_client;
+use function stream_socket_shutdown;
+use function strlen;
 
 /**
  * Example working client that implements all methods from the mandatory ClientInterface
@@ -40,7 +60,7 @@ final class Client extends ProtocolBase implements ClientInterface
 
     /**
      * Annotates the last time there was known to be communication with the MQTT server
-     * @var \DateTimeImmutable
+     * @var DateTimeImmutable
      */
     private $lastCommunication;
 
@@ -58,11 +78,11 @@ final class Client extends ProtocolBase implements ClientInterface
 
     /**
      * @inheritdoc
-     * @throws \LogicException
-     * @throws \unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
+     * @throws LogicException
+     * @throws NonMatchingPacketIdentifiers
+     * @throws NotConnected
+     * @throws NoConnectionParametersDefined
+     * @throws ServerClosedConnection
      */
     public function __destruct()
     {
@@ -104,8 +124,8 @@ final class Client extends ProtocolBase implements ClientInterface
 
     /**
      * @inheritdoc
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws ServerClosedConnection
+     * @throws NotConnected
      */
     public function sendBrokerData(WritableContentInterface $object): string
     {
@@ -115,7 +135,7 @@ final class Client extends ProtocolBase implements ClientInterface
         }
 
         $writableString = $object->createSendableMessage();
-        $sizeOfString = \strlen($writableString);
+        $sizeOfString = strlen($writableString);
         $writtenBytes = fwrite($this->socket, $writableString, $sizeOfString);
         // $this->logger->debug('Sent string', ['binaryString' => str2bin($writableString)]); // Handy for debugging
         if ($writtenBytes !== $sizeOfString) {
@@ -155,7 +175,7 @@ final class Client extends ProtocolBase implements ClientInterface
      * @param int $errorCode
      * @param string $errorDescription
      * @return Client
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws NotConnected
      */
     private function checkForConnectionErrors(int $errorCode, string $errorDescription): self
     {
@@ -176,8 +196,8 @@ final class Client extends ProtocolBase implements ClientInterface
      *
      * @param Connect $connection
      * @return bool
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws NotConnected
+     * @throws NoConnectionParametersDefined
      */
     private function generateSocketConnection(Connect $connection): bool
     {
@@ -211,7 +231,7 @@ final class Client extends ProtocolBase implements ClientInterface
     private function setSocketTimeout(): self
     {
         $timeCalculation = $this->connectionParameters->getKeepAlivePeriod() * 1.5;
-        $seconds = (int)floor($timeCalculation);
+        $seconds = (int) floor($timeCalculation);
         stream_set_timeout($this->socket, $seconds, (int)($timeCalculation - $seconds) * 1000);
 
         return $this;
@@ -233,8 +253,8 @@ final class Client extends ProtocolBase implements ClientInterface
      *
      * @param WritableContentInterface $object
      * @return Client
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
+     * @throws NotConnected
+     * @throws NoConnectionParametersDefined
      */
     private function preSocketCommunication(WritableContentInterface $object): self
     {
@@ -252,7 +272,7 @@ final class Client extends ProtocolBase implements ClientInterface
      *
      * @param ReadableContentInterface $readableContent
      * @return WritableContentInterface
-     * @throws \LogicException
+     * @throws LogicException
      */
     private function postSocketCommunication(ReadableContentInterface $readableContent): WritableContentInterface
     {
@@ -279,15 +299,15 @@ final class Client extends ProtocolBase implements ClientInterface
 
     /**
      * @inheritdoc
-     * @throws \LogicException
-     * @throws \unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers
-     * @throws \unreal4u\MQTT\Exceptions\ServerClosedConnection
-     * @throws \unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined
-     * @throws \unreal4u\MQTT\Exceptions\NotConnected
+     * @throws LogicException
+     * @throws NonMatchingPacketIdentifiers
+     * @throws ServerClosedConnection
+     * @throws NoConnectionParametersDefined
+     * @throws NotConnected
      */
     public function processObject(WritableContentInterface $object): ReadableContentInterface
     {
-        $currentObject = \get_class($object);
+        $currentObject = get_class($object);
         $this->logger->debug('Validating object', ['object' => $currentObject]);
 
         $this->preSocketCommunication($object);
@@ -301,7 +321,7 @@ final class Client extends ProtocolBase implements ClientInterface
          */
         $this->logger->debug('Checking stack and performing special operations', [
             'originObject' => $currentObject,
-            'responseObject' => \get_class($readableContent),
+            'responseObject' => get_class($readableContent),
         ]);
 
         $readableContent->performSpecialActions($this, $this->postSocketCommunication($readableContent));
@@ -314,7 +334,7 @@ final class Client extends ProtocolBase implements ClientInterface
      */
     public function isItPingTime(): bool
     {
-        $secondsDifference = (new \DateTime('now'))->getTimestamp() - $this->lastCommunication->getTimestamp();
+        $secondsDifference = (new DateTime('now'))->getTimestamp() - $this->lastCommunication->getTimestamp();
         $this->logger->debug('Checking time difference', [
             'secondsDifference' => $secondsDifference,
             'keepAlivePeriod' => $this->connectionParameters->getKeepAlivePeriod(),
@@ -338,7 +358,7 @@ final class Client extends ProtocolBase implements ClientInterface
             $lastCommunication = $this->lastCommunication->format('Y-m-d H:i:s.u');
         }
         // "now" does not support microseconds, so create the timestamp with a format that does
-        $this->lastCommunication = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
+        $this->lastCommunication = DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
         $this->logger->debug('Updating internal last communication timestamp', [
             'previousValue' => $lastCommunication,
             'currentValue' => $this->lastCommunication->format('Y-m-d H:i:s.u'),

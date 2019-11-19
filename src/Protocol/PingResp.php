@@ -19,7 +19,7 @@ final class PingResp extends ProtocolBase implements ReadableContentInterface
 {
     use ReadableContent;
 
-    const CONTROL_PACKET_VALUE = 13;
+    private const CONTROL_PACKET_VALUE = 13;
 
     /**
      * @inheritdoc

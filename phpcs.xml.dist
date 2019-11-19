@@ -4,7 +4,7 @@
     <file>src</file>
     <file>tests</file>
 
-    <!-- include all rules in PSR-2 ruleset -->
-    <rule ref="PSR2"/>
+    <!-- include all rules in PSR-12 ruleset -->
+    <rule ref="PSR12"/>
 </ruleset>
 

@@ -6,7 +6,9 @@ namespace unreal4u\MQTT\Internals;
 
 use unreal4u\MQTT\Exceptions\InvalidResponseType;
 use unreal4u\MQTT\Utilities;
+
 use function ord;
+use function sprintf;
 use function strlen;
 
 /**
@@ -15,12 +17,6 @@ use function strlen;
  */
 trait ReadableContent
 {
-    /**
-     * Length of variable header
-     * @var int
-     */
-    protected $variableHeaderSize = 0;
-
     /**
      * The remaining length field may be from 1 to 4 bytes long, this field will represent that offset
      * @var int
