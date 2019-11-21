@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fin phpunit && fin phpcs -p && fin phpstan -c phpstan.neon --level 7 src/
+fin phpunit && fin phpcs -p && fin phpstan

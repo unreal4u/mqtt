@@ -53,7 +53,7 @@ trait WritableContent
             'controlPacketValue' => self::getControlPacketValue(),
             'specialFlags' => $this->specialFlags,
             'variableHeaderLength' => $variableHeaderLength,
-            'composed' => decbin(chr((self::getControlPacketValue() << 4) | $this->specialFlags)),
+            #'composed' => decbin(chr((self::getControlPacketValue() << 4) | $this->specialFlags)),
         ]);
 
         // Binary OR is safe to do because the first 4 bits are always 0 after shifting

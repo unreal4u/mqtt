@@ -1,6 +1,6 @@
 filter:
     paths: [src/*]
-    excluded_paths: [bin/*, vendor/*, tests/*, examples/*]
+    excluded_paths: [.docksal/*, vendor/*, tests/*, examples/*]
 tools:
     external_code_coverage: true
     php_pdepend: true

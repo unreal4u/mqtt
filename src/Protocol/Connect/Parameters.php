@@ -118,7 +118,6 @@ final class Parameters
      * Bit 0: Reserved
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180843
-     * @var string
      */
     private $bitFlag = b'00000000';
 
@@ -200,8 +199,6 @@ final class Parameters
 
     /**
      * Returns the connection string
-     *
-     * @TODO Currently only TCP connections supported, SSL will come
      *
      * @return string
      */

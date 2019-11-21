@@ -28,7 +28,7 @@ trait TopicFilterFunctionality
     /**
      * A subscription is based on filters, this function allows us to pass on filters
      *
-     * @param TopicFilter[] $topics
+     * @param TopicFilter[] ...$topics
      * @return self
      */
     final public function addTopics(TopicFilter ...$topics): self

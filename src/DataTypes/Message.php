@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\DataTypes;
 
+use unreal4u\MQTT\Exceptions\InvalidQoSLevel;
 use unreal4u\MQTT\Exceptions\MessageTooBig;
 
 final class Message
@@ -41,8 +42,8 @@ final class Message
     /**
      * Message constructor.
      * @param string $payload
-     * @param TopicFilter $topic
-     * @throws \unreal4u\MQTT\Exceptions\MessageTooBig
+     * @param TopicName $topic
+     * @throws MessageTooBig
      */
     public function __construct(string $payload, TopicName $topic)
     {
@@ -60,7 +61,7 @@ final class Message
      * @param QoSLevel $level
      * @return Message
      */
-    public function setQoSLevel(QosLevel $level): Message
+    public function setQoSLevel(QoSLevel $level): Message
     {
         $this->qosLevel = $level;
         return $this;
@@ -97,7 +98,7 @@ final class Message
      * Gets the current QoS level
      *
      * @return int
-     * @throws \unreal4u\MQTT\Exceptions\InvalidQoSLevel
+     * @throws InvalidQoSLevel
      */
     public function getQoSLevel(): int
     {

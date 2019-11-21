@@ -11,8 +11,8 @@ before_script:
 script:
   # Setting stty prevents warning on lowest dependencies: https://github.com/sebastianbergmann/phpunit/issues/1976
   - stty cols 80; vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
-  - vendor/bin/phpcs src/ --standard=psr12 -sp
-  - vendor/bin/phpstan analyse -c phpstan.neon --level 7 src/
+  - vendor/bin/phpcs src/ tests/ --standard=psr12 -sp
+  - vendor/bin/phpstan analyse -c phpstan.neon.dist --level 7 src/
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar

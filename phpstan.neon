@@ -2,6 +2,19 @@ parameters:
   autoload_files:
     - vendor/autoload.php
   level: 7
+  inferPrivatePropertyTypeFromConstructor: true
   paths:
     - src
     - tests
+  ignoreErrors:
+    - '#Call to an undefined method unreal4u\\MQTT\\Internals\\WritableContentInterface::getPacketIdentifier\(\)\.#'
+    - '#Call to an undefined method Psr\\Log\\LoggerInterface::withName\(\)\.#'
+    -
+      message: '#Property unreal4u\\MQTT\\Client::\$lastCommunication \(DateTimeImmutable\) does not accept DateTimeImmutable\|false\.#'
+      path: %currentWorkingDirectory%/src/Client.php
+    -
+      message: '#Cannot call method format\(\) on DateTimeImmutable\|false\.#'
+      path: %currentWorkingDirectory%/src/Client.php
+    -
+      message: '#Parameter \#1 \$(stream|fp|socket) of function (fread|stream\_[a-z_]+) expects resource, resource\|null given\.#'
+      path: %currentWorkingDirectory%/src/Client.php

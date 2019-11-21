@@ -2,15 +2,15 @@
 tests/** export-ignore
 vendor/** export-ignore
 .vagrant/** export-ignore
-VagrantProvisionScripts/** export-ignore
-documentation-assets/** export-ignore
+.docksal/** export-ignore
 docs/** export-ignore
 report/** export-ignore
-bin/** export-ignore
 
 .git* export-ignore
 .*.yml export-ignore
+.phpcs.cache export-ignore
+phpcs.xml* export-ignore
+phpstan.neon export-ignore
 phpunit.xml* export-ignore
-Vagrantfile export-ignore
 
 *.php diff=php

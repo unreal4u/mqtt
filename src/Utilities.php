@@ -158,6 +158,6 @@ final class Utilities
             $iteration++;
         } while (($encodedByte & 128) !== 0);
 
-        return $value;
+        return (int)$value;
     }
 }

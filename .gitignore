@@ -6,3 +6,4 @@ docs/
 composer.phar
 quicky.php
 phpunit.xml
+.phpcs.cache

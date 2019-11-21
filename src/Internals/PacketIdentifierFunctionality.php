@@ -76,7 +76,6 @@ trait PacketIdentifierFunctionality
              *
              * If I am mistaken, please contact me at https://t.me/unreal4u
              */
-            /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             /** @noinspection RandomApiMigrationInspection */
             $this->packetIdentifier = new PacketIdentifier(mt_rand(1, 65535));
         }

@@ -30,7 +30,8 @@ final class DebugTools
         $strLength = strlen($rawString);
         for ($a = 0; $a < $strLength; $a++) {
             $dec = ord($rawString[$a]); //determine symbol ASCII-code
-            $bin = sprintf('%08d', base_convert($dec, 10, 2)); //convert to binary representation and add leading zeros
+            //convert to binary representation and add leading zeros
+            $bin = sprintf('%08d', base_convert((string)$dec, 10, 2));
             $out .= $bin;
         }
 

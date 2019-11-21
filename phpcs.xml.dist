@@ -7,4 +7,3 @@
     <!-- include all rules in PSR-12 ruleset -->
     <rule ref="PSR12"/>
 </ruleset>
-

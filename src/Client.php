@@ -110,7 +110,7 @@ final class Client extends ProtocolBase implements ClientInterface
             'numberOfBytes' => $bytes,
             'isLocked' => $this->isCurrentlyLocked,
         ]);
-        return fread($this->socket, $bytes);
+        return (string)fread($this->socket, $bytes);
     }
 
     /**
@@ -203,13 +203,16 @@ final class Client extends ProtocolBase implements ClientInterface
     {
         $this->logger->debug('Creating socket connection');
         $this->connectionParameters = $connection->getConnectionParameters();
-        $this->socket = stream_socket_client(
+        $socket = stream_socket_client(
             $this->connectionParameters->getConnectionUrl(),
             $errorCode,
             $errorDescription,
             60,
             STREAM_CLIENT_CONNECT
         );
+        if ($socket !== false) {
+            $this->socket = $socket;
+        }
 
         $this
             ->checkForConnectionErrors($errorCode, $errorDescription)
