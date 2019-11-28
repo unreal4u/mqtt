@@ -21,7 +21,7 @@ include __DIR__ . '/00.basics.php';
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST);
 $connectionParameters->setCredentials('testuser', 'userpass');
 $connectionParameters->setKeepAlivePeriod(6);
 
@@ -49,15 +49,15 @@ $subscribe = new Subscribe($logger);
  *
  * That being said, I must very sincerely admit that I can not find a use-case for this, but the protocol supports it
  * and it was kind of trivial to implement. If you know about an actual use for this, please let me know or submit an
- * PR!
+ * issue!
  */
-$subscribe->addTopics(new TopicFilter(COMMON_TOPICNAME), new QoSLevel(0));
+$subscribe->addTopics(new TopicFilter(COMMON_TOPICNAME, new QoSLevel(0)));
 
 /** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
     // Any message here should NOT be within the SECONDARY_TOPICNAME topic
     printf(
-        '%s-- Payload detected on topic "%s" (QoS lvl %d): %s + %s%s',
+        '%s-- Payload detected on topic "%s" (QoS lvl %d): %s (+ %s%s',
         PHP_EOL,
         $message->getTopicName(),
         $message->getQoSLevel(),

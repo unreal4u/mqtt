@@ -16,7 +16,7 @@ use unreal4u\MQTT\Protocol\Publish;
 include __DIR__ . '/00.basics.php';
 
 // For this connection, we'll do something different: we'll connect with a username and password. This is done by doing:
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST);
 $connectionParameters->setCredentials('testuser', 'userpass');
 
 // Now we'll setup a Connect object
@@ -39,7 +39,7 @@ if ($client->isConnected()) {
 
     for ($i = 1; $i <= MAXIMUM; $i++) {
         // We'll pick a random topic
-        $topicId = random_int(0, 2);
+        $topicId = random_int(0, 1);
 
         // And we'll set the message to the Publish object
         $publish->setMessage(new Message(sprintf('Hello world!! (%d / %d, %s)', $i, MAXIMUM, $topics[$topicId]),

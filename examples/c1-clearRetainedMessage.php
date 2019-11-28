@@ -13,7 +13,7 @@ use unreal4u\MQTT\Protocol\Publish;
 include __DIR__ . '/00.basics.php';
 
 $connect = new Connect();
-$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST));
 
 $client = new Client();
 $client->processObject($connect);

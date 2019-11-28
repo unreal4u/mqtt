@@ -23,7 +23,7 @@ $willMessage = new Message(
 );
 
 // Now we will setup a new Connect Parameters object
-$parameters = new Parameters($clientId);
+$parameters = new Parameters($clientId, BROKER_HOST);
 // Set the will message to the above created message
 $parameters->setWill($willMessage);
 

@@ -1,6 +1,6 @@
 # unreal4u/MQTT
 
-Complete PHP7+ MQTT client with full support for 
+Complete PHP7.1+ MQTT client with full support for 
 [the MQTT version 3.1.1 protocol](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html). This package is an
 entire rewrite of [McFizh/libMQTT](https://github.com/McFizh/libMQTT).
 
@@ -23,9 +23,9 @@ Don't forget to read the other articles which may contain more useful informatio
 ## Capabilities of this package: 
 
 This package is able to:
-- Connect to the broker. You can connect with virtually all optional parameters the protocol
-supports, including Will Message. The only exception to the rule is the clean session flag. This is not tested and may
-or may not work as intended.
+- Connect to the broker. You can connect with virtually all optional parameters the protocol supports, including Will
+Message. The only exception to the rule is the clean session flag. This is not tested and may or may not work as
+intended.
 - Publish QoS level 0, 1 and 2 messages. All protocol supported parameters are also supported, such as retained messages
 and other options.
 - Subscribe on QoS level 0, 1 and 2 topics. Connection handling will be done automatically, no need to fiddle with
@@ -38,7 +38,10 @@ create your own client, for which you'll just have to implement an interface.
 
 ## Examples
 
-This package has many examples detailing the many things you can do with it. Please check the [examples directory](https://github.com/unreal4u/mqtt/tree/master/examples) for more information. In case of questions or doubt, [open up an Issue](https://github.com/unreal4u/mqtt/issues/new) or submit a [Pull Request](https://github.com/unreal4u/mqtt/pulls) if you feel the need to clarify, correct or add more examples.
+This package has many examples detailing the many things you can do with it. Please check the 
+[examples directory](https://github.com/unreal4u/mqtt/tree/master/examples) for more information. In case of questions
+or doubt, [open up an Issue](https://github.com/unreal4u/mqtt/issues/new) or submit a
+[Pull Request](https://github.com/unreal4u/mqtt/pulls) if you feel the need to clarify, correct or add more examples.
 
 # References
 **[mqtt-v3.1.1-plus-errata01]**

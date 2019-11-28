@@ -23,3 +23,4 @@ ini_set('display_errors', '1');
 // For all our tests, we will define 2 topics on which to execute them
 const COMMON_TOPICNAME = 'firstTest';
 const SECONDARY_TOPICNAME = 'sensors/baseroom';
+const BROKER_HOST = 'mosquitto';

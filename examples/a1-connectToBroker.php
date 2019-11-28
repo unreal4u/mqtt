@@ -19,7 +19,7 @@ $client = new Client();
 // Create a Connect object
 $connect = new Connect();
 // Set the most basic parameters possible: send just a ClientId
-$connect->setConnectionParameters(new Parameters(new ClientId('uniqueClientId123')));
+$connect->setConnectionParameters(new Parameters(new ClientId('uniqueClientId123'), BROKER_HOST));
 
 // Example of invalid protocol which will throw an exception:
 /** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */

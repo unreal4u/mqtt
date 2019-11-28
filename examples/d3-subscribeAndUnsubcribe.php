@@ -22,7 +22,7 @@ include __DIR__ . '/00.basics.php';
 $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST);
 $connectionParameters->setCredentials('testuser', 'userpass');
 
 $connect = new Connect();

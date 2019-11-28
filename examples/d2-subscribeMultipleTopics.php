@@ -23,7 +23,7 @@ $logger = new Logger('main');
 // To adjust the level of logging, adjust last parameter of StreamHandler to something like Logger::INFO
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
+$connectionParameters = new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST);
 // Keep alive period is used for connections that must ping the broker more or less frequently. It defaults to 60 secs.
 $connectionParameters->setKeepAlivePeriod(5);
 $connectionParameters->setCredentials('testuser', 'userpass');

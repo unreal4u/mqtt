@@ -1,0 +1,3 @@
+#!/bin/bash
+
+fin exec --in=mosquitto mosquitto_sub -t '#' -v

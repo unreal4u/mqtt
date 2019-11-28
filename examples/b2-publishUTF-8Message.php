@@ -23,7 +23,7 @@ $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 // Create the Connect object and set the parameters
 $connect = new Connect();
-$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST));
 
 // Create the client connection and connect to the broker
 $client = new Client();

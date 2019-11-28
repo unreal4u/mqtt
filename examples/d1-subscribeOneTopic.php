@@ -17,7 +17,7 @@ include __DIR__ . '/00.basics.php';
 
 // First, we must connect to the broker
 $connect = new Connect();
-$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__))));
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__)), BROKER_HOST));
 
 $client = new Client();
 $client->processObject($connect);

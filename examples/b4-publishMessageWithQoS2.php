@@ -29,12 +29,14 @@ $logger = new Logger('main');
 $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
 // Set up the connection parameters
-$connectionParameters = new Parameters(new ClientId(basename(__FILE__)));
-$connectionParameters->setCredentials('testuser', 'userpass');
+//$connectionParameters = new Parameters(new ClientId(basename(__FILE__), 'mosquitto'));
+//$connect->setConnectionParameters(new Parameters(new ClientId('uniqueClientId123'), 'mosquitto'));
+//$connectionParameters->setCredentials('testuser', 'userpass');
 
 // And connect, every object will give you output about what it is doing
 $connect = new Connect($logger);
-$connect->setConnectionParameters($connectionParameters);
+$connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__)), 'mosquitto'));
+//$connect->setConnectionParameters($connectionParameters);
 
 // Make the initial connection
 $client = new Client($logger);
