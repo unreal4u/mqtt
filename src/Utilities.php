@@ -68,7 +68,7 @@ final class Utilities
      */
     public static function convertBinaryStringToNumber(string $binaryString): int
     {
-        return self::convertEndianness((ord($binaryString{1}) << 8) + (ord($binaryString{0}) & 255));
+        return self::convertEndianness((ord($binaryString[1]) << 8) + (ord($binaryString[0]) & 255));
     }
 
     /**
@@ -146,7 +146,7 @@ final class Utilities
 
         do {
             // Extract the next byte in the sequence
-            $encodedByte = ord($remainingLengthField{$iteration});
+            $encodedByte = ord($remainingLengthField[$iteration]);
 
             // Add the current multiplier^iteration * first half of byte
             $value += ($encodedByte & 127) * ($multiplier ** $iteration);

@@ -1,0 +1,19 @@
+version: "3"
+services:
+  mosquitto:
+    container_name: "mqtt-broker"
+    image: "eclipse-mosquitto:latest"
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+  php74:
+    container_name: "mqtt-php74"
+    build: "docker/php74"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+    expose:
+      - 9000
+    volumes:
+      - .:/var/www/html:z
+      - ~/.composer:/.composer:z

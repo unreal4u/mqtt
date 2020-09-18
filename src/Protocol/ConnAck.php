@@ -60,7 +60,7 @@ final class ConnAck extends ProtocolBase implements ReadableContentInterface
      */
     public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->connectReturnCode = ord($rawMQTTHeaders{3});
+        $this->connectReturnCode = ord($rawMQTTHeaders[3]);
         if ($this->connectReturnCode !== 0) {
             // We have detected a problem while connecting to the broker, send out the correct exception
             $this->throwConnectException();

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-## Executes PHPUnit test suite
-
-fin exec vendor/bin/phpunit "$@"
-

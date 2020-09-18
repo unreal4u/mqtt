@@ -1,4 +1,0 @@
-#!/bin/bash
-
-## Executes PHPStan
-fin exec vendor/bin/phpstan analyse --level 7 -c ./phpstan.neon src/

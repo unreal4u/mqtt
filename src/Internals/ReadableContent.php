@@ -71,8 +71,8 @@ trait ReadableContent
         ClientInterface $client
     ): int {
         // Early return: assume defaults if first digit has a value under 128, no further need for complex checks
-        if (ord($rawMQTTHeaders{1}) < 128) {
-            return ord($rawMQTTHeaders{1});
+        if (ord($rawMQTTHeaders[1]) < 128) {
+            return ord($rawMQTTHeaders[1]);
         }
 
         // If we have less than 4 bytes now, we should really try to recover the rest of the remaining field data
