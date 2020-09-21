@@ -17,3 +17,14 @@ services:
     volumes:
       - .:/var/www/html:z
       - ~/.composer:/.composer:z
+  php71:
+    container_name: "mqtt-php71"
+    build: "docker/php71"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+    expose:
+      - 9001
+    volumes:
+      - .:/var/www/html:z
+      - ~/.composer:/.composer:z

@@ -34,5 +34,16 @@
     "phpunit/phpunit": "@stable",
     "squizlabs/php_codesniffer": "@stable",
     "phpstan/phpstan": "@stable"
+  },
+  "scripts": {
+    "unit-tests": [
+      "php vendor/bin/phpunit"
+    ],
+    "phpcs": [
+      "php vendor/bin/phpcs src/ tests/ --standard=psr12 -sp"
+    ],
+    "phpstan": [
+      "php vendor/bin/phpstan analyse -c phpstan.neon --level 7 src/"
+    ]
   }
 }

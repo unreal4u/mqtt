@@ -4,6 +4,7 @@ php:
   - '7.1'
   - '7.2'
   - '7.3'
+  - '7.4'
 
 before_script:
   - composer install -o
@@ -12,7 +13,7 @@ script:
   # Setting stty prevents warning on lowest dependencies: https://github.com/sebastianbergmann/phpunit/issues/1976
   - stty cols 80; vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
   - vendor/bin/phpcs src/ tests/ --standard=psr12 -sp
-  - vendor/bin/phpstan analyse -c phpstan.neon.dist --level 7 src/
+  - vendor/bin/phpstan analyse -c phpstan.neon --level 7 src/
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar

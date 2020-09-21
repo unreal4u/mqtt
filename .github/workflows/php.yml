@@ -1,4 +1,4 @@
-name: PHP Composer
+name: CI MQTT
 
 on:
   push:
@@ -7,34 +7,42 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  run:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['7.3', '7.4', '8.0']
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+
     - uses: actions/checkout@v2
+
+    - name: Show php version
+      run: php --version
 
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
     - name: Install dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
+      if: ${{ matrix.php-versions != '8.0' && steps.composer-cache.outputs.cache-hit != 'true' }}
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+    - name: Install dependencies ignoring platform requirements
+      if:  ${{ matrix.php-versions == '8.0' }}
+      run: composer install --no-progress --no-interaction --ignore-platform-reqs
 
-    - name: PHPUnit tests
-      uses: php-actions/phpunit@v8
-      with: 
-        configuration: phpunit.xml.dist
-        memory_limit: 256M
+    - name: Run test suite
+      run: composer run-script unit-test
+
+    - name: Run PHPCS
+      run: composer run-script phpcs
+
+    - name: Run PHPStan
+      run: composer run-script phpstan
