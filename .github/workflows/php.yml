@@ -38,4 +38,3 @@ jobs:
       with: 
         configuration: phpunit.xml.dist
         memory_limit: 256M
-        run: composer run-script test
