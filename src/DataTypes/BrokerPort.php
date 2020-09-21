@@ -31,7 +31,7 @@ final class BrokerPort
 
     /**
      * List of valid protocols that this package implements (or the broker can implement)
-     * @var array
+     * @var string[]
      */
     private static $validProtocols = [
         'tcp',

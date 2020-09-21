@@ -17,7 +17,7 @@ class UnsubAckTest extends TestCase
      */
     private $unsuback;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->unsuback = new UnsubAck();
         parent::setUp();

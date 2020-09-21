@@ -4,6 +4,9 @@ namespace unreal4u\MQTT\Exceptions\Connect;
 
 class IdentifierRejected extends \InvalidArgumentException
 {
+    /**
+     * @var string
+     */
     private $possibleReason = '';
 
     public function fillPossibleReason(string $possibleReason): self

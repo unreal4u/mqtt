@@ -19,7 +19,7 @@ class PubRelTest extends TestCase
      */
     private $pubRel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pubRel = new PubRel();
         parent::setUp();

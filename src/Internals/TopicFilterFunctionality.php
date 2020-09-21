@@ -21,7 +21,7 @@ trait TopicFilterFunctionality
 
     /**
      * Unordered list of topic names in order to avoid duplicates
-     * @var array
+     * @var string[]
      */
     private $topicHashTable = [];
 

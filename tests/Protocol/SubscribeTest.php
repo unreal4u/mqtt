@@ -21,7 +21,7 @@ class SubscribeTest extends TestCase
      */
     private $subscribe;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscribe = new Subscribe();
         parent::setUp();

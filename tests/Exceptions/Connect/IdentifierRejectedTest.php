@@ -14,7 +14,7 @@ class IdentifierRejectedTest extends TestCase
      */
     private $exception;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exception = new IdentifierRejected();
         parent::setUp();

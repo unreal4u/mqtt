@@ -29,14 +29,14 @@ class PublishTest extends TestCase
      */
     private $message;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->publish = new Publish();
         $this->message = new Message('Hello test world!', new TopicName('t'));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->publish = null;

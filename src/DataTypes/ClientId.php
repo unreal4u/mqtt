@@ -46,6 +46,9 @@ final class ClientId
         return $this->clientId === '';
     }
 
+    /**
+     * @return \Generator|string[]
+     */
     public function performStrictValidationCheck(): \Generator
     {
         $utf8ClientIdSize = \mb_strlen($this->clientId);

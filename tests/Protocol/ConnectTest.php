@@ -31,13 +31,13 @@ class ConnectTest extends TestCase
      */
     private $connect;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->connect = new Connect();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->connect = null;

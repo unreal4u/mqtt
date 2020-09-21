@@ -16,7 +16,7 @@ class PingRespTest extends TestCase
      */
     private $pingResp;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pingResp = new PingResp();
         parent::setUp();

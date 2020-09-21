@@ -149,13 +149,14 @@ final class Utilities
             $encodedByte = ord($remainingLengthField[$iteration]);
 
             // Add the current multiplier^iteration * first half of byte
-            $value += ($encodedByte & 127) * ($multiplier ** $iteration);
-            if ($multiplier > 128 ** 3) {
+            $value += ($encodedByte & 127) * (128 ** $iteration);
+            if ($multiplier > (128 ** 3)) {
                 throw new LogicException('Malformed remaining length field');
             }
 
             // Prepare for the next iteration
             $iteration++;
+            $multiplier *= $iteration;
         } while (($encodedByte & 128) !== 0);
 
         return (int)$value;

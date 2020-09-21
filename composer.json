@@ -36,13 +36,13 @@
     "phpstan/phpstan": "@stable"
   },
   "scripts": {
-    "unit-tests": [
+    "unit": [
       "php vendor/bin/phpunit"
     ],
-    "phpcs": [
+    "cs": [
       "php vendor/bin/phpcs src/ tests/ --standard=psr12 -sp"
     ],
-    "phpstan": [
+    "stan": [
       "php vendor/bin/phpstan analyse -c phpstan.neon --level 7 src/"
     ]
   }

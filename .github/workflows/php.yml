@@ -39,10 +39,10 @@ jobs:
       run: composer install --no-progress --no-interaction --ignore-platform-reqs
 
     - name: Run test suite
-      run: composer run-script unit-test
+      run: composer run-script unit
 
     - name: Run PHPCS
-      run: composer run-script phpcs
+      run: composer run-script cs
 
     - name: Run PHPStan
-      run: composer run-script phpstan
+      run: composer run-script stan

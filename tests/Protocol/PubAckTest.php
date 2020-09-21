@@ -17,7 +17,7 @@ class PubAckTest extends TestCase
      */
     private $pubAck;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pubAck = new PubAck();
         parent::setUp();

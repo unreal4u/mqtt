@@ -14,13 +14,13 @@ class PingReqTest extends TestCase
      */
     private $pingReq;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->pingReq = new PingReq();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->pingReq = null;

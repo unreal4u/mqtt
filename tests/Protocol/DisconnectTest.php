@@ -16,13 +16,13 @@ class DisconnectTest extends TestCase
      */
     private $disconnect;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->disconnect = new Disconnect();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->disconnect = null;

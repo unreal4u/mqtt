@@ -14,13 +14,13 @@ class EmptyWritableResponseTest extends TestCase
      */
     private $emptyWritableResponse;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emptyWritableResponse = new EmptyWritableResponse();
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->emptyWritableResponse = null;

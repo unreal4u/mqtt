@@ -18,7 +18,7 @@ class PubRecTest extends TestCase
      */
     private $pubRec;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pubRec = new PubRec();
         parent::setUp();

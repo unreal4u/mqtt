@@ -17,7 +17,7 @@ class UnsubscribeTest extends TestCase
      */
     private $unsubscribe;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->unsubscribe = new Unsubscribe();
         parent::setUp();

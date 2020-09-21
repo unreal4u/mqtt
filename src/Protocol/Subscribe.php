@@ -10,6 +10,7 @@ use Generator;
 use OutOfRangeException;
 use SplQueue;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
+use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\MustContainTopic;
 use unreal4u\MQTT\Exceptions\NotConnected;
@@ -134,7 +135,7 @@ final class Subscribe extends ProtocolBase implements WritableContentInterface
      * @param ClientInterface $client
      * @param int $idleMicroseconds The amount of microseconds the watcher should wait before checking the socket again
      * @param callable|null $hookBeforeLoop
-     * @return Generator
+     * @return Generator|Message[]
      * @throws NotConnected
      * @throws NoConnectionParametersDefined
      * @throws DomainException

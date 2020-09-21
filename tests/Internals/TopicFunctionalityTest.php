@@ -13,7 +13,7 @@ class TopicFunctionalityTest extends TestCase
 {
     use TopicFilterFunctionality;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->topics = new \SplQueue();
         parent::setUp();

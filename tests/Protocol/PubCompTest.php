@@ -19,7 +19,7 @@ class PubCompTest extends TestCase
      */
     private $pubComp;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pubComp = new PubComp();
         parent::setUp();

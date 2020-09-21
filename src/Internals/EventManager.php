@@ -30,7 +30,7 @@ final class EventManager extends ProtocolBase
      * A list of all Readable objects that this class may instantiate at some point
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349209
-     * @var array
+     * @var string[]
      */
     private static $readableObjects = [
         2 => ConnAck::class,
@@ -48,7 +48,7 @@ final class EventManager extends ProtocolBase
      * Not used in this class but handy to have, will maybe be used in the future?
      *
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349209
-     * @var array
+     * @var string[]
      */
     /*
     private static $writableObjects = [

@@ -16,7 +16,7 @@ class DisconnectCleanupTest extends TestCase
      */
     private $disconnectCleanup;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->disconnectCleanup = new DisconnectCleanup();

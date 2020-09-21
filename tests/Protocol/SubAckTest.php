@@ -17,7 +17,7 @@ class SubAckTest extends TestCase
      */
     private $suback;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->suback = new SubAck();
         parent::setUp();

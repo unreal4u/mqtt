@@ -15,7 +15,7 @@ class NonMatchingPacketIdentifiersTest extends TestCase
      */
     private $exception;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exception = new NonMatchingPacketIdentifiers();
         parent::setUp();

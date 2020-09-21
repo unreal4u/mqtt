@@ -22,7 +22,7 @@ class ConnAckTest extends TestCase
      */
     private $connAck;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connAck = new ConnAck();
         parent::setUp();
