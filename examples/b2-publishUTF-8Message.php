@@ -3,6 +3,7 @@
 /**
  * This package is able to cope with UTF-8 and the MQTT broker without any problems, here are some examples
  */
+
 declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;

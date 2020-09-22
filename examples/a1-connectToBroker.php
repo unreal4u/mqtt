@@ -4,7 +4,7 @@
  * Example file of how to connect to a broker
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
@@ -25,7 +25,8 @@ $connect->setConnectionParameters(new Parameters(new ClientId('uniqueClientId123
 /** @var \unreal4u\MQTT\Protocol\ConnAck $connAck */
 $connAck = $client->processObject($connect);
 
-printf('Connection return code: %d.%sClient is connected: %s',
+printf(
+    'Connection return code: %d.%sClient is connected: %s',
     $connAck->getConnectReturnCode(),
     PHP_EOL,
     $client->isConnected() ? 'true' : 'false'

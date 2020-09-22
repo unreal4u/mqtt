@@ -3,6 +3,7 @@
 /**
  * This example will connect to the broker through SSL
  */
+
 declare(strict_types=1);
 
 use unreal4u\MQTT\DataTypes\BrokerPort;

@@ -8,13 +8,13 @@
  */
 
 // Set strict typing to true
-declare(strict_types = 1);
+declare(strict_types=1);
 
 // Go one directory up
 chdir(__DIR__ . '/../');
 
 // include composer's autoloader
-include __DIR__.'/../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 // Enable error reporting
 error_reporting(E_ALL);
