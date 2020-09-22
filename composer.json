@@ -31,9 +31,9 @@
   },
   "require-dev": {
     "monolog/monolog": "~1.17",
-    "phpunit/phpunit": "@stable",
     "squizlabs/php_codesniffer": "@stable",
-    "phpstan/phpstan": "@stable"
+    "phpstan/phpstan": "@stable",
+    "phpunit/phpunit": "^9.3"
   },
   "scripts": {
     "unit": [
