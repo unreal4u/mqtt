@@ -56,4 +56,6 @@ interface WritableContentInterface
      * @return string
      */
     public function createSendableMessage(): string;
+
+    public function hasActivePacketIdentifier(): bool;
 }

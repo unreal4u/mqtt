@@ -60,6 +60,25 @@ trait ReadableContent
     }
 
     /**
+     * All classes must implement how to handle the object filling
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     */
+    abstract public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface;
+
+    /**
+     * Any class can overwrite the default behaviour
+     * @param ClientInterface $client
+     * @param WritableContentInterface $originalRequest
+     * @return bool
+     */
+    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
+    {
+        return false;
+    }
+
+    /**
      * Returns the correct format for the length in bytes of the remaining bytes
      *
      * @param ClientInterface $client
@@ -104,24 +123,5 @@ trait ReadableContent
 
         $this->sizeOfRemainingLengthField = $iterations;
         return $iterations;
-    }
-
-    /**
-     * All classes must implement how to handle the object filling
-     * @param string $rawMQTTHeaders
-     * @param ClientInterface $client
-     * @return ReadableContentInterface
-     */
-    abstract public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface;
-
-    /**
-     * Any class can overwrite the default behaviour
-     * @param ClientInterface $client
-     * @param WritableContentInterface $originalRequest
-     * @return bool
-     */
-    public function performSpecialActions(ClientInterface $client, WritableContentInterface $originalRequest): bool
-    {
-        return false;
     }
 }

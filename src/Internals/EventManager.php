@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Internals;
 
+use DomainException;
 use unreal4u\MQTT\Application\EmptyReadableResponse;
 use unreal4u\MQTT\Protocol\ConnAck;
 use unreal4u\MQTT\Protocol\PingResp;
@@ -15,17 +16,13 @@ use unreal4u\MQTT\Protocol\PubRel;
 use unreal4u\MQTT\Protocol\SubAck;
 use unreal4u\MQTT\Protocol\UnsubAck;
 
+use function ord;
+
 /**
  * Is able to load in an incoming event and handle it with properly, providing the ability to actively validate
  */
 final class EventManager extends ProtocolBase
 {
-    /**
-     * Current object in string format
-     * @var string
-     */
-    private $currentObjectType = '';
-
     /**
      * A list of all Readable objects that this class may instantiate at some point
      *
@@ -71,7 +68,7 @@ final class EventManager extends ProtocolBase
      * @param string $rawMQTTHeaders Arbitrary size of minimum 1 incoming byte(s)
      * @param ClientInterface $client Used if the object itself needs to process some more stuff
      * @return ReadableContentInterface
-     * @throws \DomainException
+     * @throws DomainException
      */
     public function analyzeHeaders(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
@@ -79,20 +76,20 @@ final class EventManager extends ProtocolBase
             $this->logger->debug('Empty headers, returning an empty object');
             return new EmptyReadableResponse($this->logger);
         }
-        $controlPacketType = \ord($rawMQTTHeaders[0]) >> 4;
+        $controlPacketType = ord($rawMQTTHeaders[0]) >> 4;
 
         if (isset(self::$readableObjects[$controlPacketType])) {
-            $this->currentObjectType = self::$readableObjects[$controlPacketType];
+            $currentObjectType = self::$readableObjects[$controlPacketType];
             $this->logger->info('Found a matching object, instantiating', [
-                'type' => $this->currentObjectType,
+                'type' => $currentObjectType,
                 'controlPacketNumber' => $controlPacketType,
             ]);
             /** @var ReadableContentInterface $readableContent */
-            $readableContent = new $this->currentObjectType($this->logger);
+            $readableContent = new $currentObjectType($this->logger);
             $readableContent->instantiateObject($rawMQTTHeaders, $client);
         } else {
             $this->logger->error('Invalid control packet type found', ['controlPacketType' => $controlPacketType]);
-            throw (new \DomainException(sprintf('Invalid control packet found (%d)', $controlPacketType)));
+            throw new DomainException(sprintf('Invalid control packet found (%d)', $controlPacketType));
         }
 
         return $readableContent;

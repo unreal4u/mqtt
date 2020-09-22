@@ -8,7 +8,7 @@
  * the broker during Publish.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -42,7 +42,7 @@ $connect->setConnectionParameters(new Parameters(new ClientId(basename(__FILE__)
 $client = new Client($logger);
 $client->processObject($connect);
 
-define('MAXIMUM', 1);
+define('MAXIMUM', 10);
 if ($client->isConnected()) {
     // Main topic
     $topic = new TopicName(COMMON_TOPICNAME);

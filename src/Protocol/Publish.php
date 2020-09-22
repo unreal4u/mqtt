@@ -59,19 +59,17 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     use PacketIdentifierFunctionality;
 
     private const CONTROL_PACKET_VALUE = 3;
-
-    /**
-     * Contains the message to be sent
-     * @var Message
-     */
-    private $message;
-
     /**
      * Flag to check whether a message is a redelivery (DUP flag)
      * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718038
      * @var bool
      */
     public $isRedelivery = false;
+    /**
+     * Contains the message to be sent
+     * @var Message
+     */
+    private $message;
 
     /**
      * @return string
@@ -181,6 +179,16 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
+     * Gets the set message
+     *
+     * @return Message
+     */
+    public function getMessage(): Message
+    {
+        return $this->message;
+    }
+
+    /**
      * Sets the to be sent message
      *
      * @param Message $message
@@ -193,67 +201,60 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
-     * Gets the set message
-     *
-     * @return Message
-     */
-    public function getMessage(): Message
-    {
-        return $this->message;
-    }
-
-    /**
-     * Sets several bits and pieces from the first byte of the fixed header for the Publish packet
-     *
-     * @param int $firstByte
-     * @param QoSLevel $qoSLevel
-     * @return Publish
+     * Will perform sanity checks and fill in the Readable object with data
+     * @param string $rawMQTTHeaders
+     * @param ClientInterface $client
+     * @return ReadableContentInterface
+     * @throws MessageTooBig
+     * @throws OutOfBoundsException
      * @throws InvalidQoSLevel
+     * @throws InvalidArgumentException
+     * @throws OutOfRangeException
      */
-    private function analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel): Publish
+    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
     {
-        $this->logger->debug('Analyzing first byte', [sprintf('%08d', decbin($firstByte))]);
-        // Retained bit is bit 0 of first byte
-        $this->message->setRetainFlag(false);
-        if (($firstByte & 1) === 1) {
-            $this->logger->debug('Setting retain flag to true');
-            $this->message->setRetainFlag(true);
-        }
-        // QoS level is already been taken care of, assign it to the message at this point
-        $this->message->setQoSLevel($qoSLevel);
+        // Retrieve full message first
+        $fullMessage = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
+        // Handy to maintain for debugging purposes
+        #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
-        // Duplicate message must be checked only on QoS > 0, else set it to false
-        $this->isRedelivery = false;
-        if (($firstByte & 8) === 8 && $this->message->getQoSLevel() !== 0) {
-            // Is a duplicate is always bit 3 of first byte
-            $this->isRedelivery = true;
-            $this->logger->debug('Setting redelivery bit');
+        // Handy to have: the first byte
+        $firstByte = ord($fullMessage[0]);
+        // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
+        $topicSize = ord($fullMessage[$this->sizeOfRemainingLengthField + 2]);
+        // With the first byte, we can determine the QoS level of the incoming message
+        $qosLevel = $this->determineIncomingQoSLevel($firstByte);
+
+        $messageStartPosition = $this->sizeOfRemainingLengthField + 3;
+        // If we have a QoS level present, we must retrieve the packet identifier as well
+        if ($qosLevel->getQoSLevel() > 0) {
+            $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
+            // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
+            $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
+                $fullMessage[$this->sizeOfRemainingLengthField + 3 + $topicSize] .
+                $fullMessage[$this->sizeOfRemainingLengthField + 4 + $topicSize]
+            )));
+            $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
+            $messageStartPosition += 2;
         }
+
+        // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
+        $this->message = new Message(
+        // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
+            substr($fullMessage, $messageStartPosition + $topicSize),
+            new TopicName(substr($fullMessage, $this->sizeOfRemainingLengthField + 3, $topicSize))
+        );
+        $this->analyzeFirstByte($firstByte, $qosLevel);
+
+        $this->logger->debug('Determined headers', [
+            'topicSize' => $topicSize,
+            'QoSLevel' => $this->message->getQoSLevel(),
+            'isDuplicate' => $this->isRedelivery,
+            'isRetained' => $this->message->isRetained(),
+            #'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(), // This is not always set!
+        ]);
 
         return $this;
-    }
-
-    /**
-     * Finds out the QoS level in a fixed header for the Publish object
-     *
-     * @param int $bitString
-     * @return QoSLevel
-     * @throws InvalidQoSLevel
-     */
-    private function determineIncomingQoSLevel(int $bitString): QoSLevel
-    {
-        // QoS lvl are in bit positions 1-2. Shifting is strictly speaking not needed, but increases human comprehension
-        $shiftedBits = $bitString >> 1;
-        $incomingQoSLevel = 0;
-        if (($shiftedBits & 1) === 1) {
-            $incomingQoSLevel = 1;
-        }
-        if (($shiftedBits & 2) === 2) {
-            $incomingQoSLevel = 2;
-        }
-
-        $this->logger->debug('Setting QoS level', ['bitString' => $bitString, 'incomingQoSLevel' => $incomingQoSLevel]);
-        return new QoSLevel($incomingQoSLevel);
     }
 
     /**
@@ -297,58 +298,55 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
     }
 
     /**
-     * Will perform sanity checks and fill in the Readable object with data
-     * @param string $rawMQTTHeaders
-     * @param ClientInterface $client
-     * @return ReadableContentInterface
-     * @throws MessageTooBig
-     * @throws OutOfBoundsException
+     * Finds out the QoS level in a fixed header for the Publish object
+     *
+     * @param int $bitString
+     * @return QoSLevel
      * @throws InvalidQoSLevel
-     * @throws InvalidArgumentException
-     * @throws OutOfRangeException
      */
-    public function fillObject(string $rawMQTTHeaders, ClientInterface $client): ReadableContentInterface
+    private function determineIncomingQoSLevel(int $bitString): QoSLevel
     {
-        // Retrieve full message first
-        $fullMessage = $this->completePossibleIncompleteMessage($rawMQTTHeaders, $client);
-        // Handy to maintain for debugging purposes
-        #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
-
-        // Handy to have: the first byte
-        $firstByte = ord($fullMessage[0]);
-        // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
-        $topicSize = ord($fullMessage[$this->sizeOfRemainingLengthField + 2]);
-        // With the first byte, we can determine the QoS level of the incoming message
-        $qosLevel = $this->determineIncomingQoSLevel($firstByte);
-
-        $messageStartPosition = $this->sizeOfRemainingLengthField + 3;
-        // If we have a QoS level present, we must retrieve the packet identifier as well
-        if ($qosLevel->getQoSLevel() > 0) {
-            $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
-            // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
-            $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
-                $fullMessage[$this->sizeOfRemainingLengthField + 3 + $topicSize] .
-                $fullMessage[$this->sizeOfRemainingLengthField + 4 + $topicSize]
-            )));
-            $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
-            $messageStartPosition += 2;
+        // QoS lvl are in bit positions 1-2. Shifting is strictly speaking not needed, but increases human comprehension
+        $shiftedBits = $bitString >> 1;
+        $incomingQoSLevel = 0;
+        if (($shiftedBits & 1) === 1) {
+            $incomingQoSLevel = 1;
+        }
+        if (($shiftedBits & 2) === 2) {
+            $incomingQoSLevel = 2;
         }
 
-        // At this point $rawMQTTHeaders will be always 1 byte long, initialize a Message object with dummy data for now
-        $this->message = new Message(
-            // Save to assume a constant here: first 2 bytes will always be fixed header, next 2 bytes are topic size
-            substr($fullMessage, $messageStartPosition + $topicSize),
-            new TopicName(substr($fullMessage, $this->sizeOfRemainingLengthField + 3, $topicSize))
-        );
-        $this->analyzeFirstByte($firstByte, $qosLevel);
+        $this->logger->debug('Setting QoS level', ['bitString' => $bitString, 'incomingQoSLevel' => $incomingQoSLevel]);
+        return new QoSLevel($incomingQoSLevel);
+    }
 
-        $this->logger->debug('Determined headers', [
-            'topicSize' => $topicSize,
-            'QoSLevel' => $this->message->getQoSLevel(),
-            'isDuplicate' => $this->isRedelivery,
-            'isRetained' => $this->message->isRetained(),
-            #'packetIdentifier' => $this->packetIdentifier->getPacketIdentifierValue(), // This is not always set!
-        ]);
+    /**
+     * Sets several bits and pieces from the first byte of the fixed header for the Publish packet
+     *
+     * @param int $firstByte
+     * @param QoSLevel $qoSLevel
+     * @return Publish
+     * @throws InvalidQoSLevel
+     */
+    private function analyzeFirstByte(int $firstByte, QoSLevel $qoSLevel): Publish
+    {
+        $this->logger->debug('Analyzing first byte', [sprintf('%08d', decbin($firstByte))]);
+        // Retained bit is bit 0 of first byte
+        $this->message->setRetainFlag(false);
+        if (($firstByte & 1) === 1) {
+            $this->logger->debug('Setting retain flag to true');
+            $this->message->setRetainFlag(true);
+        }
+        // QoS level is already been taken care of, assign it to the message at this point
+        $this->message->setQoSLevel($qoSLevel);
+
+        // Duplicate message must be checked only on QoS > 0, else set it to false
+        $this->isRedelivery = false;
+        if (($firstByte & 8) === 8 && $this->message->getQoSLevel() !== 0) {
+            // Is a duplicate is always bit 3 of first byte
+            $this->isRedelivery = true;
+            $this->logger->debug('Setting redelivery bit');
+        }
 
         return $this;
     }
@@ -374,20 +372,6 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         return true;
-    }
-
-    /**
-     * Composes a PubRec answer with the same packetIdentifier as what we received
-     *
-     * @return PubRec
-     * @throws InvalidRequest
-     */
-    private function composePubRecAnswer(): PubRec
-    {
-        $this->checkForValidPacketIdentifier();
-        $pubRec = new PubRec($this->logger);
-        $pubRec->setPacketIdentifier($this->packetIdentifier);
-        return $pubRec;
     }
 
     /**
@@ -418,6 +402,20 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         }
 
         return $this;
+    }
+
+    /**
+     * Composes a PubRec answer with the same packetIdentifier as what we received
+     *
+     * @return PubRec
+     * @throws InvalidRequest
+     */
+    private function composePubRecAnswer(): PubRec
+    {
+        $this->checkForValidPacketIdentifier();
+        $pubRec = new PubRec($this->logger);
+        $pubRec->setPacketIdentifier($this->packetIdentifier);
+        return $pubRec;
     }
 
     /**

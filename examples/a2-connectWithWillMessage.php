@@ -3,12 +3,13 @@
 /**
  * This example will connect to the broker setting a will message while doing so
  */
-declare(strict_types = 1);
 
+declare(strict_types=1);
+
+use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
 use unreal4u\MQTT\DataTypes\TopicName;
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\Protocol\Connect;
 use unreal4u\MQTT\Protocol\Connect\Parameters;
 

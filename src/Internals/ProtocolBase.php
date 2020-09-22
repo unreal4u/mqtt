@@ -19,7 +19,7 @@ abstract class ProtocolBase
      * Base constructor for all protocol stuff
      * @param LoggerInterface|null $logger
      */
-    final public function __construct(LoggerInterface $logger = null)
+    final public function __construct(?LoggerInterface $logger = null)
     {
         if ($logger === null) {
             $logger = new Logger();
@@ -32,12 +32,18 @@ abstract class ProtocolBase
     }
 
     /**
-     * Should any method have any abnormal default behaviour, we can do so here
-     *
-     * @return ProtocolBase
+     * Should any method have any abnormal default behaviour, we can overwrite this method
      */
     protected function initializeObject(): ProtocolBase
     {
         return $this;
+    }
+
+    /**
+     * If the object in question uses Packet Identifier functionality, it should be added to the stack
+     */
+    final public function hasActivePacketIdentifier(): bool
+    {
+        return property_exists($this, 'packetIdentifier') && $this->packetIdentifier !== null;
     }
 }

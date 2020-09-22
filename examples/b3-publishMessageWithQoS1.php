@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\ClientId;
 use unreal4u\MQTT\DataTypes\Message;
-use unreal4u\MQTT\Client;
 use unreal4u\MQTT\DataTypes\QoSLevel;
 use unreal4u\MQTT\DataTypes\TopicName;
 use unreal4u\MQTT\Protocol\Connect;
