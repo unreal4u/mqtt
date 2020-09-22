@@ -57,4 +57,6 @@ interface ReadableContentInterface
      * @return int
      */
     public function getOriginControlPacket(): int;
+
+    public function hasActivePacketIdentifier(): bool;
 }

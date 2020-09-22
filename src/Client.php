@@ -8,6 +8,7 @@ use DateTime;
 use DateTimeImmutable;
 use LogicException;
 use unreal4u\MQTT\Application\EmptyWritableResponse;
+use unreal4u\MQTT\Application\PacketIdentifierStack;
 use unreal4u\MQTT\Exceptions\Connect\NoConnectionParametersDefined;
 use unreal4u\MQTT\Exceptions\NonMatchingPacketIdentifiers;
 use unreal4u\MQTT\Exceptions\NotConnected;
@@ -75,6 +76,17 @@ final class Client extends ProtocolBase implements ClientInterface
      * @var WritableContentInterface[]
      */
     private $objectStack = [];
+
+    /**
+     * @var PacketIdentifierStack
+     */
+    private $packetIdentifierStack;
+
+    protected function initializeObject(): ProtocolBase
+    {
+        $this->packetIdentifierStack = new PacketIdentifierStack();
+        return parent::initializeObject();
+    }
 
     /**
      * @inheritdoc
@@ -145,6 +157,10 @@ final class Client extends ProtocolBase implements ClientInterface
             ]);
 
             throw new ServerClosedConnection('The server may have disconnected the current client');
+        }
+
+        if ($object->hasActivePacketIdentifier()) {
+            $this->packetIdentifierStack->add($object);
         }
 
         $this->logger->debug('Sent data to socket', ['writtenBytes' => $writtenBytes, 'sizeOfString' => $sizeOfString]);
