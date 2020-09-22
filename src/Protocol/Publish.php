@@ -315,7 +315,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         // Handy to have: the first byte
         $firstByte = ord($fullMessage{0});
         // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
-        $topicSize = ord($fullMessage{$this->sizeOfRemainingLengthField + 2});
+        $topicSize = ord($fullMessage[$this->sizeOfRemainingLengthField + 2]);
         // With the first byte, we can determine the QoS level of the incoming message
         $qosLevel = $this->determineIncomingQoSLevel($firstByte);
 
@@ -325,8 +325,8 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
             $this->logger->debug('QoS level above 0, shifting message start position and getting packet identifier');
             // [2 (fixed header) + 2 (topic size) + $topicSize] marks the beginning of the 2 packet identifier bytes
             $this->setPacketIdentifier(new PacketIdentifier(Utilities::convertBinaryStringToNumber(
-                $fullMessage{$this->sizeOfRemainingLengthField + 3 + $topicSize} .
-                $fullMessage{$this->sizeOfRemainingLengthField + 4 + $topicSize}
+                $fullMessage[$this->sizeOfRemainingLengthField + 3 + $topicSize] .
+                $fullMessage[$this->sizeOfRemainingLengthField + 4 + $topicSize]
             )));
             $this->logger->debug('Determined packet identifier', ['PI' => $this->getPacketIdentifier()]);
             $messageStartPosition += 2;
