@@ -36,6 +36,7 @@ jobs:
 
     - name: Install dependencies ignoring platform requirements
       if:  ${{ matrix.php-versions == '8.0' }}
+      continue-on-error: true
       run: composer install --no-progress --no-interaction --ignore-platform-reqs
 
     - name: Run test suite

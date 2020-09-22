@@ -365,7 +365,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $qosLevel = $this->message->getQoSLevel();
         if ($qosLevel === 0) {
             $this->logger->debug('No response needed', ['qosLevel', $qosLevel]);
-        } else if ($qosLevel === 1) {
+        } elseif ($qosLevel === 1) {
             $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
             $client->processObject($this->composePubAckAnswer());
         } elseif ($qosLevel === 2) {

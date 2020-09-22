@@ -6,6 +6,17 @@ services:
     restart: unless-stopped
     ports:
       - "1883:1883"
+  php80:
+    container_name: "mqtt-php80"
+    build: "docker/php80"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+    expose:
+      - 9000
+    volumes:
+      - .:/var/www/html:z
+      - ~/.composer:/.composer:z
   php74:
     container_name: "mqtt-php74"
     build: "docker/php74"
@@ -13,7 +24,7 @@ services:
     environment:
       - TZ=Europe/Amsterdam
     expose:
-      - 9000
+      - 9001
     volumes:
       - .:/var/www/html:z
       - ~/.composer:/.composer:z
@@ -24,7 +35,7 @@ services:
     environment:
       - TZ=Europe/Amsterdam
     expose:
-      - 9001
+      - 9002
     volumes:
       - .:/var/www/html:z
       - ~/.composer:/.composer:z
