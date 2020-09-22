@@ -3,7 +3,9 @@ docs/phpdoc-cache-*
 .idea
 report/
 docs/
+vendor/
 composer.phar
 quicky.php
 phpunit.xml
 .phpcs.cache
+.phpunit.result.cache
