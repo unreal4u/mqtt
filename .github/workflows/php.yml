@@ -34,9 +34,6 @@ jobs:
       if: ${{ steps.composer-cache.outputs.cache-hit != 'true' }}
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Install dependencies ignoring platform requirements
-      run: composer install --no-progress --no-interaction --ignore-platform-reqs
-
     - name: Run test suite
       run: composer run-script unit
 
