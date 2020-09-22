@@ -313,7 +313,7 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         #$this->logger->debug('Bin data', [\unreal4u\MQTT\DebugTools::convertToBinaryRepresentation($rawMQTTHeaders)]);
 
         // Handy to have: the first byte
-        $firstByte = ord($fullMessage{0});
+        $firstByte = ord($fullMessage[0]);
         // TopicName size is always on the second position after the size of the remaining length field (1 to 4 bytes)
         $topicSize = ord($fullMessage[$this->sizeOfRemainingLengthField + 2]);
         // With the first byte, we can determine the QoS level of the incoming message
