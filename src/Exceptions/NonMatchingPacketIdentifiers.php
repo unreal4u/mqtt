@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace unreal4u\MQTT\Exceptions;
 
+use LogicException;
 use unreal4u\MQTT\DataTypes\PacketIdentifier;
 
-class NonMatchingPacketIdentifiers extends \LogicException
+class NonMatchingPacketIdentifiers extends LogicException
 {
     /**
      * @var PacketIdentifier

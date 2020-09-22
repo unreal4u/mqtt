@@ -120,7 +120,9 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         if ($this->message->getQoSLevel() !== 0) {
             // 0 for QoS lvl2 for QoS lvl1 and 4 for QoS lvl2
             $this->specialFlags |= ($this->message->getQoSLevel() * 2);
-            $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()));
+            $this->logger->debug(sprintf('Activating QoS level %d bit', $this->message->getQoSLevel()), [
+                'PI' => $this->packetIdentifier->getPacketIdentifierValue(),
+            ]);
             return $this->getPacketIdentifierBinaryRepresentation();
         }
 
@@ -363,14 +365,12 @@ final class Publish extends ProtocolBase implements ReadableContentInterface, Wr
         $qosLevel = $this->message->getQoSLevel();
         if ($qosLevel === 0) {
             $this->logger->debug('No response needed', ['qosLevel', $qosLevel]);
-        } else {
-            if ($qosLevel === 1) {
-                $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
-                $client->processObject($this->composePubAckAnswer());
-            } elseif ($qosLevel === 2) {
-                $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
-                $client->processObject($this->composePubRecAnswer());
-            }
+        } else if ($qosLevel === 1) {
+            $this->logger->debug('Responding with PubAck', ['qosLevel' => $qosLevel]);
+            $client->processObject($this->composePubAckAnswer());
+        } elseif ($qosLevel === 2) {
+            $this->logger->debug('Responding with PubRec', ['qosLevel' => $qosLevel]);
+            $client->processObject($this->composePubRecAnswer());
         }
 
         return true;

@@ -52,7 +52,6 @@ $secondaryTopic = new TopicFilter(SECONDARY_TOPICNAME, new QoSLevel(0));
 $subscribe = new Subscribe($logger);
 // And provide multiple arguments to the subscription's addTopics() method
 $subscribe->addTopics($mainTopic, $secondaryTopic);
-/** @var \unreal4u\MQTT\DataTypes\Message $message */
 foreach ($subscribe->loop($client) as $message) {
     /*
      * Given the following conditions:
